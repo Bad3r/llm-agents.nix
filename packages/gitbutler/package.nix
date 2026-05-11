@@ -39,7 +39,11 @@ let
   });
   turbo' = turbo.override {
     turbo-unwrapped = turbo-unwrapped.override {
-      extra-cmake-modules = ecm;
+      kdePackages = kdePackages.overrideScope (
+        _: _: {
+          extra-cmake-modules = ecm;
+        }
+      );
     };
   };
 in
