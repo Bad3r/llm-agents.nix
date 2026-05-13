@@ -7,25 +7,31 @@
   pkg-config,
   autoPatchelfHook,
   versionCheckHook,
+  unpinCargoMsrvHook,
   ...
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.53.0";
+  version = "0.54.0";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-jK3/NDNQkeeCKP2iMIJMCq9lrDZ9ksiEnHhFmrz+gew=";
+    hash = "sha256-ER/hJ4YQf+anxhXVq7RNvkvw02gU7JtLI+SZwr/a+ZU=";
   };
 
-  cargoHash = "sha256-OK2vlXYFdjMHqzVR6ZoRn7WEfAUVATGhk32JLoDED5c=";
+  cargoHash = "sha256-OhuCW5mYthC/MVhfbwhro8hnVWmiQUuIDPMn/auBDcQ=";
 
   # keyring uses sync-secret-service (dbus) on Linux, apple-native on Darwin
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ dbus ];
-  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+  # unpinCargoMsrvHook: upstream pins rust-version = "1.95" (unreleased MSRV
+  # bump) but builds fine on the rustc in nixpkgs.
+  nativeBuildInputs = [
+    unpinCargoMsrvHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     pkg-config
     autoPatchelfHook
   ];
