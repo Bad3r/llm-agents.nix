@@ -1,0 +1,9 @@
+{
+  "version": "0.5.8",
+  "hash": "sha256-nmFDcMmMhiklERIY2oPYqWqCPSzRWneHLawVtaxBZp0=",
+  "cargoHash": "sha256-nU69jhqx0HkybH9UnTyJfYQ3JOe2dluUSNfXvO++G7M=",
+  "binaryHashes": {
+    "aarch64-darwin": "sha256-vFjWwY2yotBcmNstRa74SzHW7K0jMkHGPtFq+bugTf0=",
+    "x86_64-darwin": "sha256-5vYVAmVdgf5mc5HVuB1FZYBhfJiHPAclY1BNlDMTvf0="
+  }
+}
