@@ -36,8 +36,13 @@ stdenv.mkDerivation {
   dontUseBunBuild = true;
   dontUseBunInstall = true;
   dontRunLifecycleScripts = true;
+  # `bun build --compile` embeds the JS bundle inside the executable;
+  # stripping corrupts it.
   dontStrip = true;
 
+  # Pin every dependency to the exact version vendored in bun.nix.
+  # bun's offline resolver refuses semver ranges (^/~) when only one
+  # version is present in the store, so collapse them to exact pins.
   postPatch = ''
     for f in package.json packages/*/package.json; do
       if [ -f "$f" ]; then
@@ -53,15 +58,17 @@ stdenv.mkDerivation {
     mkdir -p .bun-tmp .bun-install
     BUN_TMPDIR=$PWD/.bun-tmp \
     BUN_INSTALL=$PWD/.bun-install \
-    ${bun}/bin/bun build --compile "./src/main.tsx" --outfile "hunk-bin"
+    ${lib.getExe bun} build --compile "./src/main.tsx" --outfile "hunk-bin"
 
     runHook postBuild
   '';
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin
-    cp -p ./hunk-bin $out/bin/hunk
+    install -Dm755 ./hunk-bin $out/bin/hunk
+    # The binary locates the bundled review skill by walking ancestor
+    # directories of process.execPath looking for skills/hunk-review/SKILL.md
+    # (src/core/paths.ts), so it must live at $out/skills.
     cp -r ./skills $out/
     runHook postInstall
   '';
