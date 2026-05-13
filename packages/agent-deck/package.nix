@@ -10,16 +10,16 @@
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.8.3";
+  version = "1.9.3";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     rev = "v${version}";
-    hash = "sha256-XJJmZuGhCenMt5WJsf8zz7P1fPV0sHUAOr2bao4niYI=";
+    hash = "sha256-zUQ927SCU1CIR9KdBPTfxcOyNXy46c3ezqpjqBIY4bg=";
   };
 
-  vendorHash = "sha256-aH32Up3redCpeyjZkjcjiVN0tfYpF+GFB2WVAGm3J2I=";
+  vendorHash = "sha256-/7hzCID4Vu9z6VHN7NiAjyoZPEBPHet4fJdh/VSZaGQ=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -34,7 +34,14 @@ buildGoModule rec {
   # subprocess and waits for it to write debug.log. The TUI bails in the
   # sandbox (no tmux/terminal), so debug.log never appears. The test guards
   # the subprocess arm with testing.Short(), so honour that.
-  checkFlags = [ "-short" ];
+  # TestValidatePluginFlags_EmptyCatalogActionableError leaks plugin catalog
+  # state from the earlier TelegramForkAccepted test (a package-level cache is
+  # not reset between tests), so the "empty catalog" assertion sees tg-fork.
+  # Upstream test isolation bug; skip it.
+  checkFlags = [
+    "-short"
+    "-skip=TestValidatePluginFlags_EmptyCatalogActionableError"
+  ];
 
   preCheck = ''
     export HOME=$(mktemp -d)
@@ -46,9 +53,8 @@ buildGoModule rec {
   ldflags = [
     "-s"
     "-w"
-    "-X=main.version=${version}"
-    "-X=main.commit=v${version}"
-    "-X=main.date=1970-01-01T00:00:00Z"
+    # Upstream renamed the variable from main.version to main.Version in 1.9.x.
+    "-X=main.Version=${version}"
   ];
 
   passthru.category = "Workflow & Project Management";
