@@ -19,6 +19,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>antigravity</strong> - CLI for Google Antigravity, an agentic development platform</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://antigravity.google/
+- **Usage**: `nix run github:numtide/llm-agents.nix#antigravity -- --help`
+- **Nix**: [packages/antigravity/package.nix](packages/antigravity/package.nix)
+
+</details>
+<details>
 <summary><strong>bernstein</strong> - Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents</summary>
 
 - **Source**: source
