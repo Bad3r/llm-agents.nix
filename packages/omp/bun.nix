@@ -1179,9 +1179,9 @@
     url = "https://registry.npmjs.org/duck/-/duck-0.1.12.tgz";
     hash = "sha512-wkctla1O6VfP89gQ+J/yDesM0S7B7XLXjKGzXxMDVFg7uEn706niAtyYovKbyq1oT9YwDcly721/iUWoc8MVRg==";
   };
-  "electron-to-chromium@1.5.356" = fetchurl {
-    url = "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.356.tgz";
-    hash = "sha512-9NgFd7m5t5MCJ5rUSjJITUXAH9mEGlrlofnMf4YEr+pz6JlP7cWmTAH+JFmbPnaSW8koVTkuW7pacORWAnA5Yw==";
+  "electron-to-chromium@1.5.358" = fetchurl {
+    url = "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.358.tgz";
+    hash = "sha512-EO7tKm3QxRqTs1lSuPXzl6yRAwznehp0AH9OoMOIC+4mQzTFday8FJCO5KU6J/TFSQXEOahNq4vTKpz1jmCVOA==";
   };
   "elkjs@0.11.1" = fetchurl {
     url = "https://registry.npmjs.org/elkjs/-/elkjs-0.11.1.tgz";
