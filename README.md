@@ -566,7 +566,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>ccusage</strong> - Analyze coding agent CLI token usage and costs from local data</summary>
 
-- **Source**: bytecode
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
