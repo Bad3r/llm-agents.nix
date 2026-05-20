@@ -11,18 +11,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "ccusage";
-  version = "20.0.0";
+  version = "20.0.1";
 
   src = fetchFromGitHub {
     owner = "ryoppippi";
     repo = "ccusage";
     rev = "v${version}";
-    hash = "sha256-OD+yzs8fAL4bOwMlo2DzLiUH7mu9zSIMoAm1s5yraU8=";
+    hash = "sha256-ICSLe15toqNb84wng/E6gUlV7B1txb30TA2FYodiinY=";
   };
 
   sourceRoot = "${src.name}/rust";
 
-  cargoHash = "sha256-lZgbix8kSYEjNP+XWrj3WTy32MoGT+z/6mCJJapGOOw=";
+  cargoHash = "sha256-b5kaigi/H4mPAayN7iDqxYvkcwtlgt1/sBziW5Ge18s=";
 
   cargoBuildFlags = [
     "-p"
