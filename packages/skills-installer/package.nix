@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation rec {
   pname = "skills-installer";
-  version = "0.3.0";
+  version = "0.3.1";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/${pname}/-/${pname}-${version}.tgz";
-    hash = "sha256-qVLc3mdAH/xkSUYFI8STMRDYK+GrI2ULI2tD6MAs8AU=";
+    hash = "sha256-YZmMRwT8A8rEQzn/geZbzq4gLmnTNED7H3eoaZeWdP4=";
   };
 
   buildInputs = [ nodejs ];
