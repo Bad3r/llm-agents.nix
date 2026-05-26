@@ -4,25 +4,43 @@
   stdenv,
   bun2nix,
   bun,
+  nodejs,
   fetchFromGitHub,
+  fetchNpmDeps,
   makeWrapper,
   autoPatchelfHook,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hash;
-in
-stdenv.mkDerivation {
-  pname = "oh-my-opencode";
-  inherit version;
+  inherit (versionData)
+    version
+    hash
+    lspToolsMcpNpmHash
+    ;
 
-  src = fetchFromGitHub {
+  upstream = fetchFromGitHub {
     owner = "code-yeongyu";
     repo = "oh-my-openagent";
     tag = "v${version}";
     inherit hash;
+    # packages/lsp-tools-mcp/ is a git submodule needed for the plugin's
+    # built-in `lsp` MCP server.
+    fetchSubmodules = true;
   };
+
+  # lsp-tools-mcp is npm-managed (own package-lock.json), so it can't
+  # share the top-level bun deps.
+  lspToolsMcpDeps = fetchNpmDeps {
+    name = "oh-my-opencode-${version}-lsp-tools-mcp-deps";
+    src = "${upstream}/packages/lsp-tools-mcp";
+    hash = lspToolsMcpNpmHash;
+  };
+in
+stdenv.mkDerivation {
+  pname = "oh-my-opencode";
+  inherit version;
+  src = upstream;
 
   # Non-empty when upstream ships a stale bun.lock; kept in sync by update.py
   patches = lib.optional (
@@ -32,6 +50,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     bun2nix.hook
     bun
+    nodejs
     makeWrapper
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
@@ -67,6 +86,21 @@ stdenv.mkDerivation {
     # Generate the config schema (non-fatal if it fails)
     bun run build:schema || true
 
+    # Build the ast_grep MCP server (bun workspace package)
+    bun run --cwd packages/ast-grep-mcp build
+
+    # Build the lsp_tools MCP server (npm-managed submodule) offline
+    # against the pre-fetched npm cache
+    pushd packages/lsp-tools-mcp >/dev/null
+      export HOME="$TMPDIR"
+      export npm_config_cache="$TMPDIR/npm-cache"
+      cp -r --no-preserve=mode ${lspToolsMcpDeps} "$npm_config_cache"
+      npm ci --offline --no-audit --no-fund --ignore-scripts
+      # /usr/bin/env shebangs in npm-installed bins (tsc, ...) fail in the sandbox
+      patchShebangs node_modules
+      npm run build
+    popd >/dev/null
+
     runHook postBuild
   '';
 
@@ -76,6 +110,17 @@ stdenv.mkDerivation {
     mkdir -p $out/lib/oh-my-opencode $out/bin
 
     cp -r dist node_modules package.json $out/lib/oh-my-opencode/
+
+    # The plugin resolves its MCP servers at
+    # <ancestor>/packages/{ast-grep-mcp,lsp-tools-mcp}/dist/cli.js
+    mkdir -p $out/lib/oh-my-opencode/packages
+    cp -r packages/{ast-grep-mcp,lsp-tools-mcp} $out/lib/oh-my-opencode/packages/
+
+    # ast-grep-mcp's dist/cli.js is a self-contained bun bundle; its
+    # node_modules only holds a workspace symlink that would dangle in
+    # $out and fail noBrokenSymlinks. lsp-tools-mcp keeps its
+    # node_modules — tsc output imports deps at runtime.
+    rm -rf $out/lib/oh-my-opencode/packages/ast-grep-mcp/node_modules
 
     # Remove broken workspace symlinks (monorepo workspace packages
     # aren't needed at runtime — the CLI bundle is self-contained)

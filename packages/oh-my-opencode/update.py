@@ -3,9 +3,10 @@
 
 """Update script for oh-my-opencode package.
 
-Custom updater needed because oh-my-opencode uses bun2nix: after each version
-bump the bun.nix lockfile must be regenerated from the upstream bun.lock
-using the bun2nix CLI.
+Custom updater needed because oh-my-opencode uses bun2nix (bun.nix must be
+regenerated from upstream bun.lock) and fetches submodules, so both the
+source hash and the lsp-tools-mcp npm deps hash are recovered from failed
+builds via calculate_dependency_hash instead of nix-prefetch-url.
 """
 
 import sys
@@ -14,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
+    calculate_dependency_hash,
     clone_and_generate_bun_nix,
     fetch_github_latest_release,
     load_hashes,
@@ -21,7 +23,6 @@ from updater import (
     should_update,
     strip_workspace_entries,
 )
-from updater.nix import nix_prefetch_url
 
 PKG_DIR = Path(__file__).parent
 FLAKE_ROOT = PKG_DIR.parent.parent
@@ -46,17 +47,11 @@ def main() -> None:
 
     print(f"Updating oh-my-opencode from {current} to {latest}")
 
-    # Step 1: Calculate new source hash
-    print("Calculating source hash...")
-    url = f"https://github.com/{OWNER}/{REPO}/archive/refs/tags/v{latest}.tar.gz"
-    src_hash = nix_prefetch_url(url, unpack=True)
-    print(f"  source hash: {src_hash}")
+    # Step 1: Bump version; hashes are filled in by the steps below
+    data["version"] = latest
+    save_hashes(HASHES_FILE, data)
 
-    # Step 2: Update hashes.json
-    save_hashes(HASHES_FILE, {"version": latest, "hash": src_hash})
-    print("Updated hashes.json")
-
-    # Step 3: Regenerate bun.nix from upstream bun.lock
+    # Step 2: Regenerate bun.nix from upstream bun.lock
     clone_and_generate_bun_nix(
         OWNER,
         REPO,
@@ -66,9 +61,33 @@ def main() -> None:
         ref_prefix="v",
         pkg_dir=PKG_DIR,
     )
-
     # Strip workspace copyPathToStore entries that don't exist in our tree
     strip_workspace_entries(BUN_NIX, "@oh-my-opencode", FLAKE_ROOT)
+
+    # Step 3: Source hash. nix-prefetch-url can't be used because the
+    # GitHub tarball excludes submodule contents.
+    print("Calculating source hash (with submodules)...")
+    src_hash = calculate_dependency_hash(
+        package_attr=".#oh-my-opencode",
+        hash_key="hash",
+        hashes_file=HASHES_FILE,
+        data=data,
+    )
+    data["hash"] = src_hash
+    save_hashes(HASHES_FILE, data)
+    print(f"  source hash: {src_hash}")
+
+    # Step 4: lsp-tools-mcp npm deps hash
+    print("Calculating lsp-tools-mcp npm cache hash...")
+    npm_hash = calculate_dependency_hash(
+        package_attr=".#oh-my-opencode",
+        hash_key="lspToolsMcpNpmHash",
+        hashes_file=HASHES_FILE,
+        data=data,
+    )
+    data["lspToolsMcpNpmHash"] = npm_hash
+    save_hashes(HASHES_FILE, data)
+    print(f"  lspToolsMcpNpmHash: {npm_hash}")
 
     print(f"Updated oh-my-opencode to {latest}")
 
