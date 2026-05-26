@@ -1014,6 +1014,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>semble</strong> - Fast and accurate local code search for AI agents — CLI and MCP server</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/MinishLab/semble
+- **Usage**: `nix run github:numtide/llm-agents.nix#semble -- --help`
+- **Nix**: [packages/semble/package.nix](packages/semble/package.nix)
+
+</details>
+<details>
 <summary><strong>showboat</strong> - Create executable demo documents showing and proving an agent's work</summary>
 
 - **Source**: source
