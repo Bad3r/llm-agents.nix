@@ -19,16 +19,16 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "gemini-cli";
-  version = "0.43.0";
+  version = "0.44.0";
 
   src = fetchFromGitHub {
     owner = "google-gemini";
     repo = "gemini-cli";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-UFz+CQLGbzFlpa5Mhf/frnQJWttF35URvua1QTfoaZ0=";
+    hash = "sha256-+DoYL1+bmA3iRL/wa98gaN/CckYsx83TPCuTGoxrKeM=";
   };
 
-  npmDepsHash = "sha256-kz3S+EYAKYJtRAaHYsYHgsfAMxf4PZzDi4A6256FDLc=";
+  npmDepsHash = "sha256-/AQ0FapaqZp5F7d42bYQ44X6rZtp4ARrZDmYvRm/L9k=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [
@@ -52,10 +52,15 @@ buildNpmPackage (finalAttrs: {
   '';
 
   postPatch = ''
-    # Hardcode ripgrep path so ensureRgPath() returns our Nix-provided binary
-    # instead of downloading or finding a dynamically-linked one
+    # Point resolveRipgrepPath() at our ripgrep: no bundled rg binaries exist
+    # and the trusted-path check rejects /nix/store, so allow the store dir.
     substituteInPlace packages/core/src/tools/ripGrep.ts \
-      --replace-fail "await ensureRgPath();" "'${lib.getExe ripgrep}';"
+      --replace-fail \
+        "const systemRg = resolveExecutable('rg');" \
+        "const systemRg = resolveExecutable('${lib.getExe ripgrep}');" \
+      --replace-fail \
+        "if (isTrustedSystemPath(realPath)) {" \
+        "if (isTrustedSystemPath(realPath) || realPath.startsWith('${builtins.storeDir}/')) {"
 
     # Disable auto-update and update nag: Nix manages updates, not the tool itself.
     # v0.27.0 reads these defaults cleanly from the schema (unlike v0.25.2 / nixpkgs#13569).
