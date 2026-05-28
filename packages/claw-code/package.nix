@@ -9,13 +9,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0-unstable-2026-05-25";
+  version = "0-unstable-2026-05-28";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "5b79413e872cca639710aac575d34db1ab44f88e";
-    hash = "sha256-veqE0Xj5fDN4AwTI5nYiRh1xVhpTBGQc9YW3JdGR3S8=";
+    rev = "c3e7b6af600a2868e966f5d4cd8ade30f2a49d8f";
+    hash = "sha256-XFIVKBoDAgNP38xbUZMUe8k2cVk4HlRoEAoAQ9mk550=";
   };
 
   sourceRoot = "source/rust";
@@ -27,14 +27,7 @@ rustPlatform.buildRustPackage rec {
     sed -i '/^criterion = /d' crates/api/Cargo.toml
   '';
 
-  patches = [
-    # init::tests share a temp dir when SystemTime nanos collide between
-    # parallel test threads (observed on aarch64-darwin in the sandbox).
-    # Upstreamable; drop once merged.
-    ./init-tests-unique-tmpdir.patch
-  ];
-
-  cargoHash = "sha256-qRTk6A+hfe+aGBmCoqEiuWwduLmiHQ48hu++uAJDwn4=";
+  cargoHash = "sha256-bmMscPgzy33nEEmv0KpOKa6bwsoxfi2lscQiyz65zM8=";
 
   cargoBuildFlags = [
     "--package"
