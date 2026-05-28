@@ -23,8 +23,8 @@ on:
         type: boolean
         default: false
     secrets:
-      APP_ID:
-        description: 'GitHub App ID'
+      CLIENT_ID:
+        description: 'GitHub App client ID'
         required: true
       APP_PRIVATE_KEY:
         description: 'GitHub App private key'

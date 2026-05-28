@@ -24,7 +24,7 @@ jobs:
       pr-labels: 'dependencies,automated'
       auto-merge: true
     secrets:
-      APP_ID: ${{ secrets.APP_ID }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
     permissions:
       contents: write
