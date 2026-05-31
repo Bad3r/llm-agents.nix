@@ -99,14 +99,15 @@ let
     packageOverrides = _pyfinal: pyprev: {
       inherit textual-speedups tree-sitter-bash;
 
-      # mistral-vibe pins textual==8.2.4. Textual 8.2.5 removed the built-in
-      # "textual-ansi" theme that vibe sets at startup, causing
-      # `Theme 'textual-ansi' has not been registered` (issue #4914).
+      # mistral-vibe 2.12.1 pins textual==8.2.7 and sets DEFAULT_THEME="ansi-dark"
+      # (vibe/core/config/_settings.py), a built-in theme that only exists in
+      # textual >=8.2.5. Pinning textual to 8.2.4 crashed vibe at startup with
+      # `InvalidThemeError: Theme 'ansi-dark' has not been registered`.
       textual = pyprev.textual.overridePythonAttrs (old: rec {
-        version = "8.2.4";
+        version = "8.2.7";
         src = old.src.override {
           tag = "v${version}";
-          hash = "sha256-827cm9pcj1o1FYeaoWKCJ6dEyXeDop4kYd205cySTfg=";
+          hash = "sha256-jRTdxVpeRk8gAur5+VpLVVghBdYenXysoEFRBfczkR4=";
         };
       });
 
@@ -164,14 +165,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.12.1";
+  version = "2.13.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-aMh1gVTsK8rDe9DVGjFci40OizCln4lDKCN/Vz+6vAs=";
+    hash = "sha256-N4VkqsqcjJfRJwShs5JGyoeGXgc8Ioa0M3UZbO68z0A=";
   };
 
   build-system = with python.pkgs; [
@@ -212,6 +213,7 @@ python.pkgs.buildPythonApplication rec {
     tomli-w
     tree-sitter
     tree-sitter-bash
+    truststore
     watchfiles
     websockets
     zstandard

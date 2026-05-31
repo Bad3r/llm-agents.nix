@@ -6,6 +6,7 @@
   beads,
   dolt,
   gitMinimal,
+  icu,
   sqlite,
   tmux,
   versionCheckHook,
@@ -13,18 +14,20 @@
 
 buildGoModule rec {
   pname = "gastown";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "gastownhall";
     repo = "gastown";
     rev = "v${version}";
-    hash = "sha256-AZ36s/YXR271/BCrNkz5SRrWd4GwrHUOr480prZegiU=";
+    hash = "sha256-JM5WkrTBdOyv4kCd+jlXpfOjjkzcMUn9XYjD9p8WgHA=";
   };
 
-  vendorHash = "sha256-PQT/Xq9na3vI8Oy9INBYJf3GsiN5IxAVCxrNLhyIpO8=";
+  vendorHash = "sha256-eiG+t0Iw3xZCX77fXA95P3EtrcVeacOixPVEdHXt0NY=";
 
   nativeBuildInputs = [ makeWrapper ];
+
+  buildInputs = [ icu ];
 
   subPackages = [ "cmd/gt" ];
 

@@ -1,0 +1,5 @@
+# fetchCrate in current nixpkgs resolves to static.crates.io, which
+# nix-update's crates.io fetcher does not recognize. Point it at a
+# crates.io URL so version detection works.
+--url
+https://crates.io/api/v1/crates/toon-format/versions

@@ -19,13 +19,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>antigravity</strong> - CLI for Google Antigravity, an agentic development platform</summary>
+<summary><strong>antigravity-cli</strong> - CLI for Google Antigravity, an agentic development platform</summary>
 
 - **Source**: binary
 - **License**: unfree
 - **Homepage**: https://antigravity.google/
-- **Usage**: `nix run github:numtide/llm-agents.nix#antigravity -- --help`
-- **Nix**: [packages/antigravity/package.nix](packages/antigravity/package.nix)
+- **Usage**: `nix run github:numtide/llm-agents.nix#antigravity-cli -- --help`
+- **Nix**: [packages/antigravity-cli/package.nix](packages/antigravity-cli/package.nix)
 
 </details>
 <details>
@@ -384,6 +384,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>hermes-hud</strong> - TUI consciousness monitor for Hermes Agent</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/joeynyc/hermes-hud
+- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-hud -- --help`
+- **Nix**: [packages/hermes-hud/package.nix](packages/hermes-hud/package.nix)
+
+</details>
+<details>
 <summary><strong>localgpt</strong> - Local AI assistant with persistent markdown memory, autonomous tasks, and semantic search</summary>
 
 - **Source**: source
@@ -687,6 +697,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>mardi-gras</strong> - Terminal UI for Beads issue tracking with a parade-inspired workflow view</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/quietpublish/mardi-gras
+- **Usage**: `nix run github:numtide/llm-agents.nix#mardi-gras -- --help`
+- **Nix**: [packages/mardi-gras/package.nix](packages/mardi-gras/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
@@ -970,6 +990,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/steipete/mcporter
 - **Usage**: `nix run github:numtide/llm-agents.nix#mcporter -- --help`
 - **Nix**: [packages/mcporter/package.nix](packages/mcporter/package.nix)
+
+</details>
+<details>
+<summary><strong>memvid-cli</strong> - AI memory CLI - crash-safe, single-file storage with semantic search</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://memvid.com
+- **Usage**: `nix run github:numtide/llm-agents.nix#memvid-cli -- --help`
+- **Nix**: [packages/memvid-cli/package.nix](packages/memvid-cli/package.nix)
 
 </details>
 <details>
