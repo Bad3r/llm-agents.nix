@@ -9,13 +9,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0-unstable-2026-05-29";
+  version = "0-unstable-2026-06-03";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "4d3dc5b873680504aeeffe43f454278588368982";
-    hash = "sha256-drvR/UiNzTFtStPUuJQBFwKfYYZ87DoERbkYqaaSzR8=";
+    rev = "22fdaeae2c3a5df97f146617ccdfc01172714b47";
+    hash = "sha256-QQQLBeXYgHnsU9YEB7I/nO3z+VO+uIiqnaPYuQgcGu4=";
   };
 
   sourceRoot = "source/rust";
@@ -27,7 +27,7 @@ rustPlatform.buildRustPackage rec {
     sed -i '/^criterion = /d' crates/api/Cargo.toml
   '';
 
-  cargoHash = "sha256-bmMscPgzy33nEEmv0KpOKa6bwsoxfi2lscQiyz65zM8=";
+  cargoHash = "sha256-Acaycrxm3e87dx3P7NdWnivopF4xxaMi3PPbpSefEyY=";
 
   cargoBuildFlags = [
     "--package"
