@@ -11,18 +11,18 @@
 
 (buildGoModule.override { go = go_1_26; }) rec {
   pname = "entire";
-  version = "0.6.3";
+  version = "0.7.3";
 
   src = fetchFromGitHub {
     owner = "entireio";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-yGutKLwdTuGamZMdkqHlhBypZFuY9jM0w/1VW6ACppg=";
+    hash = "sha256-M5TOZYLHpOisxPlU7fWPs8pOIfaEHI74UiUZjDy3uqE=";
   };
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
-  vendorHash = "sha256-pIIrrbp3x15iiY3CuA+wU7315bHUSjvJWBa4Q58OorU=";
+  vendorHash = "sha256-XzDM5Zh1XiK7oaegiAzDONNTdxVAoB2g5XNJ2PAcwzM=";
 
   subPackages = [ "./cmd/entire" ];
 
@@ -41,7 +41,7 @@
   ];
   versionCheckProgramArg = [ "version" ];
 
-  passthru.category = "Utilities";
+  passthru.category = "Usage Analytics";
 
   meta = with lib; {
     description = "CLI tool that captures AI agent sessions and links them to code changes";

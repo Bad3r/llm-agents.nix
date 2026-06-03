@@ -13,16 +13,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nono";
-  version = "0.59.0";
+  version = "0.61.1";
 
   src = fetchFromGitHub {
     owner = "always-further";
     repo = "nono";
     rev = "v${version}";
-    hash = "sha256-d9FA2nWJO548HJIAxYxqPoi6Dyrb4zPjAAnd0FJdl4Y=";
+    hash = "sha256-y5oMR5Vawf/1QUj3ACDdqAjKT+Q2gizRfKkal340EP8=";
   };
 
-  cargoHash = "sha256-o1/vGkYGNNZjSNnzlgAJN/rBIsYLcGXv6GtG5wAza38=";
+  cargoHash = "sha256-Oy/IqAK5ml1vu0eee+pF5pRjzk0Na/Fb04e1Mx0d924=";
 
   # `if let` guards in match arms require Rust >= 1.95; rewrite the single
   # use until nixpkgs ships a new enough rustc.
@@ -47,7 +47,7 @@ rustPlatform.buildRustPackage rec {
     versionCheckHook
   ];
 
-  passthru.category = "Utilities";
+  passthru.category = "Sandboxing & Isolation";
 
   meta = with lib; {
     description = "Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment.";

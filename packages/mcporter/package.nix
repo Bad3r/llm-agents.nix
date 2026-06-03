@@ -20,7 +20,7 @@ stdenv.mkDerivation (finalAttrs: {
   version = "0.11.3";
 
   src = fetchFromGitHub {
-    owner = "steipete";
+    owner = "openclaw";
     repo = "mcporter";
     rev = "v${finalAttrs.version}";
     hash = "sha256-xBH0OMrAQ3eVqBczzJnbaxbBLo2mRc6cCZBb5w4SkhI=";
@@ -28,7 +28,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   # Upstream's lockfile was generated before the pnpm.overrides entry for vite
   # was applied, so newer pnpm rejects it as out of sync with package.json.
-  # https://github.com/steipete/mcporter/issues/new (lockfile drift)
+  # https://github.com/openclaw/mcporter/issues/new (lockfile drift)
   postPatch = ''
     sed -i 's/specifier: \^8\.0\.8/specifier: 8.0.8/' pnpm-lock.yaml
   '';
@@ -88,8 +88,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = {
     description = "TypeScript runtime and CLI for the Model Context Protocol";
-    homepage = "https://github.com/steipete/mcporter";
-    changelog = "https://github.com/steipete/mcporter/releases";
+    homepage = "https://github.com/openclaw/mcporter";
+    changelog = "https://github.com/openclaw/mcporter/releases";
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     platforms = lib.platforms.all;

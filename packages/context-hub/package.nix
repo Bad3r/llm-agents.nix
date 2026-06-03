@@ -44,7 +44,7 @@ buildNpmPackage rec {
   versionCheckProgramArg = "--cli-version";
   doInstallCheck = true;
 
-  passthru.category = "Utilities";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = {
     description = "CLI for Context Hub - search and retrieve LLM-optimized docs and skills";

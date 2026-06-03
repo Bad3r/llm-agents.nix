@@ -15,7 +15,7 @@ buildGoModule.override { go = go-bin; } rec {
   version = "1.0.5";
 
   src = fetchFromGitHub {
-    owner = "steveyegge";
+    owner = "gastownhall";
     repo = "beads";
     rev = "v${version}";
     hash = "sha256-zX4rrZfFG7panBty1iE7bL2ZVazmvktFY5kYK8Xax1c=";
@@ -61,8 +61,8 @@ buildGoModule.override { go = go-bin; } rec {
 
   meta = with lib; {
     description = "A distributed issue tracker designed for AI-supervised coding workflows";
-    homepage = "https://github.com/steveyegge/beads";
-    changelog = "https://github.com/steveyegge/beads/releases/tag/v${version}";
+    homepage = "https://github.com/gastownhall/beads";
+    changelog = "https://github.com/gastownhall/beads/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ zimbatm ];

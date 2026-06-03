@@ -86,7 +86,7 @@ buildNpmPackage (finalAttrs: {
         --run 'export GITNEXUS_CACHE_DIR="$HOME/.cache"'
     '';
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = with lib; {
     description = "Graph-powered code intelligence for AI agents";

@@ -1,15 +1,15 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "urls": {
-    "x86_64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.3-6260531212976128/linux-x64/cli_linux_x64.tar.gz",
-    "aarch64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.3-6260531212976128/linux-arm/cli_linux_arm64.tar.gz",
-    "x86_64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.3-6260531212976128/darwin-x64/cli_mac_x64.tar.gz",
-    "aarch64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.3-6260531212976128/darwin-arm/cli_mac_arm64.tar.gz"
+    "x86_64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.4-6410134369468416/linux-x64/cli_linux_x64.tar.gz",
+    "aarch64-linux": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.4-6410134369468416/linux-arm/cli_linux_arm64.tar.gz",
+    "x86_64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.4-6410134369468416/darwin-x64/cli_mac_x64.tar.gz",
+    "aarch64-darwin": "https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.4-6410134369468416/darwin-arm/cli_mac_arm64.tar.gz"
   },
   "hashes": {
-    "x86_64-linux": "sha512-9s+JDUlPX9AMaWtNLlQciU1bEP9Qv9n23AK5FThuCLYcVhQPFxFYmPxJ9KpFNFgTkwmPNdtwvpquIN/eO6V4fA==",
-    "aarch64-linux": "sha512-D20ybvKOV+Rzx4JVgzFGNvoLzaUOJxF/89AZGW0EjXZK8phGkQovI43Iej+QBi4ptSUiMsfVhqhquq6pIWl+Ug==",
-    "x86_64-darwin": "sha512-Xl3k4rWpx4iTBpnQ9fcojq5K6R+3BdxuYvedlqZ2GfWOK6Q1fWwtu/1TCa648Wk06/CaVz72K0ibN+ksJ1THTg==",
-    "aarch64-darwin": "sha512-ssDSGHaum2+vYWSxW1c9duN59kPgQOd9Uo66+l1b2Ik8w8jr2aePr2e9fGdt1L/w8Cjzu7UI5UR2nWHePaa4sQ=="
+    "x86_64-linux": "sha512-/ZWTCwY4TtS1Zy0ajzIEHM2WhmMBh9mB23FyGAoqC7d+xjqIetxmKR0ry1D/WwikmWucusxYnFbIYcQCCdV/EA==",
+    "aarch64-linux": "sha512-z7vsPP78GN4/DVe8ccKBk6boBOK6HGwxnbZ+984YIBOAkGy6QktMu+B4bv1XTiyWd6NDTcsQbNKTFAFVE5JaQQ==",
+    "x86_64-darwin": "sha512-GszpIh78NtFHCxxfrvA1jfGw+oSKpRZhYXVRFF2ldcUkSFXInsJslGUqHXY0zJE3baCkG+W1yslKzl+cGuZA4A==",
+    "aarch64-darwin": "sha512-f3LIox2jBBEUaPQwI+PGEbmxA1lVqRVeX8D6dwgwl24qI3heFfAwQYMbBE/vLuwjvb+iOUs59s1UHZ5EnaHH2w=="
   }
 }

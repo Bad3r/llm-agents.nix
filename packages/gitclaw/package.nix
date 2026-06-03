@@ -31,7 +31,7 @@ buildNpmPackage (finalAttrs: {
     rm -rf $out/lib/node_modules/gitclaw/node_modules/@googleworkspace
   '';
 
-  passthru.category = "Utilities";
+  passthru.category = "AI Coding Agents";
 
   meta = {
     description = "Universal git-native multimodal AI agent (formerly gitagent)";

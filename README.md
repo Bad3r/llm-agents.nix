@@ -29,16 +29,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>bernstein</strong> - Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/chernistry/bernstein
-- **Usage**: `nix run github:numtide/llm-agents.nix#bernstein -- --help`
-- **Nix**: [packages/bernstein/package.nix](packages/bernstein/package.nix)
-
-</details>
-<details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
 - **Source**: binary
@@ -57,16 +47,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/ultraworkers/claw-code
 - **Usage**: `nix run github:numtide/llm-agents.nix#claw-code -- --help`
 - **Nix**: [packages/claw-code/package.nix](packages/claw-code/package.nix)
-
-</details>
-<details>
-<summary><strong>cli-proxy-api</strong> - Unified proxy providing OpenAI/Gemini/Claude/Codex compatible APIs for AI coding CLI tools</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/router-for-me/CLIProxyAPI
-- **Usage**: `nix run github:numtide/llm-agents.nix#cli-proxy-api -- --help`
-- **Nix**: [packages/cli-proxy-api/package.nix](packages/cli-proxy-api/package.nix)
 
 </details>
 <details>
@@ -140,24 +120,14 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>forge</strong> - AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment</summary>
+<summary><strong>forgecode</strong> - AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment</summary>
 
 - **Source**: binary
 - **License**: MIT
-- **Homepage**: https://github.com/antinomyhq/forge
-- **Usage**: `nix run github:numtide/llm-agents.nix#forge -- --help`
-- **Nix**: [packages/forge/package.nix](packages/forge/package.nix)
-- **Documentation**: See [packages/forge/README.md](packages/forge/README.md) for detailed usage
-
-</details>
-<details>
-<summary><strong>gastown</strong> - Gas Town - multi-agent workspace manager</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/gastownhall/gastown
-- **Usage**: `nix run github:numtide/llm-agents.nix#gastown -- --help`
-- **Nix**: [packages/gastown/package.nix](packages/gastown/package.nix)
+- **Homepage**: https://github.com/tailcallhq/forgecode
+- **Usage**: `nix run github:numtide/llm-agents.nix#forgecode -- --help`
+- **Nix**: [packages/forgecode/package.nix](packages/forgecode/package.nix)
+- **Documentation**: See [packages/forgecode/README.md](packages/forgecode/README.md) for detailed usage
 
 </details>
 <details>
@@ -171,23 +141,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>gitnexus</strong> - Graph-powered code intelligence for AI agents</summary>
-
-- **Source**: source
-- **License**: unfree
-- **Homepage**: https://github.com/abhigyanpatwari/GitNexus
-- **Usage**: `nix run github:numtide/llm-agents.nix#gitnexus -- --help`
-- **Nix**: [packages/gitnexus/package.nix](packages/gitnexus/package.nix)
-
-</details>
-<details>
-<summary><strong>gnhf</strong> - Ralph/autoresearch-style orchestrator that keeps coding agents running while you sleep</summary>
+<summary><strong>gitclaw</strong> - Universal git-native multimodal AI agent (formerly gitagent)</summary>
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/kunchenguid/gnhf
-- **Usage**: `nix run github:numtide/llm-agents.nix#gnhf -- --help`
-- **Nix**: [packages/gnhf/package.nix](packages/gnhf/package.nix)
+- **Homepage**: https://github.com/open-gitagent/gitagent
+- **Usage**: `nix run github:numtide/llm-agents.nix#gitclaw -- --help`
+- **Nix**: [packages/gitclaw/package.nix](packages/gitclaw/package.nix)
 
 </details>
 <details>
@@ -275,7 +235,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/Mote-Software/nanocoder
+- **Homepage**: https://github.com/Nano-Collective/nanocoder
 - **Usage**: `nix run github:numtide/llm-agents.nix#nanocoder -- --help`
 - **Nix**: [packages/nanocoder/package.nix](packages/nanocoder/package.nix)
 
@@ -374,6 +334,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### AI Assistants
 
 <details>
+<summary><strong>aionui</strong> - Desktop and WebUI cowork app that turns AI agents into a local assistant and server</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/iOfficeAI/AionUi
+- **Usage**: `nix run github:numtide/llm-agents.nix#aionui -- --help`
+- **Nix**: [packages/aionui/package.nix](packages/aionui/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
 
 - **Source**: source
@@ -381,6 +351,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://hermes-agent.nousresearch.com/
 - **Usage**: `nix run github:numtide/llm-agents.nix#hermes-agent -- --help`
 - **Nix**: [packages/hermes-agent/package.nix](packages/hermes-agent/package.nix)
+
+</details>
+<details>
+<summary><strong>hermes-desktop</strong> - Desktop companion for Hermes Agent</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/fathah/hermes-desktop
+- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-desktop -- --help`
+- **Nix**: [packages/hermes-desktop/package.nix](packages/hermes-desktop/package.nix)
 
 </details>
 <details>
@@ -424,6 +404,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>vessel-browser</strong> - Agent-oriented browser with durable state and MCP control</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/unmodeled-tyler/vessel-browser
+- **Usage**: `nix run github:numtide/llm-agents.nix#vessel-browser -- --help`
+- **Nix**: [packages/vessel-browser/package.nix](packages/vessel-browser/package.nix)
+
+</details>
+<details>
 <summary><strong>zeroclaw</strong> - Fast, small, and fully autonomous AI assistant infrastructure</summary>
 
 - **Source**: source
@@ -437,13 +427,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Claude Code Ecosystem
 
 <details>
-<summary><strong>auto-claude</strong> - Autonomous multi-agent coding framework powered by Claude AI</summary>
+<summary><strong>aperant</strong> - Autonomous multi-agent coding framework powered by Claude AI</summary>
 
 - **Source**: source
 - **License**: AGPL-3.0-only
-- **Homepage**: https://github.com/AndyMik90/Auto-Claude
-- **Usage**: `nix run github:numtide/llm-agents.nix#auto-claude -- --help`
-- **Nix**: [packages/auto-claude/package.nix](packages/auto-claude/package.nix)
+- **Homepage**: https://github.com/AndyMik90/Aperant
+- **Usage**: `nix run github:numtide/llm-agents.nix#aperant -- --help`
+- **Nix**: [packages/aperant/package.nix](packages/aperant/package.nix)
 
 </details>
 <details>
@@ -487,26 +477,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>claude-plugins</strong> - CLI tool for managing Claude Code plugins</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Kamalnrf/claude-plugins
-- **Usage**: `nix run github:numtide/llm-agents.nix#claude-plugins -- --help`
-- **Nix**: [packages/claude-plugins/package.nix](packages/claude-plugins/package.nix)
-
-</details>
-<details>
-<summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
-
-- **Source**: source
-- **License**: Check package
-- **Homepage**: https://github.com/numtide/claudebox
-- **Usage**: `nix run github:numtide/llm-agents.nix#claudebox -- --help`
-- **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
-
-</details>
-<details>
 <summary><strong>oh-my-claudecode</strong> - Multi-agent orchestration system for Claude Code</summary>
 
 - **Source**: source
@@ -514,36 +484,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/yeachan-heo/oh-my-claudecode
 - **Usage**: `nix run github:numtide/llm-agents.nix#oh-my-claudecode -- --help`
 - **Nix**: [packages/oh-my-claudecode/package.nix](packages/oh-my-claudecode/package.nix)
-
-</details>
-<details>
-<summary><strong>sandbox-runtime</strong> - Lightweight sandboxing tool for enforcing filesystem and network restrictions</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/anthropic-experimental/sandbox-runtime
-- **Usage**: `nix run github:numtide/llm-agents.nix#sandbox-runtime -- --help`
-- **Nix**: [packages/sandbox-runtime/package.nix](packages/sandbox-runtime/package.nix)
-
-</details>
-<details>
-<summary><strong>skills</strong> - The open agent skills tool for installing and managing skills across AI coding agents</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/vercel-labs/skills
-- **Usage**: `nix run github:numtide/llm-agents.nix#skills -- --help`
-- **Nix**: [packages/skills/package.nix](packages/skills/package.nix)
-
-</details>
-<details>
-<summary><strong>skills-installer</strong> - Install agent skills across multiple AI coding clients</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Kamalnrf/claude-plugins
-- **Usage**: `nix run github:numtide/llm-agents.nix#skills-installer -- --help`
-- **Nix**: [packages/skills-installer/package.nix](packages/skills-installer/package.nix)
 
 </details>
 
@@ -578,7 +518,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/wesm/agentsview
+- **Homepage**: https://github.com/kenn-io/agentsview
 - **Usage**: `nix run github:numtide/llm-agents.nix#agentsview -- --help`
 - **Nix**: [packages/agentsview/package.nix](packages/agentsview/package.nix)
 
@@ -591,6 +531,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/ryoppippi/ccusage
 - **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
 - **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
+
+</details>
+<details>
+<summary><strong>entire</strong> - CLI tool that captures AI agent sessions and links them to code changes</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/entireio/cli
+- **Usage**: `nix run github:numtide/llm-agents.nix#entire -- --help`
+- **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
 
 </details>
 
@@ -621,7 +571,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/steveyegge/beads
+- **Homepage**: https://github.com/gastownhall/beads
 - **Usage**: `nix run github:numtide/llm-agents.nix#beads -- --help`
 - **Nix**: [packages/beads/package.nix](packages/beads/package.nix)
 
@@ -644,6 +594,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/Dicklesworthstone/beads_viewer
 - **Usage**: `nix run github:numtide/llm-agents.nix#beads-viewer -- --help`
 - **Nix**: [packages/beads-viewer/package.nix](packages/beads-viewer/package.nix)
+
+</details>
+<details>
+<summary><strong>bernstein</strong> - Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/sipyourdrink-ltd/bernstein
+- **Usage**: `nix run github:numtide/llm-agents.nix#bernstein -- --help`
+- **Nix**: [packages/bernstein/package.nix](packages/bernstein/package.nix)
 
 </details>
 <details>
@@ -677,6 +637,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>gastown</strong> - Gas Town - multi-agent workspace manager</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/gastownhall/gastown
+- **Usage**: `nix run github:numtide/llm-agents.nix#gastown -- --help`
+- **Nix**: [packages/gastown/package.nix](packages/gastown/package.nix)
+
+</details>
+<details>
 <summary><strong>gitbutler</strong> - Git client for simultaneous branches on top of your existing workflow</summary>
 
 - **Source**: source
@@ -684,6 +654,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://gitbutler.com
 - **Usage**: `nix run github:numtide/llm-agents.nix#gitbutler -- --help`
 - **Nix**: [packages/gitbutler/package.nix](packages/gitbutler/package.nix)
+
+</details>
+<details>
+<summary><strong>gnhf</strong> - Ralph/autoresearch-style orchestrator that keeps coding agents running while you sleep</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/kunchenguid/gnhf
+- **Usage**: `nix run github:numtide/llm-agents.nix#gnhf -- --help`
+- **Nix**: [packages/gnhf/package.nix](packages/gnhf/package.nix)
 
 </details>
 <details>
@@ -724,6 +704,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/jixoai/openspecui
 - **Usage**: `nix run github:numtide/llm-agents.nix#openspecui -- --help`
 - **Nix**: [packages/openspecui/package.nix](packages/openspecui/package.nix)
+
+</details>
+<details>
+<summary><strong>paseo-desktop</strong> - Voice-controlled desktop development environment for AI coding agents</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-or-later
+- **Homepage**: https://paseo.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#paseo-desktop -- --help`
+- **Nix**: [packages/paseo-desktop/package.nix](packages/paseo-desktop/package.nix)
 
 </details>
 <details>
@@ -840,6 +830,186 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 
+### Memory & Code Intelligence
+
+<details>
+<summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/BeaconBay/ck
+- **Usage**: `nix run github:numtide/llm-agents.nix#ck -- --help`
+- **Nix**: [packages/ck/package.nix](packages/ck/package.nix)
+
+</details>
+<details>
+<summary><strong>codegraph</strong> - Semantic code intelligence for AI coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/colbymchenry/codegraph
+- **Usage**: `nix run github:numtide/llm-agents.nix#codegraph -- --help`
+- **Nix**: [packages/codegraph/package.nix](packages/codegraph/package.nix)
+
+</details>
+<details>
+<summary><strong>context-hub</strong> - CLI for Context Hub - search and retrieve LLM-optimized docs and skills</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/andrewyng/context-hub
+- **Usage**: `nix run github:numtide/llm-agents.nix#context-hub -- --help`
+- **Nix**: [packages/context-hub/package.nix](packages/context-hub/package.nix)
+
+</details>
+<details>
+<summary><strong>gitnexus</strong> - Graph-powered code intelligence for AI agents</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/abhigyanpatwari/GitNexus
+- **Usage**: `nix run github:numtide/llm-agents.nix#gitnexus -- --help`
+- **Nix**: [packages/gitnexus/package.nix](packages/gitnexus/package.nix)
+
+</details>
+<details>
+<summary><strong>gno</strong> - Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/gmickel/gno
+- **Usage**: `nix run github:numtide/llm-agents.nix#gno -- --help`
+- **Nix**: [packages/gno/package.nix](packages/gno/package.nix)
+
+</details>
+<details>
+<summary><strong>memvid-cli</strong> - AI memory CLI - crash-safe, single-file storage with semantic search</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://memvid.com
+- **Usage**: `nix run github:numtide/llm-agents.nix#memvid-cli -- --help`
+- **Nix**: [packages/memvid-cli/package.nix](packages/memvid-cli/package.nix)
+
+</details>
+<details>
+<summary><strong>qmd</strong> - mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/tobi/qmd
+- **Usage**: `nix run github:numtide/llm-agents.nix#qmd -- --help`
+- **Nix**: [packages/qmd/package.nix](packages/qmd/package.nix)
+- **Documentation**: See [packages/qmd/README.md](packages/qmd/README.md) for detailed usage
+
+</details>
+<details>
+<summary><strong>semble</strong> - Fast and accurate local code search for AI agents — CLI and MCP server</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/MinishLab/semble
+- **Usage**: `nix run github:numtide/llm-agents.nix#semble -- --help`
+- **Nix**: [packages/semble/package.nix](packages/semble/package.nix)
+
+</details>
+<details>
+<summary><strong>zat</strong> - Code outline viewer for LLM coding agents — shows exported symbols with line numbers</summary>
+
+- **Source**: source
+- **License**: GPL-3.0-only
+- **Homepage**: https://github.com/bglgwyng/zat
+- **Usage**: `nix run github:numtide/llm-agents.nix#zat -- --help`
+- **Nix**: [packages/zat/package.nix](packages/zat/package.nix)
+
+</details>
+
+### Sandboxing & Isolation
+
+<details>
+<summary><strong>claudebox</strong> - Sandboxed environment for Claude Code</summary>
+
+- **Source**: source
+- **License**: Check package
+- **Homepage**: https://github.com/numtide/claudebox
+- **Usage**: `nix run github:numtide/llm-agents.nix#claudebox -- --help`
+- **Nix**: [packages/claudebox/package.nix](packages/claudebox/package.nix)
+
+</details>
+<details>
+<summary><strong>fence</strong> - Lightweight, container-free sandbox for running commands with network and filesystem restrictions</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://fencesandbox.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#fence -- --help`
+- **Nix**: [packages/fence/package.nix](packages/fence/package.nix)
+
+</details>
+<details>
+<summary><strong>nono</strong> - Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment.</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://nono.sh/
+- **Usage**: `nix run github:numtide/llm-agents.nix#nono -- --help`
+- **Nix**: [packages/nono/package.nix](packages/nono/package.nix)
+
+</details>
+<details>
+<summary><strong>sandbox-runtime</strong> - Lightweight sandboxing tool for enforcing filesystem and network restrictions</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/anthropic-experimental/sandbox-runtime
+- **Usage**: `nix run github:numtide/llm-agents.nix#sandbox-runtime -- --help`
+- **Nix**: [packages/sandbox-runtime/package.nix](packages/sandbox-runtime/package.nix)
+
+</details>
+
+### Skills & Plugins
+
+<details>
+<summary><strong>claude-plugins</strong> - CLI tool for managing Claude Code plugins</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Kamalnrf/claude-plugins
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-plugins -- --help`
+- **Nix**: [packages/claude-plugins/package.nix](packages/claude-plugins/package.nix)
+
+</details>
+<details>
+<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/numman-ali/openskills
+- **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
+- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
+
+</details>
+<details>
+<summary><strong>skills</strong> - The open agent skills tool for installing and managing skills across AI coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vercel-labs/skills
+- **Usage**: `nix run github:numtide/llm-agents.nix#skills -- --help`
+- **Nix**: [packages/skills/package.nix](packages/skills/package.nix)
+
+</details>
+<details>
+<summary><strong>skills-installer</strong> - Install agent skills across multiple AI coding clients</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/Kamalnrf/claude-plugins
+- **Usage**: `nix run github:numtide/llm-agents.nix#skills-installer -- --help`
+- **Nix**: [packages/skills-installer/package.nix](packages/skills-installer/package.nix)
+
+</details>
+
 ### Utilities
 
 <details>
@@ -863,23 +1033,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
+<summary><strong>cli-proxy-api</strong> - Unified proxy providing OpenAI/Gemini/Claude/Codex compatible APIs for AI coding CLI tools</summary>
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/BeaconBay/ck
-- **Usage**: `nix run github:numtide/llm-agents.nix#ck -- --help`
-- **Nix**: [packages/ck/package.nix](packages/ck/package.nix)
-
-</details>
-<details>
-<summary><strong>codegraph</strong> - Semantic code intelligence for AI coding agents</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/colbymchenry/codegraph
-- **Usage**: `nix run github:numtide/llm-agents.nix#codegraph -- --help`
-- **Nix**: [packages/codegraph/package.nix](packages/codegraph/package.nix)
+- **Homepage**: https://github.com/router-for-me/CLIProxyAPI
+- **Usage**: `nix run github:numtide/llm-agents.nix#cli-proxy-api -- --help`
+- **Nix**: [packages/cli-proxy-api/package.nix](packages/cli-proxy-api/package.nix)
 
 </details>
 <details>
@@ -893,16 +1053,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>context-hub</strong> - CLI for Context Hub - search and retrieve LLM-optimized docs and skills</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/andrewyng/context-hub
-- **Usage**: `nix run github:numtide/llm-agents.nix#context-hub -- --help`
-- **Nix**: [packages/context-hub/package.nix](packages/context-hub/package.nix)
-
-</details>
-<details>
 <summary><strong>copilot-language-server</strong> - GitHub Copilot Language Server - AI pair programmer LSP</summary>
 
 - **Source**: bytecode
@@ -913,26 +1063,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>entire</strong> - CLI tool that captures AI agent sessions and links them to code changes</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/entireio/cli
-- **Usage**: `nix run github:numtide/llm-agents.nix#entire -- --help`
-- **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
-
-</details>
-<details>
-<summary><strong>fence</strong> - Lightweight, container-free sandbox for running commands with network and filesystem restrictions</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://fencesandbox.com/
-- **Usage**: `nix run github:numtide/llm-agents.nix#fence -- --help`
-- **Nix**: [packages/fence/package.nix](packages/fence/package.nix)
-
-</details>
-<details>
 <summary><strong>git-surgeon</strong> - Git primitives for autonomous coding agents</summary>
 
 - **Source**: source
@@ -940,26 +1070,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/raine/git-surgeon
 - **Usage**: `nix run github:numtide/llm-agents.nix#git-surgeon -- --help`
 - **Nix**: [packages/git-surgeon/package.nix](packages/git-surgeon/package.nix)
-
-</details>
-<details>
-<summary><strong>gitclaw</strong> - Universal git-native multimodal AI agent (formerly gitagent)</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/open-gitagent/gitagent
-- **Usage**: `nix run github:numtide/llm-agents.nix#gitclaw -- --help`
-- **Nix**: [packages/gitclaw/package.nix](packages/gitclaw/package.nix)
-
-</details>
-<details>
-<summary><strong>gno</strong> - Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/gmickel/gno
-- **Usage**: `nix run github:numtide/llm-agents.nix#gno -- --help`
-- **Nix**: [packages/gno/package.nix](packages/gno/package.nix)
 
 </details>
 <details>
@@ -987,39 +1097,19 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/steipete/mcporter
+- **Homepage**: https://github.com/openclaw/mcporter
 - **Usage**: `nix run github:numtide/llm-agents.nix#mcporter -- --help`
 - **Nix**: [packages/mcporter/package.nix](packages/mcporter/package.nix)
 
 </details>
 <details>
-<summary><strong>memvid-cli</strong> - AI memory CLI - crash-safe, single-file storage with semantic search</summary>
-
-- **Source**: binary
-- **License**: Apache-2.0
-- **Homepage**: https://memvid.com
-- **Usage**: `nix run github:numtide/llm-agents.nix#memvid-cli -- --help`
-- **Nix**: [packages/memvid-cli/package.nix](packages/memvid-cli/package.nix)
-
-</details>
-<details>
-<summary><strong>nono</strong> - Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment.</summary>
+<summary><strong>officecli</strong> - CLI for creating and editing Office Open XML documents</summary>
 
 - **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://nono.sh/
-- **Usage**: `nix run github:numtide/llm-agents.nix#nono -- --help`
-- **Nix**: [packages/nono/package.nix](packages/nono/package.nix)
-
-</details>
-<details>
-<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/numman-ali/openskills
-- **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
-- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
+- **License**: MIT
+- **Homepage**: https://github.com/iOfficeAI/OfficeCLI
+- **Usage**: `nix run github:numtide/llm-agents.nix#officecli -- --help`
+- **Nix**: [packages/officecli/package.nix](packages/officecli/package.nix)
 
 </details>
 <details>
@@ -1033,17 +1123,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>qmd</strong> - mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/tobi/qmd
-- **Usage**: `nix run github:numtide/llm-agents.nix#qmd -- --help`
-- **Nix**: [packages/qmd/package.nix](packages/qmd/package.nix)
-- **Documentation**: See [packages/qmd/README.md](packages/qmd/README.md) for detailed usage
-
-</details>
-<details>
 <summary><strong>rtk</strong> - CLI proxy that reduces LLM token consumption by 60-90% on common dev commands</summary>
 
 - **Source**: source
@@ -1051,16 +1130,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/rtk-ai/rtk
 - **Usage**: `nix run github:numtide/llm-agents.nix#rtk -- --help`
 - **Nix**: [packages/rtk/package.nix](packages/rtk/package.nix)
-
-</details>
-<details>
-<summary><strong>semble</strong> - Fast and accurate local code search for AI agents — CLI and MCP server</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/MinishLab/semble
-- **Usage**: `nix run github:numtide/llm-agents.nix#semble -- --help`
-- **Nix**: [packages/semble/package.nix](packages/semble/package.nix)
 
 </details>
 <details>
@@ -1081,16 +1150,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/toon-format/toon-rust
 - **Usage**: `nix run github:numtide/llm-agents.nix#toon -- --help`
 - **Nix**: [packages/toon/package.nix](packages/toon/package.nix)
-
-</details>
-<details>
-<summary><strong>zat</strong> - Code outline viewer for LLM coding agents — shows exported symbols with line numbers</summary>
-
-- **Source**: source
-- **License**: GPL-3.0-only
-- **Homepage**: https://github.com/bglgwyng/zat
-- **Usage**: `nix run github:numtide/llm-agents.nix#zat -- --help`
-- **Nix**: [packages/zat/package.nix](packages/zat/package.nix)
 
 </details>
 <!-- END GENERATED PACKAGE DOCS -->

@@ -114,7 +114,7 @@ stdenv.mkDerivation {
     # The plugin resolves its MCP servers at
     # <ancestor>/packages/{ast-grep-mcp,lsp-tools-mcp}/dist/cli.js
     mkdir -p $out/lib/oh-my-opencode/packages
-    cp -r packages/{ast-grep-mcp,lsp-tools-mcp} $out/lib/oh-my-opencode/packages/
+    cp -r packages/{ast-grep-mcp,lsp-tools-mcp,shared-skills} $out/lib/oh-my-opencode/packages/
 
     # ast-grep-mcp's dist/cli.js is a self-contained bun bundle; its
     # node_modules only holds a workspace symlink that would dangle in

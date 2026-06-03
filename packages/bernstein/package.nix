@@ -40,7 +40,7 @@ python3.pkgs.buildPythonApplication rec {
   pyproject = true;
 
   src = fetchFromGitHub {
-    owner = "chernistry";
+    owner = "sipyourdrink-ltd";
     repo = "bernstein";
     tag = "v${version}";
     hash = "sha256-LteVxDw0Nk7HcPhL+unjCSRIquTC1IgTNf9enAWU+z8=";
@@ -128,12 +128,12 @@ python3.pkgs.buildPythonApplication rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Workflow & Project Management";
 
   meta = with lib; {
     description = "Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents";
-    homepage = "https://github.com/chernistry/bernstein";
-    changelog = "https://github.com/chernistry/bernstein/releases/tag/v${version}";
+    homepage = "https://github.com/sipyourdrink-ltd/bernstein";
+    changelog = "https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ chernistry ];

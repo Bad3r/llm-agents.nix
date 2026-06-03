@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "Skills & Plugins";
 
   meta = with lib; {
     description = "CLI tool for managing Claude Code plugins";

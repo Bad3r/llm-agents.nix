@@ -1,6 +1,6 @@
-# Forge Package
+# Forgecode Package
 
-This package provides Forge (https://github.com/antinomyhq/forge), an AI-Enhanced Terminal Development Environment.
+This package provides Forgecode (https://github.com/tailcallhq/forgecode), an AI-Enhanced Terminal Development Environment. The CLI binary is still named `forge`.
 
 ## Current Implementation
 
@@ -25,7 +25,7 @@ This issue exists in the specific git revision used by forge (3a97917cd7584c4220
 ## Building
 
 ```bash
-nix build .#forge
+nix build .#forgecode
 ```
 
 The package will download and install the appropriate pre-built binary for your platform.

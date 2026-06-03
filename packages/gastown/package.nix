@@ -58,7 +58,7 @@ buildGoModule rec {
 
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Workflow & Project Management";
 
   meta = with lib; {
     description = "Gas Town - multi-agent workspace manager";

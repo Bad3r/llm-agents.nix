@@ -26,7 +26,7 @@ def main() -> None:
     """Update the agentsview package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_github_latest_release("wesm", "agentsview")
+    latest = fetch_github_latest_release("kenn-io", "agentsview")
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -34,7 +34,7 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url = f"https://github.com/wesm/agentsview/archive/refs/tags/v{latest}.tar.gz"
+    url = f"https://github.com/kenn-io/agentsview/archive/refs/tags/v{latest}.tar.gz"
 
     print("Calculating source hash...")
     source_hash = calculate_url_hash(url, unpack=True)

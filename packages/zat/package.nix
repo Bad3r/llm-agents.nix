@@ -26,7 +26,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     runHook postInstallCheck
   '';
 
-  passthru.category = "Utilities";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = {
     description = "Code outline viewer for LLM coding agents — shows exported symbols with line numbers";

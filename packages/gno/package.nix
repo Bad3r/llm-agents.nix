@@ -190,7 +190,7 @@ stdenv.mkDerivation {
     runHook postInstallCheck
   '';
 
-  passthru.category = "Utilities";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = with lib; {
     description = "Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration";

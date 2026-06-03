@@ -79,10 +79,12 @@ CATEGORY_ORDER = [
     "AI Assistants",
     "Claude Code Ecosystem",
     "ACP Ecosystem",
-    "MCP",
     "Usage Analytics",
     "Workflow & Project Management",
     "Code Review",
+    "Memory & Code Intelligence",
+    "Sandboxing & Isolation",
+    "Skills & Plugins",
     "Utilities",
     "Uncategorized",
 ]

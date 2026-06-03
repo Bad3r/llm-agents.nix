@@ -143,7 +143,7 @@ stdenv.mkDerivation {
     runHook postInstallCheck
   '';
 
-  passthru.category = "Utilities";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = with lib; {
     description = "mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local";

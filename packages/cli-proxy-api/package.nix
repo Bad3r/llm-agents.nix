@@ -42,7 +42,7 @@ buildGoModule.override { go = go_1_26; } {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Utilities";
 
   meta = with lib; {
     description = "Unified proxy providing OpenAI/Gemini/Claude/Codex compatible APIs for AI coding CLI tools";

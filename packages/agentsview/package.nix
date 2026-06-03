@@ -18,7 +18,7 @@ let
     ;
 
   src = fetchFromGitHub {
-    owner = "wesm";
+    owner = "kenn-io";
     repo = "agentsview";
     rev = "v${version}";
     inherit hash;
@@ -69,8 +69,8 @@ buildGoModule {
 
   meta = with lib; {
     description = "Local-first viewer and analytics for AI coding agent sessions";
-    homepage = "https://github.com/wesm/agentsview";
-    changelog = "https://github.com/wesm/agentsview/releases/tag/v${version}";
+    homepage = "https://github.com/kenn-io/agentsview";
+    changelog = "https://github.com/kenn-io/agentsview/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ ak2k ];

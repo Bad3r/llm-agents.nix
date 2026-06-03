@@ -3,6 +3,7 @@
   perSystem,
   ...
 }:
-pkgs.callPackage ./package.nix {
-  inherit (perSystem.self) wrapBuddy;
+pkgs.lib.warnOnInstantiate "'forge' has been renamed to 'forgecode'. Please update your references." perSystem.self.forgecode
+// {
+  passthru.hideFromDocs = true;
 }

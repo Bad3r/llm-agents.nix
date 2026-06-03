@@ -23,11 +23,11 @@ let
   platformTriple = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation rec {
-  pname = "forge";
+  pname = "forgecode";
   inherit version;
 
   src = fetchurl {
-    url = "https://github.com/antinomyhq/forge/releases/download/v${version}/forge-${platformTriple}";
+    url = "https://github.com/tailcallhq/forgecode/releases/download/v${version}/forge-${platformTriple}";
     hash = hashes.${platform};
   };
 
@@ -59,11 +59,11 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment";
-    homepage = "https://github.com/antinomyhq/forge";
-    changelog = "https://github.com/antinomyhq/forge/releases/tag/v${version}";
+    homepage = "https://github.com/tailcallhq/forgecode";
+    changelog = "https://github.com/tailcallhq/forgecode/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ mic92 ];
     mainProgram = "forge";
     platforms = [
       "x86_64-linux"

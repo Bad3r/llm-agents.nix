@@ -202,7 +202,7 @@ python3.pkgs.buildPythonApplication rec {
   '';
 
   passthru = {
-    category = "Utilities";
+    category = "Memory & Code Intelligence";
     inherit model2vec vicinity bm25s;
   };
 

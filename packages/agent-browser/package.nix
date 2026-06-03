@@ -7,14 +7,14 @@
   makeBinaryWrapper,
   nodejs-slim,
   pnpmConfigHook,
-  pnpm_10,
+  pnpm_11,
   rustPlatform,
   stdenv,
 }:
 
 let
   pname = "agent-browser";
-  version = "0.27.0";
+  version = "0.27.1";
 
   # Vendored Geist variable font (OFL-1.1) pinned to a specific upstream
   # commit so the dashboard's next/font/local build is fully offline.
@@ -27,7 +27,7 @@ let
     owner = "vercel-labs";
     repo = "agent-browser";
     rev = "v${version}";
-    hash = "sha256-c+AJAXMX88t+zzFsEAtFJDjDY5EbhmEyMRGFL4t63nE=";
+    hash = "sha256-eLtN4ErLaSetEDb/6RMqILDnVua8QnEN6r1VgbwTQBw=";
   };
 
   dashboard = stdenv.mkDerivation {
@@ -36,15 +36,15 @@ let
 
     nativeBuildInputs = [
       nodejs-slim
-      pnpm_10
+      pnpm_11
       pnpmConfigHook
     ];
 
     pnpmDeps = fetchPnpmDeps {
       pname = "${pname}-dashboard";
       inherit version src;
-      pnpm = pnpm_10;
-      hash = "sha256-xNxNFvaw5sdX0ZaBIUf449wIHQNifMPK3I+qi+yp+UU=";
+      pnpm = pnpm_11;
+      hash = "sha256-hSmlZvGlnvSWpCki1eImUNEe1myfbC3eDVcX07k0Bm4=";
       fetcherVersion = 3;
     };
 
@@ -78,7 +78,7 @@ rustPlatform.buildRustPackage {
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-2u7yokHCxIVq16370Mg+n5kf03yUDYJmctFxN1fnaAA=";
+  cargoHash = "sha256-tZtnCKhPFW9lpyj6JIEwYcEV1ZEXSCYlyxMkYi24Hqw=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;

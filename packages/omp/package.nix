@@ -135,6 +135,11 @@ stdenv.mkDerivation {
     "
   '';
 
+  # Export upstream's worker entrypoint list and guard its main() so we can
+  # import the list in buildPhase instead of duplicating it here. Fails to
+  # apply when upstream restructures the script, forcing a review on bumps.
+  patches = [ ./expose-worker-entrypoints.patch ];
+
   # We handle build and install ourselves
   dontUseBunBuild = true;
   dontUseBunInstall = true;
@@ -215,14 +220,28 @@ stdenv.mkDerivation {
     echo "Generating docs index..."
     bun packages/coding-agent/scripts/generate-docs-index.ts
 
-    # Compile the standalone binary
+    # Generate the embedded stats dashboard client bundle
+    echo "Generating embedded stats dashboard..."
+    bun --cwd packages/stats scripts/generate-client-bundle.ts --generate
+
+    # Compile the standalone binary. Worker entrypoints must be listed
+    # explicitly: bun --compile only embeds modules reachable via static
+    # imports, but workers are spawned by path at runtime (upstream issue
+    # #1150). Reuse the list from upstream's release build script.
     echo "Compiling standalone binary..."
+    workerEntrypoints=$(bun -e '
+      const { workerEntrypoints } = await import("./scripts/ci-release-build-binaries.ts");
+      if (!Array.isArray(workerEntrypoints) || workerEntrypoints.length === 0) {
+        throw new Error("empty workerEntrypoints in ci-release-build-binaries.ts");
+      }
+      console.write(workerEntrypoints.join(" "));
+    ')
     bun build --compile \
-      --define PI_COMPILED=true \
       --external mupdf \
       --target="${platform.bunTarget}" \
       --root . \
       ./packages/coding-agent/src/cli.ts \
+      $workerEntrypoints \
       --outfile dist/omp
 
     runHook postBuild
@@ -246,6 +265,15 @@ stdenv.mkDerivation {
     }"}
 
     runHook postInstall
+  '';
+
+  # Workers and the stats dashboard only fail at runtime when their bunfs
+  # entrypoints are missing; the smoke test catches that at build time.
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+    HOME=$TMPDIR $out/bin/omp --smoke-test | grep -q "smoke-test: ok"
+    runHook postInstallCheck
   '';
 
   passthru.category = "AI Coding Agents";

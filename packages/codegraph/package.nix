@@ -9,22 +9,22 @@
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "codegraph";
-  version = "0.9.7";
+  version = "0.9.9";
 
   src = fetchFromGitHub {
     owner = "colbymchenry";
     repo = "codegraph";
     rev = "v${version}";
-    hash = "sha256-s1fV+x6NAPjcrr0MG4KqTNelo8gXwE6WvLUdQGwyEIA=";
+    hash = "sha256-Oy0WpllYQDmKpVhf+xI3Y18s+0x2bzkN8DDgTOJf4B4=";
   };
 
-  npmDepsHash = "sha256-ujfsy5SrbWLlUL7H4W13n3wFoww1uC+SKSaiNRTCs8I=";
+  npmDepsHash = "sha256-hpDpsA9kQf+bG6ZAT815gFI83N3je5X4he9wmhwKCmU=";
   makeCacheWritable = true;
 
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
 
-  passthru.category = "Utilities";
+  passthru.category = "Memory & Code Intelligence";
 
   meta = {
     description = "Semantic code intelligence for AI coding agents";

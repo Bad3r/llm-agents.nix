@@ -41,7 +41,7 @@ buildNpmPackage rec {
     versionCheckHomeHook
   ];
 
-  passthru.category = "AI Coding Agents";
+  passthru.category = "Workflow & Project Management";
 
   meta = with lib; {
     description = "Ralph/autoresearch-style orchestrator that keeps coding agents running while you sleep";

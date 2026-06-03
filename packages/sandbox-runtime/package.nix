@@ -57,7 +57,7 @@ buildNpmPackage {
   # (1.0.0 from commander instead of 0.0.26 from package.json)
   doInstallCheck = false;
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "Sandboxing & Isolation";
 
   meta = {
     description = "Lightweight sandboxing tool for enforcing filesystem and network restrictions";

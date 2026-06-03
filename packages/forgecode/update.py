@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for forge package."""
+"""Update script for forgecode package."""
 
 import sys
 from pathlib import Path
@@ -27,10 +27,10 @@ PLATFORMS = {
 
 
 def main() -> None:
-    """Update the forge package."""
+    """Update the forgecode package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_github_latest_release("antinomyhq", "forge")
+    latest = fetch_github_latest_release("tailcallhq", "forgecode")
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -38,7 +38,7 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url_template = f"https://github.com/antinomyhq/forge/releases/download/v{latest}/forge-{{platform}}"
+    url_template = f"https://github.com/tailcallhq/forgecode/releases/download/v{latest}/forge-{{platform}}"
     hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
     save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})

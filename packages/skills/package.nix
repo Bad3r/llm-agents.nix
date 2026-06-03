@@ -16,11 +16,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "skills";
-  version = "1.5.9";
+  version = "1.5.10";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/${pname}/-/${pname}-${version}.tgz";
-    hash = "sha256-ijVwyER+/DmBW8Bulh57Pi4lbEP/JWXb6cuxvHNsNbM=";
+    hash = "sha256-uDkxbEFAcMTPm//3BSitXDGIkP9g7sNQRvXY4Hajk40=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -49,7 +49,7 @@ stdenv.mkDerivation rec {
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "Skills & Plugins";
 
   meta = with lib; {
     description = "The open agent skills tool for installing and managing skills across AI coding agents";

@@ -20,7 +20,7 @@ buildNpmPackage (finalAttrs: {
   npmDepsHash = "sha256-ZYiY66PKF7hAnFkw3RQ5xBw7L9WZx0giUhgE8ySE0Xw=";
   makeCacheWritable = true;
 
-  passthru.category = "Utilities";
+  passthru.category = "Skills & Plugins";
 
   meta = {
     description = "Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent";

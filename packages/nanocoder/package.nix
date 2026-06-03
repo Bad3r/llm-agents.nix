@@ -13,7 +13,7 @@ buildNpmPackage rec {
   version = "1.27.0";
 
   src = fetchFromGitHub {
-    owner = "Mote-Software";
+    owner = "Nano-Collective";
     repo = "nanocoder";
     rev = "v${version}";
     hash = "sha256-YlFDjuOEPBYbLhb7Ipb4fAO65a4PoICCv3azRMJcztw=";
@@ -50,8 +50,8 @@ buildNpmPackage rec {
 
   meta = with lib; {
     description = "A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒";
-    homepage = "https://github.com/Mote-Software/nanocoder";
-    changelog = "https://github.com/Mote-Software/nanocoder/releases";
+    homepage = "https://github.com/Nano-Collective/nanocoder";
+    changelog = "https://github.com/Nano-Collective/nanocoder/releases";
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
     license = licenses.mit;
     platforms = platforms.all;

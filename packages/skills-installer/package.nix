@@ -32,7 +32,7 @@ stdenv.mkDerivation rec {
     runHook postInstallCheck
   '';
 
-  passthru.category = "Claude Code Ecosystem";
+  passthru.category = "Skills & Plugins";
 
   meta = with lib; {
     description = "Install agent skills across multiple AI coding clients";

@@ -1,0 +1,19 @@
+diff --git a/scripts/ci-release-build-binaries.ts b/scripts/ci-release-build-binaries.ts
+index fad13b13a..d5ff14d57 100644
+--- a/scripts/ci-release-build-binaries.ts
++++ b/scripts/ci-release-build-binaries.ts
+@@ -23,7 +23,7 @@ const entrypoint = "./packages/coding-agent/src/cli.ts";
+ // literals at the spawn sites resolve to. Keep this in sync with the dev
+ // script at `packages/coding-agent/scripts/build-binary.ts`; the
+ // `issue-1150-repro` test pins both halves of the contract.
+-const workerEntrypoints = [
++export const workerEntrypoints = [
+ 	"./packages/stats/src/sync-worker.ts",
+ 	"./packages/coding-agent/src/tools/browser/tab-worker-entry.ts",
+ 	"./packages/coding-agent/src/eval/js/worker-entry.ts",
+@@ -209,4 +209,4 @@ async function main(): Promise<void> {
+ 	}
+ }
+ 
+-await main();
++if (import.meta.main) await main();

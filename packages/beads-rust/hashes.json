@@ -1,9 +1,9 @@
 {
-  "version": "0.2.11",
-  "hash": "sha256-XfxO1gDt51CWv6T/wEX97uLm89Px0rEmCZEcofeWZG0=",
-  "cargoHash": "sha256-3u7GMriV2ZG0mjjGYLXGcUDQrs83uRYDMy5NKXTdaTI=",
+  "version": "0.2.14",
+  "hash": "sha256-BZ6KkO/m+pfoYQEoqR+uuHLZhQ9YzSHXYhOKKE52luc=",
+  "cargoHash": "sha256-euhmwcg11D7pQpbBX/M0fBucHmHZ55/qN1yv5dJHB3k=",
   "frankensqlite": {
-    "rev": "c0c8f32892a71f432a3ead0e5a04a9352549ccd4",
-    "hash": "sha256-sY2LA2k1r5ItsGbb1W2OmX6dNPwg+H4LmJmbGUdkFoE="
+    "rev": "4574efea411c8ba26a957f654a45179f5c57032d",
+    "hash": "sha256-hhv9/OaqZwdBqgB8flS7Pwb3PkACJfGqw0eMbj58nxc="
   }
 }
