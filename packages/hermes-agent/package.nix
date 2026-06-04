@@ -272,6 +272,13 @@ python3.pkgs.buildPythonApplication {
     setuptools
   ];
 
+  postPatch = ''
+    # Upstream package discovery only lists `hermes_cli`, which drops nested
+    # modules such as dashboard_auth and proxy from isolated setuptools builds.
+    substituteInPlace pyproject.toml \
+      --replace-fail '"hermes_cli", "gateway"' '"hermes_cli", "hermes_cli.*", "gateway"'
+  '';
+
   dependencies = hermesDeps;
   optional-dependencies = optionalDeps;
 
@@ -308,6 +315,8 @@ python3.pkgs.buildPythonApplication {
 
   pythonImportsCheck = [
     "hermes_cli"
+    "hermes_cli.dashboard_auth"
+    "hermes_cli.proxy"
     # #4175: adapters swallow ImportError, so assert these import.
     "slack_bolt"
     "discord"
