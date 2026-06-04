@@ -9,13 +9,13 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0-unstable-2026-06-03";
+  version = "0-unstable-2026-06-04";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "22fdaeae2c3a5df97f146617ccdfc01172714b47";
-    hash = "sha256-QQQLBeXYgHnsU9YEB7I/nO3z+VO+uIiqnaPYuQgcGu4=";
+    rev = "b45c61eff9466a3e0436b41f4c02cf139c0987a9";
+    hash = "sha256-pmvnu/tGXJ6925pf6Fg7a6vkV0F1dkuGyC6mr/tEZlk=";
   };
 
   sourceRoot = "source/rust";
