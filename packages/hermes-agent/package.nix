@@ -259,8 +259,9 @@ let
   };
 
   # The TUI spawns `$HERMES_PYTHON -m tui_gateway.entry`; sys.executable is the
-  # bare interpreter, so give it an env with the runtime deps. tui_gateway
-  # itself is found via PYTHONPATH=$out/site-packages (HERMES_PYTHON_SRC_ROOT).
+  # bare interpreter, so give it an env with the runtime deps. The dashboard
+  # PTY path copies wrapper env into a nested Node subprocess, which then
+  # resolves the gateway import root from HERMES_PYTHON_SRC_ROOT.
   pythonEnv = python3.withPackages (_: hermesDeps);
 in
 python3.pkgs.buildPythonApplication {
@@ -292,6 +293,9 @@ python3.pkgs.buildPythonApplication {
     "--set"
     "HERMES_PYTHON"
     "${pythonEnv}/bin/python3"
+    "--set"
+    "HERMES_PYTHON_SRC_ROOT"
+    "${placeholder "out"}/${python3.sitePackages}"
     "--set"
     "HERMES_NODE"
     "${nodejs}/bin/node"
@@ -336,6 +340,7 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_TUI_DIR $out/bin/hermes
     grep -q HERMES_WEB_DIST $out/bin/hermes
     grep -q HERMES_PYTHON $out/bin/hermes
+    grep -q HERMES_PYTHON_SRC_ROOT $out/bin/hermes
     test -f ${hermes-tui}/lib/hermes-tui/dist/entry.js
     test -f ${hermes-web}/share/hermes-web/index.html
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
