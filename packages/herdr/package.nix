@@ -76,8 +76,6 @@ let
       export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-local-cache"
       mkdir -p "$ZIG_GLOBAL_CACHE_DIR" "$ZIG_LOCAL_CACHE_DIR"
       ln -s ${finalAttrs.zigDeps} "$ZIG_GLOBAL_CACHE_DIR/p"
-      # ReleaseFast is the upstream default; ReleaseSafe keeps overflow checks.
-      export LIBGHOSTTY_VT_OPTIMIZE=ReleaseSafe
     '';
 
     # Tests spawn PTYs / interact with the terminal and don't work in the

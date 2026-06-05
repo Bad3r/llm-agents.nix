@@ -133,14 +133,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "semble";
-  version = "0.3.1";
+  version = "0.3.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "MinishLab";
     repo = "semble";
     rev = "v${version}";
-    hash = "sha256-FhpN6Xc0F24oI4DBwiMvcfUNVjXieMdMxuXXmqLuhoY=";
+    hash = "sha256-AZJYGrYrvAa+qm95lU8Dz1Gq+bHUgrGay8chgZzhs68=";
   };
 
   build-system = with python3.pkgs; [
@@ -163,6 +163,7 @@ python3.pkgs.buildPythonApplication rec {
     numpy
     bm25s
     pathspec
+    questionary
     tree-sitter
     tree-sitter-language-pack
     orjson

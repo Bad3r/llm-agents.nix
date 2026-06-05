@@ -479,10 +479,6 @@
     url = "https://registry.npmjs.org/@codemirror/language-data/-/language-data-6.5.2.tgz";
     hash = "sha512-CPkWBKrNS8stYbEU5kwBwTf3JB1kghlbh4FSAwzGW2TEscdeHHH4FGysREW86Mqnj3Qn09s0/6Ea/TutmoTobg==";
   };
-  "@codemirror/language@6.12.2" = fetchurl {
-    url = "https://registry.npmjs.org/@codemirror/language/-/language-6.12.2.tgz";
-    hash = "sha512-jEPmz2nGGDxhRTg3lTpzmIyGKxz3Gp3SJES4b0nAuE5SWQoKdT5GoQ69cwMmFd+wvFUhYirtDTr0/DRHpQAyWg==";
-  };
   "@codemirror/language@6.12.3" = fetchurl {
     url = "https://registry.npmjs.org/@codemirror/language/-/language-6.12.3.tgz";
     hash = "sha512-QwCZW6Tt1siP37Jet9Tb02Zs81TQt6qQrZR2H+eGMcFsL1zMrk2/b9CLC7/9ieP1fjIUMgviLWMmgiHoJrj+ZA==";

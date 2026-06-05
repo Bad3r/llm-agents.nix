@@ -927,9 +927,9 @@
     url = "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.2.3.tgz";
     hash = "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==";
   };
-  "@types/react@19.2.15" = fetchurl {
-    url = "https://registry.npmjs.org/@types/react/-/react-19.2.15.tgz";
-    hash = "sha512-eRwcGNHve+E8qtEQSSRl6urh+rFop4v8gm6O8rGv25CodbvFdLjA1vVQ1KkiFE0w0UPOnb8tDiFKL5lp0rtY5Q==";
+  "@types/react@19.2.16" = fetchurl {
+    url = "https://registry.npmjs.org/@types/react/-/react-19.2.16.tgz";
+    hash = "sha512-esJiCAnl0kfpNdE69f3So4WJUXy95dLZydX0KwK46riIHDzHM7O9Vtf9xCHW0PXIqvgqNrswl522kA/5yx+F4w==";
   };
   "@types/triple-beam@1.3.5" = fetchurl {
     url = "https://registry.npmjs.org/@types/triple-beam/-/triple-beam-1.3.5.tgz";
@@ -1691,9 +1691,9 @@
     url = "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz";
     hash = "sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==";
   };
-  "node-releases@2.0.46" = fetchurl {
-    url = "https://registry.npmjs.org/node-releases/-/node-releases-2.0.46.tgz";
-    hash = "sha512-GYVXHE2KnrzAfsAjl4uP++evGFCrAU1jta4ubEjIG7YWt/64Gqv66a30yKwWczVjA6j3bM4nBwH7Pk1JmDHaxQ==";
+  "node-releases@2.0.47" = fetchurl {
+    url = "https://registry.npmjs.org/node-releases/-/node-releases-2.0.47.tgz";
+    hash = "sha512-Uzmd6LXpouKo8EUK68IjH4+E01w/hXyV3R3g/geCJo+rXLNfh1xucB+LOzYEOQPSiUK3h/xZf0cQGcSsmyL2Og==";
   };
   "nth-check@2.1.1" = fetchurl {
     url = "https://registry.npmjs.org/nth-check/-/nth-check-2.1.1.tgz";

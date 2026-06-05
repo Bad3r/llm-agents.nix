@@ -165,14 +165,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.13.0";
+  version = "2.14.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-N4VkqsqcjJfRJwShs5JGyoeGXgc8Ioa0M3UZbO68z0A=";
+    hash = "sha256-LMf3bZZ8+lSm3NOzpRS5BnvgQ21X7jyjOWeQy15q+tQ=";
   };
 
   build-system = with python.pkgs; [
@@ -189,6 +189,7 @@ python.pkgs.buildPythonApplication rec {
     giturlparse
     google-auth
     httpx
+    humanize
     jsonpatch
     keyring
     markdownify
