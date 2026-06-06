@@ -183,9 +183,9 @@
     url = "https://registry.npmjs.org/@huggingface/jinja/-/jinja-0.5.9.tgz";
     hash = "sha512-uWTG+l3VJRsl7EXxYizuL3P+cCPoc3cRqbWWRcQN0FhejRfbdq0RNhCmbY/YDtnTcz9icdLYuLDjsnz4d8JMuw==";
   };
-  "@huggingface/tasks@0.21.2" = fetchurl {
-    url = "https://registry.npmjs.org/@huggingface/tasks/-/tasks-0.21.2.tgz";
-    hash = "sha512-e8dw3tZ7mbZ/mytr9zIFmsr67tMpd9rm/pURCi5ciFqlVvLvdH9FjnoZxVO4KfRXyqzPeV0shXv9z5s2M8Msmw==";
+  "@huggingface/tasks@0.21.6" = fetchurl {
+    url = "https://registry.npmjs.org/@huggingface/tasks/-/tasks-0.21.6.tgz";
+    hash = "sha512-XfLE2clF0uHw7kMb6HHMkpyJ+bmu2T0EZ8O1WxbJXIqdRwKRB0RM7Y639Ph3aYj2GjFLJhNo1Lz8y0jn9k10LQ==";
   };
   "@huggingface/tokenizers@0.1.3" = fetchurl {
     url = "https://registry.npmjs.org/@huggingface/tokenizers/-/tokenizers-0.1.3.tgz";
