@@ -14,16 +14,16 @@
 
 buildGoModule rec {
   pname = "gastown";
-  version = "1.2.0";
+  version = "1.2.1";
 
   src = fetchFromGitHub {
     owner = "gastownhall";
     repo = "gastown";
     rev = "v${version}";
-    hash = "sha256-JM5WkrTBdOyv4kCd+jlXpfOjjkzcMUn9XYjD9p8WgHA=";
+    hash = "sha256-U3spPM8tKp5aoWy+l1qpRtrfIppkQAPSp1z50FQUv2I=";
   };
 
-  vendorHash = "sha256-eiG+t0Iw3xZCX77fXA95P3EtrcVeacOixPVEdHXt0NY=";
+  vendorHash = "sha256-PQT/Xq9na3vI8Oy9INBYJf3GsiN5IxAVCxrNLhyIpO8=";
 
   nativeBuildInputs = [ makeWrapper ];
 
