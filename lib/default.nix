@@ -132,6 +132,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 55891793;
         name = "arch-fan";
       };
+      fraggerfox = {
+        github = "fraggerfox";
+        githubId = 189939;
+        name = "Santhosh Raju";
+      };
     };
   }
 )

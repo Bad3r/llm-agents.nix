@@ -790,6 +790,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Code Review
 
 <details>
+<summary><strong>annot</strong> - Human-in-the-loop annotation tool for AI workflows</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://github.com/denolehov/annot
+- **Usage**: `nix run github:numtide/llm-agents.nix#annot -- --help`
+- **Nix**: [packages/annot/package.nix](packages/annot/package.nix)
+
+</details>
+<details>
 <summary><strong>code-review-graph</strong> - Local knowledge graph for AI coding agents — builds persistent map of your codebase for token-efficient code reviews</summary>
 
 - **Source**: source

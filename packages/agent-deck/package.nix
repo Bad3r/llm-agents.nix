@@ -10,13 +10,13 @@
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.9.47";
+  version = "1.9.49";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     rev = "v${version}";
-    hash = "sha256-ui31HMzTcA5IAoAC+YoBsnx+CMRk+zhKyTW7dhyKjok=";
+    hash = "sha256-LfQoomymphCb5Kxz+L+LfIbeTISkWlCsMBnEIoximhs=";
   };
 
   vendorHash = "sha256-ltU0qyZEUjzN+E5FOBnfnc4W3CchPJ0+0GFCtA9C8Zo=";
@@ -49,7 +49,12 @@ buildGoModule rec {
   ];
 
   preCheck = ''
-    export HOME=$(mktemp -d)
+    # Since 1.9.48 a test-only guard refuses to touch paths under the real
+    # user home, taken from the passwd entry (/build for nixbld). All temp
+    # dirs (t.TempDir, mktemp) default to TMPDIR=/build and trip it, so move
+    # HOME and TMPDIR to /tmp, which is outside the passwd home.
+    export TMPDIR=$(mktemp -d -p /tmp)
+    export HOME=$(mktemp -d -p /tmp)
     export PATH="${git}/bin:$PATH"
   '';
 
