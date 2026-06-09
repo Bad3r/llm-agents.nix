@@ -1,7 +1,9 @@
 {
   lib,
   stdenv,
+  bash,
   buildGoModule,
+  codegraph,
   fetchFromGitHub,
   flake,
   makeWrapper,
@@ -47,8 +49,18 @@ buildGoModule rec {
 
   postFixup = ''
     wrapProgram $out/bin/reasonix \
-      --prefix PATH : ${lib.makeBinPath [ ripgrep ]} \
-      ${lib.optionalString stdenv.hostPlatform.isLinux "--suffix PATH : ${lib.makeBinPath [ bubblewrap ]}"}
+      --prefix PATH : ${
+        lib.makeBinPath (
+          [
+            bash
+            codegraph
+            ripgrep
+          ]
+          ++ lib.optionals stdenv.hostPlatform.isLinux [
+            bubblewrap
+          ]
+        )
+      }
   '';
 
   meta = {
