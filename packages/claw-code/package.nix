@@ -9,30 +9,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0-unstable-2026-06-07";
+  version = "0-unstable-2026-06-08";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "ae2f203eb5462fbb75f7e719da465c32fcd8b979";
-    hash = "sha256-OHfotPqCzUX1Im8sv7zQ3WrLWPwPv8ke+/fkLRwYLFI=";
+    rev = "d229a9b022d4845d28a728677e6a6b7c22ec5a2e";
+    hash = "sha256-mP7nd9sMsjGD3cOF08C4PW3Y/2EcDGoPlhmcSSTdmeQ=";
   };
 
   sourceRoot = "source/rust";
-
-  # Upstream merge commit ae2f203 botched the conflict resolution in
-  # crates/api/src/providers/openai_compat.rs, leaving a duplicated tail of
-  # send_message behind the closing brace, which fails to parse. Drop the
-  # stray block until upstream fixes it.
-  # Reported upstream: https://github.com/ultraworkers/claw-code/issues/3235
-  patches = [ ./fix-openai-compat-bad-merge.patch ];
-
-  # Upstream added a criterion dev-dependency to crates/api without
-  # regenerating Cargo.lock, so cargo can't resolve it from the vendored
-  # set. We don't run that crate's benches, so just drop the dep.
-  postPatch = ''
-    sed -i '/^criterion = /d' crates/api/Cargo.toml
-  '';
 
   cargoHash = "sha256-Acaycrxm3e87dx3P7NdWnivopF4xxaMi3PPbpSefEyY=";
 
