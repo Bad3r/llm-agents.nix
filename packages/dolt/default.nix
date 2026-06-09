@@ -8,12 +8,12 @@ let
   };
 in
 (base.overrideAttrs (old: rec {
-  version = "2.1.5";
+  version = "2.1.6";
   src = pkgs.fetchFromGitHub {
     owner = "dolthub";
     repo = "dolt";
     rev = "v${version}";
-    hash = "sha256-+/9H3iYNR9gy3JwXjpvOAf/67N/DcYY3ML1I+Ifcygo=";
+    hash = "sha256-Wu79ujLtQcc8Pk9+Du9DB6lPi44fqlC9dhreliI954U=";
   };
   vendorHash = "sha256-mId7ozGsQSEBHqi/Nug71uW2KOMDfY7JkN1AkDk0pKE=";
   passthru = (old.passthru or { }) // {
