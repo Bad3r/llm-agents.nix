@@ -25,13 +25,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.6.1";
+  version = "2026.6.5";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-FjxiI7YHkt6fTzJD7G5A3/wsbcWgpO44IHMOwymDxpg=";
+    hash = "sha256-hiYbIhE13XMFIeB0zmb6AHlfw8le6vpJgCqN81YWGsE=";
   };
 
   pnpmDeps = fetchPnpmDeps {

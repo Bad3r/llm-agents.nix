@@ -1113,6 +1113,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>icm</strong> - Persistent memory for AI agents with hybrid search, temporal decay, and multilingual embeddings</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/rtk-ai/icm
+- **Usage**: `nix run github:numtide/llm-agents.nix#icm -- --help`
+- **Nix**: [packages/icm/package.nix](packages/icm/package.nix)
+
+</details>
+<details>
 <summary><strong>mcporter</strong> - TypeScript runtime and CLI for the Model Context Protocol</summary>
 
 - **Source**: source

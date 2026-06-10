@@ -137,6 +137,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 189939;
         name = "Santhosh Raju";
       };
+      cirios-santhiago = {
+        github = "cirios-santhiago";
+        githubId = 8346803;
+        name = "Cirios Santhiago";
+      };
     };
   }
 )

@@ -3,26 +3,28 @@
   buildGoModule,
   fetchFromGitHub,
   flake,
-  go_1_26,
+  go-bin,
   unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-(buildGoModule.override { go = go_1_26; }) rec {
+# entireio/auth-go requires a go >= 1.26.4 toolchain, but nixpkgs only ships
+# 1.26.3 so far; go-bin tracks the latest upstream patch release.
+(buildGoModule.override { go = go-bin; }) rec {
   pname = "entire";
-  version = "0.7.3";
+  version = "0.7.5";
 
   src = fetchFromGitHub {
     owner = "entireio";
     repo = "cli";
     rev = "v${version}";
-    hash = "sha256-M5TOZYLHpOisxPlU7fWPs8pOIfaEHI74UiUZjDy3uqE=";
+    hash = "sha256-bCfXaFag3eS2bp+qlOWkYJpsx67b4To5AABtimeiYzg=";
   };
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
-  vendorHash = "sha256-XzDM5Zh1XiK7oaegiAzDONNTdxVAoB2g5XNJ2PAcwzM=";
+  vendorHash = "sha256-31GHWH7KdjpspNauJz3jpICf20OhtbnwXgcOjBpTL1Q=";
 
   subPackages = [ "./cmd/entire" ];
 
