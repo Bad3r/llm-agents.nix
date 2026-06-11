@@ -12,13 +12,13 @@ buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   forceGitDeps = true;
   pname = "gitnexus";
-  version = "1.6.5";
+  version = "1.6.6";
 
   src = fetchFromGitHub {
     owner = "abhigyanpatwari";
     repo = "GitNexus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-bNV6yhbMbCYmkSu67dEF3Pm4amgzXNopWk+G2fmkdpI=";
+    hash = "sha256-6j6phmZwbfXMcHFbDNjOD78lBF67c3a+a5x6qo7p4as=";
   };
 
   sourceRoot = "source/gitnexus";
@@ -41,10 +41,18 @@ buildNpmPackage (finalAttrs: {
       --replace-fail "path.join('node_modules', '.bin', 'tsc')" "'tsc'"
   '';
 
-  npmDepsHash = "sha256-BRvS1npNezOKThqQcHa1YKOSNQa5dL582/JszB6vdRI=";
+  npmDepsHash = "sha256-EG4/uRujXRVbjJkU6Q+YKOKPejIWIeSmjD/dYatuGZM=";
   makeCacheWritable = true;
 
   npmFlags = [ "--ignore-scripts" ];
+
+  # --ignore-scripts skips the upstream postinstall that copies vendored
+  # tree-sitter grammars (dart/proto/swift) into node_modules; tsc needs
+  # their type declarations. The native binding build is still skipped, as
+  # it was with the 1.6.5 file: optionalDependencies under --ignore-scripts.
+  preBuild = ''
+    node scripts/materialize-vendor-grammars.cjs
+  '';
 
   nativeBuildInputs = [
     makeWrapper
@@ -82,8 +90,7 @@ buildNpmPackage (finalAttrs: {
       fi
 
       wrapProgram $out/bin/gitnexus \
-        --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}" \
-        --run 'export GITNEXUS_CACHE_DIR="$HOME/.cache"'
+        --set-default GITNEXUS_ORT_BINDING_PATH "${ortBinding}"
     '';
 
   passthru.category = "Memory & Code Intelligence";

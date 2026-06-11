@@ -19,13 +19,13 @@ let
 in
 buildNpmPackage rec {
   pname = "hermes-desktop";
-  version = "0.5.9";
+  version = "0.6.0";
 
   src = fetchFromGitHub {
     owner = "fathah";
     repo = "hermes-desktop";
     tag = "v${version}";
-    hash = "sha256-B4tGpNY50+C+8RBtTxxwXLCAftH2dXcNwVe2o4XNaGg=";
+    hash = "sha256-s+kL5DHg/PoPbuPf9AQjA+j1r1dAhQ84woay4j46i9c=";
   };
 
   npmDepsHash = "sha256-r07MF5sJvx/nbm5lUr6v3ENik82C5Ca/u1gmr1y0Yfc=";

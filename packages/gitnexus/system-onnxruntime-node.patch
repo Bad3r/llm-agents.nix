@@ -1,102 +1,26 @@
 diff --git gitnexus/src/core/embeddings/embedder.ts gitnexus/src/core/embeddings/embedder.ts
-index 72ddcbd7..9516db3c 100644
+index d873f3a..6e853df 100644
 --- gitnexus/src/core/embeddings/embedder.ts
 +++ gitnexus/src/core/embeddings/embedder.ts
-@@ -20,12 +20,31 @@ import {
-   type FeatureExtractionPipeline,
-   type ProgressInfo,
- } from '@huggingface/transformers';
--import { existsSync } from 'fs';
-+import { existsSync, mkdirSync } from 'fs';
- import { execFileSync } from 'child_process';
- import { join, dirname } from 'path';
- import { createRequire } from 'module';
- import { DEFAULT_EMBEDDING_CONFIG, type EmbeddingConfig, type ModelProgress } from './types.js';
- import { isHttpMode, getHttpDimensions, httpEmbed } from './http-client.js';
-+import { applyOnnxruntimeNodeBindingOverride } from './onnxruntime-node-loader.js';
-+
-+const configureTransformersCache = () => {
-+  const cacheRoot =
-+    process.env.GITNEXUS_CACHE_DIR ??
-+    process.env.XDG_CACHE_HOME ??
-+    (process.env.HOME ? join(process.env.HOME, '.cache') : null);
-+
-+  if (!cacheRoot) return;
-+
-+  const cacheDir = join(cacheRoot, 'gitnexus', 'transformers');
-+  try {
-+    mkdirSync(cacheDir, { recursive: true });
-+    env.cacheDir = cacheDir;
-+    env.useFSCache = true;
-+  } catch {
-+    // If cache setup fails, fall back to transformers.js defaults.
-+  }
-+};
+@@ -28,6 +28,7 @@ import { isHttpMode, getHttpDimensions, httpEmbed } from './http-client.js';
  import { resolveEmbeddingConfig } from './config.js';
  import { applyHfEnvOverrides, isHfDownloadFailure, withHfDownloadRetry } from './hf-env.js';
+ import { getLocalEmbeddingRuntimeBlocker } from './runtime-support.js';
++import { applyOnnxruntimeNodeBindingOverride } from './onnxruntime-node-loader.js';
  import { logger } from '../logger.js';
-@@ -145,6 +164,9 @@ export const initEmbedder = async (
-   }
  
-   // If already initializing, wait for that promise
-+  applyOnnxruntimeNodeBindingOverride();
-+  configureTransformersCache();
-+
-   if (isInitializing && initPromise) {
-     return initPromise;
-   }
-diff --git gitnexus/src/mcp/core/embedder.ts gitnexus/src/mcp/core/embedder.ts
-index f529f280..00d2c737 100644
---- gitnexus/src/mcp/core/embedder.ts
-+++ gitnexus/src/mcp/core/embedder.ts
-@@ -6,6 +6,8 @@
-  */
+ /**
+@@ -179,6 +180,7 @@ export const initEmbedder = async (
+     try {
+       // Lazy-load transformers.js only after the runtime guard has passed, so
+       // unsupported platforms never reach the native ONNX import (#1515).
++      applyOnnxruntimeNodeBindingOverride();
+       const { pipeline, env } = await import('@huggingface/transformers');
  
- import { pipeline, env, type FeatureExtractionPipeline } from '@huggingface/transformers';
-+import { mkdirSync } from 'fs';
-+import { join } from 'path';
- import {
-   isHttpMode,
-   getHttpDimensions,
-@@ -18,6 +20,25 @@ import {
-   withHfDownloadRetry,
- } from '../../core/embeddings/hf-env.js';
- import { silenceStdout, restoreStdout, realStderrWrite } from '../../core/lbug/pool-adapter.js';
-+import { applyOnnxruntimeNodeBindingOverride } from '../../core/embeddings/onnxruntime-node-loader.js';
-+
-+const configureTransformersCache = () => {
-+  const cacheRoot =
-+    process.env.GITNEXUS_CACHE_DIR ??
-+    process.env.XDG_CACHE_HOME ??
-+    (process.env.HOME ? join(process.env.HOME, '.cache') : null);
-+
-+  if (!cacheRoot) return;
-+
-+  const cacheDir = join(cacheRoot, 'gitnexus', 'transformers');
-+  try {
-+    mkdirSync(cacheDir, { recursive: true });
-+    env.cacheDir = cacheDir;
-+    env.useFSCache = true;
-+  } catch {
-+    // If cache setup fails, fall back to transformers.js defaults.
-+  }
-+};
- 
- import { logger } from '../../core/logger.js';
- // Model config
-@@ -40,6 +61,9 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
-     return embedderInstance;
-   }
- 
-+  applyOnnxruntimeNodeBindingOverride();
-+  configureTransformersCache();
-+
-   if (isInitializing && initPromise) {
-     return initPromise;
-   }
+       // Configure transformers.js environment
 diff --git gitnexus/src/core/embeddings/onnxruntime-node-loader.ts gitnexus/src/core/embeddings/onnxruntime-node-loader.ts
 new file mode 100644
-index 00000000..252064f0
+index 0000000..252064f
 --- /dev/null
 +++ gitnexus/src/core/embeddings/onnxruntime-node-loader.ts
 @@ -0,0 +1,53 @@
@@ -153,3 +77,23 @@ index 00000000..252064f0
 +    return originalResolve(request, parent, isMain, options);
 +  };
 +};
+diff --git gitnexus/src/mcp/core/embedder.ts gitnexus/src/mcp/core/embedder.ts
+index 451d12c..477c718 100644
+--- gitnexus/src/mcp/core/embedder.ts
++++ gitnexus/src/mcp/core/embedder.ts
+@@ -24,6 +24,7 @@ import {
+ import { getLocalEmbeddingRuntimeBlocker } from '../../core/embeddings/runtime-support.js';
+ import { silenceStdout, restoreStdout, realStderrWrite } from '../../core/lbug/pool-adapter.js';
+ 
++import { applyOnnxruntimeNodeBindingOverride } from '../../core/embeddings/onnxruntime-node-loader.js';
+ import { logger } from '../../core/logger.js';
+ // Model config
+ const MODEL_ID = 'Snowflake/snowflake-arctic-embed-xs';
+@@ -65,6 +66,7 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
+     try {
+       // Lazy-load transformers.js only after the runtime guard has passed, so
+       // unsupported platforms never reach the native ONNX import (#1515).
++      applyOnnxruntimeNodeBindingOverride();
+       const { pipeline, env } = await import('@huggingface/transformers');
+ 
+       env.allowLocalModels = false;

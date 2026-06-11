@@ -36,7 +36,6 @@ stdenv.mkDerivation {
     runHook preInstall
 
     install -Dm755 antigravity $out/bin/agy
-    ln -s agy $out/bin/antigravity
 
     runHook postInstall
   '';

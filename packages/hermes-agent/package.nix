@@ -122,53 +122,43 @@ let
     };
   };
 
-  version = "2026.5.29";
+  version = "2026.6.5";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-4SwFC4IjwdQi27dHXTd8QYS1eJHiQY0ja2LxyeW6KjE=";
+    hash = "sha256-ngpkopVczNrT0bfCXHm38QjgrZT96Bm/rO89NA/ls3Y=";
   };
 
-  # `hermes --tui` runs a compiled Ink/React app from ui-tui/ that the wheel
-  # does not ship. Prebuild it and expose via HERMES_TUI_DIR so the CLI takes
-  # the fast-path in hermes_cli/main.py:_make_tui_argv (#4364).
-  hermes-tui = buildNpmPackage {
-    pname = "hermes-tui";
-    inherit version;
-    src = "${src}/ui-tui";
-    npmDepsHash = "sha256-F6/MzZOWc0zhW9mIfnaY+PrllPvJcsA/OdFdEM+NpLY=";
+  # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
+  # package-lock.json, so both frontends must be built from the repo root.
+  # `hermes --tui` runs the compiled Ink/React bundle via HERMES_TUI_DIR
+  # (hermes_cli/main.py:_make_tui_argv fast-path, #4364) and
+  # `hermes dashboard` serves the Vite app via HERMES_WEB_DIST.
+  hermes-frontend = buildNpmPackage {
+    pname = "hermes-frontend";
+    inherit version src;
+    npmDepsHash = "sha256-hgnqcpKRPztHhDEpwC7HJrALuJp9wsrV4+GJ6t6HI2c=";
 
-    installPhase = ''
-      runHook preInstall
-      mkdir -p $out/lib/hermes-tui
-      cp -r dist node_modules package.json $out/lib/hermes-tui/
-      # @hermes/ink is a file: dep — replace dangling symlink with the source.
-      rm -f $out/lib/hermes-tui/node_modules/@hermes/ink
-      cp -r packages/hermes-ink $out/lib/hermes-tui/node_modules/@hermes/ink
-      runHook postInstall
-    '';
-  };
-
-  # `hermes dashboard` serves a Vite app from hermes_cli/web_dist. Build it
-  # ahead of time and point the wrapper at the immutable output so packaged
-  # installs never try to build frontend assets at runtime.
-  hermes-web = buildNpmPackage {
-    pname = "hermes-web";
-    inherit version;
-    src = "${src}/web";
-    npmDepsHash = "sha256-HV0aISBVjwbGqDj8qQynSxGFrrZDzuYAW3D3lB/x3zo=";
+    # The apps/desktop workspace pulls in electron; skip its binary download
+    # and all install scripts — the esbuild/vite builds below don't need them.
+    npmFlags = [ "--ignore-scripts" ];
+    env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
 
     buildPhase = ''
       runHook preBuild
-      npm run build -- --outDir "$TMPDIR/web-dist"
+      npm run build --workspace ui-tui
+      npm run build --workspace web -- --outDir "$TMPDIR/web-dist"
       runHook postBuild
     '';
 
+    # dist/entry.js is a self-contained esbuild bundle; package.json is kept
+    # so node resolves it as an ES module.
     installPhase = ''
       runHook preInstall
-      mkdir -p $out/share/hermes-web
+      mkdir -p $out/lib/hermes-tui $out/share/hermes-web
+      cp -r ui-tui/dist ui-tui/package.json $out/lib/hermes-tui/
       cp -r "$TMPDIR/web-dist"/. $out/share/hermes-web/
       runHook postInstall
     '';
@@ -185,6 +175,7 @@ let
       httpx
       rich
       tenacity
+      pathspec
       pyyaml
       ruamel-yaml
       requests
@@ -229,11 +220,12 @@ let
       # [web]
       fastapi
       uvicorn
+      # [markdown] — used by matrix and other formatters
+      markdown
     ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
       # [matrix] — python-olm broken on macOS upstream.
       mautrix
-      markdown
       aiosqlite
       asyncpg
     ];
@@ -273,23 +265,16 @@ python3.pkgs.buildPythonApplication {
     setuptools
   ];
 
-  postPatch = ''
-    # Upstream package discovery only lists `hermes_cli`, which drops nested
-    # modules such as dashboard_auth and proxy from isolated setuptools builds.
-    substituteInPlace pyproject.toml \
-      --replace-fail '"hermes_cli", "gateway"' '"hermes_cli", "hermes_cli.*", "gateway"'
-  '';
-
   dependencies = hermesDeps;
   optional-dependencies = optionalDeps;
 
   makeWrapperArgs = [
     "--set"
     "HERMES_TUI_DIR"
-    "${hermes-tui}/lib/hermes-tui"
+    "${hermes-frontend}/lib/hermes-tui"
     "--set"
     "HERMES_WEB_DIST"
-    "${hermes-web}/share/hermes-web"
+    "${hermes-frontend}/share/hermes-web"
     "--set"
     "HERMES_PYTHON"
     "${pythonEnv}/bin/python3"
@@ -313,6 +298,7 @@ python3.pkgs.buildPythonApplication {
     "ruamel.yaml"
     "requests"
     "pydantic"
+    "pathspec"
     "firecrawl-py"
     "pyjwt"
   ];
@@ -341,14 +327,14 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_WEB_DIST $out/bin/hermes
     grep -q HERMES_PYTHON $out/bin/hermes
     grep -q HERMES_PYTHON_SRC_ROOT $out/bin/hermes
-    test -f ${hermes-tui}/lib/hermes-tui/dist/entry.js
-    test -f ${hermes-web}/share/hermes-web/index.html
+    test -f ${hermes-frontend}/lib/hermes-tui/dist/entry.js
+    test -f ${hermes-frontend}/share/hermes-web/index.html
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
   '';
 
   passthru = {
     category = "AI Assistants";
-    inherit hermes-tui hermes-web;
+    inherit hermes-frontend;
   };
 
   meta = with lib; {
