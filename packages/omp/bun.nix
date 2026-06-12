@@ -1235,9 +1235,9 @@
     url = "https://registry.npmjs.org/elkjs/-/elkjs-0.11.1.tgz";
     hash = "sha512-zxxR9k+rx5ktMwT/FwyLdPCrq7xN6e4VGGHH8hA01vVYKjTFik7nHOxBnAYtrgYUB1RpAiLvA1/U2YraWxyKKg==";
   };
-  "emnapi@1.10.0" = fetchurl {
-    url = "https://registry.npmjs.org/emnapi/-/emnapi-1.10.0.tgz";
-    hash = "sha512-swoyZjupDvLoe/KC3HZ4SY1JUN+tviT6eOZ3Px28TZAYdBHtRIiMWWrIUUH+2/9CYY4fNTID1YhYZ+kdFHszHg==";
+  "emnapi@1.11.0" = fetchurl {
+    url = "https://registry.npmjs.org/emnapi/-/emnapi-1.11.0.tgz";
+    hash = "sha512-3+AyVLAzk2jr9FPnCT9fgU4/gGoHrB3MpYxqNG6JdmkWmFPpKAhArQgfK/WEiT9kExX2ecXVA6DoPceDShR47g==";
   };
   "emoji-regex@10.6.0" = fetchurl {
     url = "https://registry.npmjs.org/emoji-regex/-/emoji-regex-10.6.0.tgz";
