@@ -1,9 +1,9 @@
 {
-  "version": "7.3.41",
+  "version": "7.3.45",
   "hashes": {
-    "aarch64-darwin": "sha256-vI5prnBLi0dULla1zTpDkeW9rJijOYTZUkgcasqHbrc=",
-    "x86_64-darwin": "sha256-M8uf2+D9ymAQdHzexL19zQLOpiFAE4p+pQJ9befzGxg=",
-    "x86_64-linux": "sha256-K8yYGAwvxdWpAzFQlzcQRnzhBztRMSKmX1OdsDSkSKY=",
-    "aarch64-linux": "sha256-fnyhyDL627kQlLEZreZgywaF6exUBgG1i5BHV9FNKXY="
+    "aarch64-darwin": "sha256-NkUEni/wDRXtJGdo7T5AoYJIeCSqqte9ayO97BgEX1c=",
+    "x86_64-darwin": "sha256-8sza2mG6dkx20Zlxr7cFLKzVNyH8Ufx3nRkT7tX2OtY=",
+    "aarch64-linux": "sha256-jXNCn5NEo82kQtYu+5T6U0ooFvuvy6qiu0AzHV1qk0M=",
+    "x86_64-linux": "sha256-qOAd1gzIe1a3YvVOqzxNeaMLYOFJB32yKuPdUnLtnwA="
   }
 }
