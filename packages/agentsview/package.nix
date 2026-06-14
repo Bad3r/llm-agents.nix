@@ -5,6 +5,7 @@
   buildNpmPackage,
   fetchFromGitHub,
   versionCheckHook,
+  makeBinaryWrapper,
   unpinGoModVersionHook,
 }:
 
@@ -41,7 +42,10 @@ buildGoModule {
   pname = "agentsview";
   inherit version src vendorHash;
 
-  nativeBuildInputs = [ unpinGoModVersionHook ];
+  nativeBuildInputs = [
+    makeBinaryWrapper
+    unpinGoModVersionHook
+  ];
 
   subPackages = [ "cmd/agentsview" ];
   tags = [ "fts5" ];
@@ -64,6 +68,11 @@ buildGoModule {
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
+
+  postInstall = ''
+    wrapProgram $out/bin/agentsview \
+      --set AGENTSVIEW_TELEMETRY_ENABLED 0
+  '';
 
   passthru.category = "Usage Analytics";
 

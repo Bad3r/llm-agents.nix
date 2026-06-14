@@ -111,6 +111,9 @@ rustPlatform.buildRustPackage {
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    mkdir -p $out/codex-resources
+    ln -s ${lib.getExe bubblewrap} $out/codex-resources/bwrap
+
     wrapProgram $out/bin/codex \
       --prefix PATH : ${lib.makeBinPath [ bubblewrap ]}
   '';
