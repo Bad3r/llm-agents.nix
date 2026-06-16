@@ -97,17 +97,12 @@ rustPlatform.buildRustPackage {
   };
 
   preBuild = ''
-    # Upstream sets codegen-units=1 in [profile.release] purely to shrink
-    # the shipped binary (openai/codex#1411). With ~1.2k crates and 80
-    # workspace members, codegen-units=1 makes each late-stage rustc hold the
-    # whole crate's IR in one module (~2–2.5 GiB RSS for codex-core/-tui), so
-    # `cargo -j$NIX_BUILD_CORES` peaks at ~12 GiB and OOMs our 16 GiB aarch64
-    # builder. Use 16 codegen-units instead: keeps memory bounded while
-    # shrinking __TEXT below the 128 MiB ARM64 branch range, which the
-    # default Mach-O linker hit on aarch64-darwin (#4417). Upstream switched
-    # lto to "thin" itself in 0.138.0, so only codegen-units needs patching.
+    # Upstream's low codegen-units (4 since 0.140.0) makes late-stage rustc
+    # hold large IR modules, peaking at ~12 GiB and OOMing our 16 GiB aarch64
+    # builder. Raise to 16 to bound memory; __TEXT still stays below the
+    # 128 MiB ARM64 branch range the Mach-O linker hit on aarch64-darwin (#4417).
     substituteInPlace Cargo.toml \
-      --replace-fail 'codegen-units = 1' 'codegen-units = 16'
+      --replace-fail 'codegen-units = 4' 'codegen-units = 16'
   '';
 
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''

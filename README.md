@@ -221,6 +221,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>mimo-code</strong> - Open-source AI coding agent with cross-session memory</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/XiaomiMiMo/MiMo-Code
+- **Usage**: `nix run github:numtide/llm-agents.nix#mimo-code -- --help`
+- **Nix**: [packages/mimo-code/package.nix](packages/mimo-code/package.nix)
+
+</details>
+<details>
 <summary><strong>mistral-vibe</strong> - Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral</summary>
 
 - **Source**: source

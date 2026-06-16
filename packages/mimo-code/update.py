@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 --command python3
 
-"""Update script for cursor-agent package."""
+"""Update script for mimo-code package binary releases."""
 
 import sys
 from pathlib import Path
@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 from updater import (
     calculate_platform_hashes,
-    fetch_version_from_text,
+    fetch_github_latest_release,
     load_hashes,
     save_hashes,
     should_update,
@@ -19,25 +19,18 @@ from updater import (
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
 PLATFORMS = {
-    "x86_64-linux": "linux/x64",
-    "aarch64-linux": "linux/arm64",
-    "x86_64-darwin": "darwin/x64",
-    "aarch64-darwin": "darwin/arm64",
+    "x86_64-linux": "mimocode-linux-x64.tar.gz",
+    "aarch64-linux": "mimocode-linux-arm64.tar.gz",
+    "x86_64-darwin": "mimocode-darwin-x64.zip",
+    "aarch64-darwin": "mimocode-darwin-arm64.zip",
 }
-
-VERSION_URL = "https://cursor.com/install"
-# Build id suffix can contain hyphens (e.g. 2026.06.15-18-00-12-6f5a2cf);
-# match them and anchor on the trailing path separator.
-VERSION_PATTERN = (
-    r"downloads\.cursor\.com/lab/([0-9]{4}\.[0-9]{2}\.[0-9]{2}-[0-9a-f-]+)/"
-)
 
 
 def main() -> None:
-    """Update the cursor-agent package."""
+    """Update the mimo-code package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    latest = fetch_version_from_text(VERSION_URL, VERSION_PATTERN)
+    latest = fetch_github_latest_release("XiaomiMiMo", "MiMo-Code")
 
     print(f"Current: {current}, Latest: {latest}")
 
@@ -45,7 +38,10 @@ def main() -> None:
         print("Already up to date")
         return
 
-    url_template = f"https://downloads.cursor.com/lab/{latest}/{{platform}}/agent-cli-package.tar.gz"
+    url_template = (
+        f"https://github.com/XiaomiMiMo/MiMo-Code/releases/download/"
+        f"v{latest}/{{platform}}"
+    )
     hashes = calculate_platform_hashes(url_template, PLATFORMS)
 
     save_hashes(HASHES_FILE, {"version": latest, "hashes": hashes})

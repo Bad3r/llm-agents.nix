@@ -79,15 +79,18 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
 
-    # Build the library and CLI bundles
-    bun build src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi
-    bun build src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi
+    # Build the library and CLI bundles. Since 4.9.x upstream split into a
+    # monorepo, so the entry points live under packages/omo-opencode/.
+    bun build packages/omo-opencode/src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi --external zod
+    bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi
 
     # Generate the config schema (non-fatal if it fails)
     bun run build:schema || true
 
-    # Build the ast_grep MCP server (bun workspace package)
+    # Build the bundled MCP servers (bun workspace packages). git-bash-mcp was
+    # added in 4.10.0; the plugin resolves all three at runtime.
     bun run --cwd packages/ast-grep-mcp build
+    bun run --cwd packages/git-bash-mcp build
 
     # Build the lsp_tools MCP server (npm-managed submodule) offline
     # against the pre-fetched npm cache
@@ -112,15 +115,16 @@ stdenv.mkDerivation {
     cp -r dist node_modules package.json $out/lib/oh-my-opencode/
 
     # The plugin resolves its MCP servers at
-    # <ancestor>/packages/{ast-grep-mcp,lsp-tools-mcp}/dist/cli.js
+    # <ancestor>/packages/{ast-grep-mcp,git-bash-mcp,lsp-tools-mcp}/dist/cli.js
     mkdir -p $out/lib/oh-my-opencode/packages
-    cp -r packages/{ast-grep-mcp,lsp-tools-mcp,shared-skills} $out/lib/oh-my-opencode/packages/
+    cp -r packages/{ast-grep-mcp,git-bash-mcp,lsp-tools-mcp,shared-skills} $out/lib/oh-my-opencode/packages/
 
-    # ast-grep-mcp's dist/cli.js is a self-contained bun bundle; its
-    # node_modules only holds a workspace symlink that would dangle in
-    # $out and fail noBrokenSymlinks. lsp-tools-mcp keeps its
+    # ast-grep-mcp's and git-bash-mcp's dist/cli.js are self-contained bun
+    # bundles; their node_modules only hold workspace symlinks that would
+    # dangle in $out and fail noBrokenSymlinks. lsp-tools-mcp keeps its
     # node_modules — tsc output imports deps at runtime.
     rm -rf $out/lib/oh-my-opencode/packages/ast-grep-mcp/node_modules
+    rm -rf $out/lib/oh-my-opencode/packages/git-bash-mcp/node_modules
 
     # Remove broken workspace symlinks (monorepo workspace packages
     # aren't needed at runtime — the CLI bundle is self-contained)

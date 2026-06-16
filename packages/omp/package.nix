@@ -219,6 +219,12 @@ stdenv.mkDerivation {
     echo "Generating embedded stats dashboard..."
     bun --cwd packages/stats scripts/generate-client-bundle.ts --generate
 
+    # Generate the embedded HTML-export tool-views bundle (coding-agent prepack
+    # step): export/html/index.ts text-imports ./tool-views.generated.js, which
+    # bun compile cannot resolve unless it is generated first.
+    echo "Generating embedded HTML-export tool-views..."
+    bun --cwd packages/collab-web scripts/build-tool-views.ts
+
     # Compile the standalone binary. Since v15.11.0 workers re-enter via
     # Bun.main, so no separate worker entrypoints are needed.
     echo "Compiling standalone binary..."
