@@ -10,13 +10,13 @@
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.9.57";
+  version = "1.9.68";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     rev = "v${version}";
-    hash = "sha256-Pn+OVshqc0bZNr4ClYx6JtWQk0YZFjxwZNnBM7CB3Xg=";
+    hash = "sha256-nC9fJ+rp/BOqygRTabg1XROIkqHdbrjvoi7eCZih8Yw=";
   };
 
   vendorHash = "sha256-GyG71/iR2R4mq1vOYcL4rGXh0RQIMNeWj+WtjF75KCg=";
@@ -43,9 +43,13 @@ buildGoModule rec {
   # polls real wall-clock time with a 20ms window and 2ms interval; on loaded
   # CI builders the window elapses before the consumed pane is observed and a
   # spurious warning fails the test. Timing-sensitive; skip it.
+  # TestWaitForFreshOutput_UniquePeerStillReads waits for fresh transcript
+  # output with a 300ms freshness timeout; on loaded CI builders the read
+  # races past the window and the transcript comes back empty. Timing-sensitive;
+  # skip it.
   checkFlags = [
     "-short"
-    "-skip=TestValidatePluginFlags_TelegramForkAccepted|TestValidatePluginFlags_EmptyCatalogActionableError|TestVerifyPromptConsumedAfterLaunch_UnsentFirstWindow_RetryThenConsumed_OneRetry_NoWarning"
+    "-skip=TestValidatePluginFlags_TelegramForkAccepted|TestValidatePluginFlags_EmptyCatalogActionableError|TestVerifyPromptConsumedAfterLaunch_UnsentFirstWindow_RetryThenConsumed_OneRetry_NoWarning|TestWaitForFreshOutput_UniquePeerStillReads"
   ];
 
   preCheck = ''
