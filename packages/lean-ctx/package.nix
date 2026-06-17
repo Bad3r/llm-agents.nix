@@ -45,7 +45,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     changelog = "https://github.com/yvgude/lean-ctx/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    maintainers = with flake.lib.maintainers; [ cirios-santhiago ];
+    maintainers = with flake.lib.maintainers; [ csanthiago ];
     mainProgram = "lean-ctx";
     platforms = lib.platforms.unix;
   };

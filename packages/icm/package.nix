@@ -111,7 +111,7 @@ rustPlatform.buildRustPackage {
 
   passthru = {
     inherit icm-web;
-    category = "Utilities";
+    category = "Memory & Code Intelligence";
   };
 
   meta = with lib; {
@@ -120,7 +120,7 @@ rustPlatform.buildRustPackage {
     changelog = "https://github.com/rtk-ai/icm/releases/tag/icm-v${hashes.version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    maintainers = with flake.lib.maintainers; [ cirios-santhiago ];
+    maintainers = with flake.lib.maintainers; [ csanthiago ];
     mainProgram = "icm";
     platforms = platforms.unix;
   };
