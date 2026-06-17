@@ -913,6 +913,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>icm</strong> - Persistent memory for AI agents with hybrid search, temporal decay, and multilingual embeddings</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/rtk-ai/icm
+- **Usage**: `nix run github:numtide/llm-agents.nix#icm -- --help`
+- **Nix**: [packages/icm/package.nix](packages/icm/package.nix)
+
+</details>
+<details>
 <summary><strong>lean-ctx</strong> - Context OS for AI development — compression, memory, and routing for LLM context</summary>
 
 - **Source**: source
@@ -1130,16 +1140,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/slopus/happy
 - **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
 - **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
-
-</details>
-<details>
-<summary><strong>icm</strong> - Persistent memory for AI agents with hybrid search, temporal decay, and multilingual embeddings</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/rtk-ai/icm
-- **Usage**: `nix run github:numtide/llm-agents.nix#icm -- --help`
-- **Nix**: [packages/icm/package.nix](packages/icm/package.nix)
 
 </details>
 <details>
