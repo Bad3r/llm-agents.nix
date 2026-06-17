@@ -165,14 +165,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.16.0";
+  version = "2.16.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-FBpHVES1EXz1ihE7FrKy24BcrAylMsk3lqtQymBIRVA=";
+    hash = "sha256-sv0gaEA7dvf4trxlsRQS9xA5Hiike5i/aLI3qYKP/lY=";
   };
 
   build-system = with python.pkgs; [
