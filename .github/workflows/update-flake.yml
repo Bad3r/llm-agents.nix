@@ -36,7 +36,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
       has-updates: ${{ steps.build-matrix.outputs.has-updates }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
         with:
@@ -67,7 +67,7 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ steps.app-token.outputs.token }}
           # Full history needed so we can rebase existing update/* branches onto main.
@@ -142,7 +142,7 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ steps.app-token.outputs.token }}
           ref: main
