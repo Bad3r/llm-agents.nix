@@ -8,18 +8,18 @@
   stdenv,
   darwinMinVersionHook,
 }:
-rustPlatform.buildRustPackage {
+rustPlatform.buildRustPackage rec {
   pname = "ck";
   version = "0.7.11";
 
   src = fetchFromGitHub {
     owner = "BeaconBay";
     repo = "ck";
-    tag = "0.7.4";
-    hash = "sha256-fUD/YeOMy8+oM1UA4clqto0i3gSZkyRuhxBnNb0KYTI=";
+    tag = version;
+    hash = "sha256-YZ5zswjTvst6Ee5arJPKzz9BDIIXf/pHuQ6QB+qZ9kc=";
   };
 
-  cargoHash = "sha256-ULuvrXV7+RsaHouuE2MuOWvR0KERkovGY8TVBeDIkjg=";
+  cargoHash = "sha256-sv7wTFN5eA7HWOE+syDGLtwcV/pvUmqyO8Cb0n5ldgE=";
 
   nativeBuildInputs = [ pkg-config ];
 
