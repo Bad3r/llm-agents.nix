@@ -176,6 +176,7 @@ let
       rich
       tenacity
       pathspec
+      pillow
       pyyaml
       ruamel-yaml
       requests
@@ -301,6 +302,10 @@ python3.pkgs.buildPythonApplication {
     "pathspec"
     "firecrawl-py"
     "pyjwt"
+    "certifi"
+    "packaging"
+    "urllib3"
+    "websockets"
   ];
 
   pythonImportsCheck = [
