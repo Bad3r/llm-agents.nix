@@ -1,21 +1,21 @@
 {
-  "version": "1.0.24",
+  "version": "1.0.25",
   "platforms": {
     "aarch64-darwin": {
-      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.24/qodercli-darwin-arm64.tar.gz",
-      "hash": "sha256-mAWlarlPyQf+V17uZlmtJ0G5//bV6zXeAYp6/1YA0q4="
+      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.25/qodercli-darwin-arm64.tar.gz",
+      "hash": "sha256-+zVRO11TzHBu/7Q12i5afYiZ5qUKTi7pIBjCIogLToQ="
     },
     "x86_64-darwin": {
-      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.24/qodercli-darwin-x64.tar.gz",
-      "hash": "sha256-MS7XcEpeyNBypwj9GXQhAXXkrDSs2/uRkR4SbmpTbEc="
+      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.25/qodercli-darwin-x64.tar.gz",
+      "hash": "sha256-A9/mAiRNSEiag01574kC3S3XPu08P6ZvRHkpmzxxkMU="
     },
     "aarch64-linux": {
-      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.24/qodercli-linux-arm64.tar.gz",
-      "hash": "sha256-9F9hr0UhHn1IyBf7fYNkkBKttRSpToYFwacXTDv4M+8="
+      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.25/qodercli-linux-arm64.tar.gz",
+      "hash": "sha256-k8z22dX+O89tl2uMhXYU3/dTtImclT3m8aDlWRuJpJk="
     },
     "x86_64-linux": {
-      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.24/qodercli-linux-x64.tar.gz",
-      "hash": "sha256-gVazn7FpW1o1hMJ6reVUdPf5EsTcx9b1QVRUlePW5Is="
+      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.0.25/qodercli-linux-x64.tar.gz",
+      "hash": "sha256-FGP927vgG2hGjsiGpZFhgVDtwi0CyPL201M1E7vmJ9U="
     }
   }
 }

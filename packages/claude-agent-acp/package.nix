@@ -7,16 +7,16 @@
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "claude-agent-acp";
-  version = "0.48.0";
+  version = "0.49.0";
 
   src = fetchFromGitHub {
     owner = "agentclientprotocol";
     repo = "claude-agent-acp";
     rev = "v${version}";
-    hash = "sha256-1uCJnly47UAQNKURCFeaIsVEJV1CDuJkQ/E7wg9O0K0=";
+    hash = "sha256-1j6AsPS++TCnME3+gFjRLoeiYg9Pc4c8JFBBtYLhXho=";
   };
 
-  npmDepsHash = "sha256-cQ/ulmTyc/yvIEbZ64xLKdTwxmMh/jZcJdyQRJagHNU=";
+  npmDepsHash = "sha256-RhENCjlsszNeBBJ4Ut5eXeE/F2dFRESzHZH90EEGxqk=";
   makeCacheWritable = true;
 
   # Disable install scripts to avoid platform-specific dependency fetching issues
