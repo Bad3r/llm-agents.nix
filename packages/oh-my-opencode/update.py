@@ -4,9 +4,9 @@
 """Update script for oh-my-opencode package.
 
 Custom updater needed because oh-my-opencode uses bun2nix (bun.nix must be
-regenerated from upstream bun.lock) and fetches submodules, so both the
-source hash and the lsp-tools-mcp npm deps hash are recovered from failed
-builds via calculate_dependency_hash instead of nix-prefetch-url.
+regenerated from upstream bun.lock) and fetches submodules, so the source
+hash is recovered from a failed build via calculate_dependency_hash
+instead of nix-prefetch-url.
 """
 
 import sys
@@ -76,18 +76,6 @@ def main() -> None:
     data["hash"] = src_hash
     save_hashes(HASHES_FILE, data)
     print(f"  source hash: {src_hash}")
-
-    # Step 4: lsp-tools-mcp npm deps hash
-    print("Calculating lsp-tools-mcp npm cache hash...")
-    npm_hash = calculate_dependency_hash(
-        package_attr=".#oh-my-opencode",
-        hash_key="lspToolsMcpNpmHash",
-        hashes_file=HASHES_FILE,
-        data=data,
-    )
-    data["lspToolsMcpNpmHash"] = npm_hash
-    save_hashes(HASHES_FILE, data)
-    print(f"  lspToolsMcpNpmHash: {npm_hash}")
 
     print(f"Updated oh-my-opencode to {latest}")
 

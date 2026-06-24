@@ -35,18 +35,18 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "paseo-desktop";
-  version = "0.1.98";
+  version = "0.1.99";
 
   src = fetchFromGitHub {
     owner = "getpaseo";
     repo = "paseo";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Hm2V7Nct9ZTopgtuuAy5qAHwOnLQl+aqZE/ai+l0RhQ=";
+    hash = "sha256-vTlKJn/PEH3FYqVqU1YLqKL/+uMHfNkB9LIGOu2C7sM=";
   };
 
   nodejs = nodejs_22;
 
-  npmDepsHash = "sha256-ajSKLA2+Is96ZgijgRJpeS7aGd8kgXscHNVj4KUhM4M=";
+  npmDepsHash = "sha256-ewz0DfRsWgbab949ic+rrXXh5NoLk5Q8m7MeH6UlRLE=";
   npmDepsFetcherVersion = 2;
 
   # Prevent onnxruntime-node's install script from running during automatic
@@ -180,7 +180,7 @@ buildNpmPackage (finalAttrs: {
     })
   ];
 
-  passthru.category = "Workflow & Project Management";
+  passthru.category = "Voice & Transcription";
 
   meta = {
     description = "Voice-controlled desktop development environment for AI coding agents";

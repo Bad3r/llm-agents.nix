@@ -55,6 +55,17 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  # Forge phones home on every start and, if a newer release exists, runs
+  # `curl -fsSL https://forgecode.dev/cli | sh` which drops a mutable copy
+  # into ~/.local/bin and shadows the Nix-managed binary. Force the update
+  # frequency to "never" so the store path stays authoritative.
+  # https://github.com/numtide/llm-agents.nix/issues/5976
+  postFixup = ''
+    wrapProgram $out/bin/forge \
+      --set-default FORGE_UPDATES__FREQUENCY never \
+      --set-default FORGE_UPDATES__AUTO_UPDATE false
+  '';
+
   passthru.category = "AI Coding Agents";
 
   meta = with lib; {

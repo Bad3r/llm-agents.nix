@@ -340,6 +340,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/reasonix/package.nix](packages/reasonix/package.nix)
 
 </details>
+<details>
+<summary><strong>vix</strong> - Sleek, Fast and Token Efficient AI Coding Agent</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://github.com/get-vix/vix
+- **Usage**: `nix run github:numtide/llm-agents.nix#vix -- --help`
+- **Nix**: [packages/vix/package.nix](packages/vix/package.nix)
+
+</details>
 
 ### AI Assistants
 
@@ -727,16 +737,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>paseo-desktop</strong> - Voice-controlled desktop development environment for AI coding agents</summary>
-
-- **Source**: source
-- **License**: AGPL-3.0-or-later
-- **Homepage**: https://paseo.sh
-- **Usage**: `nix run github:numtide/llm-agents.nix#paseo-desktop -- --help`
-- **Nix**: [packages/paseo-desktop/package.nix](packages/paseo-desktop/package.nix)
-
-</details>
-<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -857,6 +857,49 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/agavra/tuicr
 - **Usage**: `nix run github:numtide/llm-agents.nix#tuicr -- --help`
 - **Nix**: [packages/tuicr/package.nix](packages/tuicr/package.nix)
+
+</details>
+
+### Voice & Transcription
+
+<details>
+<summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://handy.computer/
+- **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
+- **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
+
+</details>
+<details>
+<summary><strong>paseo-desktop</strong> - Voice-controlled desktop development environment for AI coding agents</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-or-later
+- **Homepage**: https://paseo.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#paseo-desktop -- --help`
+- **Nix**: [packages/paseo-desktop/package.nix](packages/paseo-desktop/package.nix)
+
+</details>
+<details>
+<summary><strong>voxterm</strong> - Local real-time voice transcription TUI with speaker diarization</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/dmarzzz/VoxTerm
+- **Usage**: `nix run github:numtide/llm-agents.nix#voxterm -- --help`
+- **Nix**: [packages/voxterm/package.nix](packages/voxterm/package.nix)
+
+</details>
+<details>
+<summary><strong>voxtype</strong> - Push-to-talk voice-to-text for Wayland</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://voxtype.io
+- **Usage**: `nix run github:numtide/llm-agents.nix#voxtype -- --help`
+- **Nix**: [packages/voxtype/package.nix](packages/voxtype/package.nix)
 
 </details>
 
@@ -1120,16 +1163,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/raine/git-surgeon
 - **Usage**: `nix run github:numtide/llm-agents.nix#git-surgeon -- --help`
 - **Nix**: [packages/git-surgeon/package.nix](packages/git-surgeon/package.nix)
-
-</details>
-<details>
-<summary><strong>handy</strong> - Fast and accurate local transcription app using AI models</summary>
-
-- **Source**: binary
-- **License**: MIT
-- **Homepage**: https://handy.computer/
-- **Usage**: `nix run github:numtide/llm-agents.nix#handy -- --help`
-- **Nix**: [packages/handy/package.nix](packages/handy/package.nix)
 
 </details>
 <details>

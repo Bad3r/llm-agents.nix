@@ -6,7 +6,6 @@
   bun,
   nodejs,
   fetchFromGitHub,
-  fetchNpmDeps,
   makeWrapper,
   autoPatchelfHook,
 }:
@@ -16,7 +15,6 @@ let
   inherit (versionData)
     version
     hash
-    lspToolsMcpNpmHash
     ;
 
   upstream = fetchFromGitHub {
@@ -27,14 +25,6 @@ let
     # packages/lsp-tools-mcp/ is a git submodule needed for the plugin's
     # built-in `lsp` MCP server.
     fetchSubmodules = true;
-  };
-
-  # lsp-tools-mcp is npm-managed (own package-lock.json), so it can't
-  # share the top-level bun deps.
-  lspToolsMcpDeps = fetchNpmDeps {
-    name = "oh-my-opencode-${version}-lsp-tools-mcp-deps";
-    src = "${upstream}/packages/lsp-tools-mcp";
-    hash = lspToolsMcpNpmHash;
   };
 in
 stdenv.mkDerivation {
@@ -69,8 +59,8 @@ stdenv.mkDerivation {
   dontUseBunBuild = true;
   dontUseBunInstall = true;
 
-  # @ast-grep/napi ships binaries for multiple platforms;
-  # ignore missing musl libc on glibc systems
+  # @opentui/core and msgpackr-extract ship glibc + musl prebuilt
+  # binaries side by side; ignore the musl loader on glibc systems
   autoPatchelfIgnoreMissingDeps = [
     "libc.musl-x86_64.so.1"
     "libc.musl-aarch64.so.1"
@@ -81,28 +71,19 @@ stdenv.mkDerivation {
 
     # Build the library and CLI bundles. Since 4.9.x upstream split into a
     # monorepo, so the entry points live under packages/omo-opencode/.
-    bun build packages/omo-opencode/src/index.ts --outdir dist --target bun --format esm --external @ast-grep/napi --external zod
-    bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm --external @ast-grep/napi
+    bun build packages/omo-opencode/src/index.ts --outdir dist --target bun --format esm --external zod
+    bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm
 
     # Generate the config schema (non-fatal if it fails)
     bun run build:schema || true
 
-    # Build the bundled MCP servers (bun workspace packages). git-bash-mcp was
-    # added in 4.10.0; the plugin resolves all three at runtime.
-    bun run --cwd packages/ast-grep-mcp build
+    # Build the bundled MCP servers. git-bash-mcp is a bun workspace; for
+    # lsp-daemon (npm-managed, not a workspace) we bundle directly with bun
+    # so its @oh-my-opencode/{lsp-core,mcp-stdio-core} imports resolve via
+    # the root workspace node_modules and we avoid a second npm FOD.
     bun run --cwd packages/git-bash-mcp build
-
-    # Build the lsp_tools MCP server (npm-managed submodule) offline
-    # against the pre-fetched npm cache
-    pushd packages/lsp-tools-mcp >/dev/null
-      export HOME="$TMPDIR"
-      export npm_config_cache="$TMPDIR/npm-cache"
-      cp -r --no-preserve=mode ${lspToolsMcpDeps} "$npm_config_cache"
-      npm ci --offline --no-audit --no-fund --ignore-scripts
-      # /usr/bin/env shebangs in npm-installed bins (tsc, ...) fail in the sandbox
-      patchShebangs node_modules
-      npm run build
-    popd >/dev/null
+    bun build packages/lsp-daemon/src/cli.ts --outdir packages/lsp-daemon/dist --target node --format esm
+    node packages/lsp-daemon/scripts/stamp-dist-version.mjs
 
     runHook postBuild
   '';
@@ -115,16 +96,16 @@ stdenv.mkDerivation {
     cp -r dist node_modules package.json $out/lib/oh-my-opencode/
 
     # The plugin resolves its MCP servers at
-    # <ancestor>/packages/{ast-grep-mcp,git-bash-mcp,lsp-tools-mcp}/dist/cli.js
+    # <ancestor>/packages/{git-bash-mcp,lsp-daemon}/dist/cli.js (4.11.0
+    # dropped ast-grep-mcp and replaced lsp-tools-mcp with lsp-daemon).
     mkdir -p $out/lib/oh-my-opencode/packages
-    cp -r packages/{ast-grep-mcp,git-bash-mcp,lsp-tools-mcp,shared-skills} $out/lib/oh-my-opencode/packages/
+    cp -r packages/{git-bash-mcp,lsp-daemon,shared-skills} $out/lib/oh-my-opencode/packages/
 
-    # ast-grep-mcp's and git-bash-mcp's dist/cli.js are self-contained bun
-    # bundles; their node_modules only hold workspace symlinks that would
-    # dangle in $out and fail noBrokenSymlinks. lsp-tools-mcp keeps its
-    # node_modules — tsc output imports deps at runtime.
-    rm -rf $out/lib/oh-my-opencode/packages/ast-grep-mcp/node_modules
+    # Both dist/cli.js outputs are self-contained bun bundles; their
+    # node_modules only hold workspace symlinks that would dangle in $out
+    # and fail noBrokenSymlinks.
     rm -rf $out/lib/oh-my-opencode/packages/git-bash-mcp/node_modules
+    rm -rf $out/lib/oh-my-opencode/packages/lsp-daemon/node_modules
 
     # Remove broken workspace symlinks (monorepo workspace packages
     # aren't needed at runtime — the CLI bundle is self-contained)

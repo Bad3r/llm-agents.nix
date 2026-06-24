@@ -3,6 +3,7 @@
   flake,
   buildGoModule,
   buildNpmPackage,
+  cacert,
   fetchFromGitHub,
   versionCheckHook,
   makeBinaryWrapper,
@@ -30,6 +31,11 @@ let
     inherit version src;
     sourceRoot = "${src.name}/frontend";
     inherit npmDepsHash;
+    # vite-plus eagerly constructs a reqwest client on startup and panics
+    # when SSL_CERT_FILE points at stdenv's /no-cert-file.crt sentinel.
+    # Give it a real CA bundle so the client builds; the sandbox still
+    # blocks any actual network egress.
+    env.SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
     installPhase = ''
       runHook preInstall
       cp -r dist $out

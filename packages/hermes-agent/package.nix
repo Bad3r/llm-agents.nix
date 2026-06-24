@@ -122,13 +122,13 @@ let
     };
   };
 
-  version = "2026.6.5";
+  version = "2026.6.19";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-ngpkopVczNrT0bfCXHm38QjgrZT96Bm/rO89NA/ls3Y=";
+    hash = "sha256-Oyl6Cpg2bTiX9MyBxFT5q4yVdYf3lCIptzFdiVULmjo=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -139,7 +139,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-hgnqcpKRPztHhDEpwC7HJrALuJp9wsrV4+GJ6t6HI2c=";
+    npmDepsHash = "sha256-sKI7LhkmyIPw8cFS2efjQVOZ/dEu4ERRpeqKhAq3jzs=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -176,6 +176,7 @@ let
       rich
       tenacity
       pathspec
+      pillow
       pyyaml
       ruamel-yaml
       requests
@@ -301,6 +302,10 @@ python3.pkgs.buildPythonApplication {
     "pathspec"
     "firecrawl-py"
     "pyjwt"
+    "certifi"
+    "packaging"
+    "urllib3"
+    "websockets"
   ];
 
   pythonImportsCheck = [
