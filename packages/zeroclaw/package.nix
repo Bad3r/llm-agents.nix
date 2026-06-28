@@ -13,13 +13,13 @@
 }:
 let
   pname = "zeroclaw";
-  version = "0.8.1";
+  version = "0.8.2";
 
   src = fetchFromGitHub {
     owner = "zeroclaw-labs";
     repo = "zeroclaw";
     tag = "v${version}";
-    hash = "sha256-VPKWgIXkQU0C1VkoyMaXiGy38ZidB9HHUqG0wnELRYI=";
+    hash = "sha256-mTH7DRaCHmYw3m9DguceP+nGGMYff7vsoIe3J0XNb/Q=";
   };
 
   frontendSrc = runCommand "${pname}-web-src-${version}" { } ''
@@ -51,10 +51,14 @@ let
     # renders the gateway's OpenAPI spec and pipes it through openapi-typescript.
     # It is only re-exported as a type from api.ts and never consumed elsewhere,
     # so stub it instead of pulling the whole Rust toolchain into the frontend.
+    # The stubs use `any` because api.ts indexes nested members (e.g.
+    # components["schemas"]["ConfigApiCode"]); a `Record<string, unknown>` stub
+    # makes the inner access fail with TS2339.
     postPatch = ''
       cat > src/lib/api-generated.ts <<'EOF'
-      export type paths = Record<string, unknown>;
-      export type components = Record<string, unknown>;
+      /* eslint-disable @typescript-eslint/no-explicit-any */
+      export type paths = any;
+      export type components = any;
       EOF
     '';
 
@@ -75,7 +79,7 @@ in
 rustPlatform.buildRustPackage rec {
   inherit pname version src;
 
-  cargoHash = "sha256-UzaPa4KYY2HdJDzSFoxX5v4EeChThnTBOhJOX4p75L8=";
+  cargoHash = "sha256-6tLLt8cblYABOTli1LrrWbyTOJYGmmewHJgTxBAhJlE=";
 
   preBuild = ''
     mkdir -p web/dist
