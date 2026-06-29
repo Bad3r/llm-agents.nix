@@ -211,9 +211,10 @@ stdenv.mkDerivation {
       bun packages/natives/scripts/gen-enums.ts || true
     fi
 
-    # Generate the docs index (prepack script in coding-agent)
+    # --generate embeds the omp:// docs index; without it the script is a no-op
+    # and the binary ships no docs, breaking omp:// reads.
     echo "Generating docs index..."
-    bun packages/coding-agent/scripts/generate-docs-index.ts
+    bun packages/coding-agent/scripts/generate-docs-index.ts --generate
 
     # Generate the embedded stats dashboard client bundle
     echo "Generating embedded stats dashboard..."
