@@ -10,13 +10,13 @@
 
 buildNpmPackage rec {
   pname = "nanocoder";
-  version = "1.28.0";
+  version = "1.28.1";
 
   src = fetchFromGitHub {
     owner = "Nano-Collective";
     repo = "nanocoder";
     rev = "v${version}";
-    hash = "sha256-hs6Do1ObudylPe398ZxwZX3S4fHvcPhTHShf9ZcHe1E=";
+    hash = "sha256-yQy+SBYvBB9x6EiriewQ1/SnHg7S3c395yNaTQdv2ic=";
   };
 
   npmDeps = null;
