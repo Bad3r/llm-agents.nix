@@ -211,11 +211,8 @@ stdenv.mkDerivation {
       bun packages/natives/scripts/gen-enums.ts || true
     fi
 
-    # Embed the omp:// harness docs index. Without --generate this script is a
-    # no-op (it only writes the index with --generate, or restores the empty
-    # placeholder with --reset), so the compiled binary would ship no docs and
-    # omp:// / `omp read omp://...` would fail. Mirrors the --generate stats and
-    # tool-views embeds below.
+    # --generate embeds the omp:// docs index; without it the script is a no-op
+    # and the binary ships no docs, breaking omp:// reads.
     echo "Generating docs index..."
     bun packages/coding-agent/scripts/generate-docs-index.ts --generate
 
