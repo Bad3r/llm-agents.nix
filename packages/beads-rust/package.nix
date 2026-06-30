@@ -35,6 +35,14 @@ rustPlatform.buildRustPackage {
   postUnpack = ''
     cp -r ${frankensqlite} frankensqlite
     chmod -R u+w frankensqlite
+
+    # frankensqlite's workspace manifest pins asupersync to the maintainer's
+    # absolute dev path (/dp/asupersync), which does not exist here. The crate
+    # is published on crates.io at the same version and is already locked in
+    # beads_rust's Cargo.lock, so drop the path override to resolve from the
+    # registry.
+    substituteInPlace frankensqlite/Cargo.toml \
+      --replace-fail ', path = "/dp/asupersync", default-features = false' ', default-features = false'
   '';
 
   postPatch = ''

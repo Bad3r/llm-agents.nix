@@ -5,6 +5,7 @@
   buildNpmPackage,
   cacert,
   fetchFromGitHub,
+  fetchurl,
   versionCheckHook,
   makeBinaryWrapper,
   unpinGoModVersionHook,
@@ -17,6 +18,7 @@ let
     hash
     npmDepsHash
     vendorHash
+    litellmSnapshot
     ;
 
   src = fetchFromGitHub {
@@ -24,6 +26,13 @@ let
     repo = "agentsview";
     rev = "v${version}";
     inherit hash;
+  };
+
+  # The //go:embed pricing snapshot is not in the source tree; upstream
+  # restores it from a pinned artifact commit over the network. Fetch that blob
+  # directly. update.py keeps url/hash in sync from the tagged source.
+  litellmSnapshotFile = fetchurl {
+    inherit (litellmSnapshot) url hash;
   };
 
   frontend = buildNpmPackage {
@@ -60,6 +69,8 @@ buildGoModule {
   preBuild = ''
     rm -rf internal/web/dist
     cp -r ${frontend} internal/web/dist
+
+    install -Dm644 ${litellmSnapshotFile} internal/pricing/snapshot/litellm_snapshot.json.gz
   '';
 
   ldflags = [

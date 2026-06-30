@@ -3,7 +3,9 @@
 
 """Update script for agentsview package."""
 
+import re
 import sys
+import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
@@ -20,6 +22,33 @@ from updater.hash import DUMMY_SHA256_HASH
 from updater.nix import NixCommandError
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
+
+# The pricing snapshot lives on a separate artifact branch, not in the tagged
+# tree. The litellm-snapshot tool bakes in the ref/file it restores; read those
+# constants from the tagged source so the embedded blob stays pinned.
+SNAPSHOT_TOOL_PATH = "internal/pricing/cmd/litellm-snapshot/main.go"
+SNAPSHOT_BASE_URL = "https://raw.githubusercontent.com/kenn-io/agentsview"
+
+
+def resolve_snapshot(version: str) -> dict[str, str]:
+    """Derive the pinned LiteLLM snapshot URL/hash from the tagged source."""
+    tool_url = f"{SNAPSHOT_BASE_URL}/v{version}/{SNAPSHOT_TOOL_PATH}"
+    with urllib.request.urlopen(tool_url) as response:
+        source = response.read().decode()
+
+    def const(name: str) -> str:
+        match = re.search(rf'{name}\s*=\s*"([^"]+)"', source)
+        if not match:
+            msg = f"could not find {name} in {SNAPSHOT_TOOL_PATH}"
+            raise ValueError(msg)
+        return match.group(1)
+
+    ref = const("defaultSnapshotRef")
+    snapshot_file = const("defaultSnapshotFile")
+    url = f"{SNAPSHOT_BASE_URL}/{ref}/{snapshot_file}"
+
+    print("Calculating LiteLLM snapshot hash...")
+    return {"url": url, "hash": calculate_url_hash(url)}
 
 
 def main() -> None:
@@ -44,6 +73,7 @@ def main() -> None:
         "hash": source_hash,
         "npmDepsHash": DUMMY_SHA256_HASH,
         "vendorHash": DUMMY_SHA256_HASH,
+        "litellmSnapshot": resolve_snapshot(latest),
     }
     save_hashes(HASHES_FILE, data)
 
