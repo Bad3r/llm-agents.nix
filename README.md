@@ -1236,6 +1236,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>terminal-use</strong> - Headless virtual terminal for AI agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/flipbit03/terminal-use
+- **Usage**: `nix run github:numtide/llm-agents.nix#terminal-use -- --help`
+- **Nix**: [packages/terminal-use/package.nix](packages/terminal-use/package.nix)
+
+</details>
+<details>
 <summary><strong>toon</strong> - Rust implementation of TOON - Token-Oriented Object Notation for LLM prompts</summary>
 
 - **Source**: source

@@ -36,14 +36,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "bernstein";
-  version = "2.8.2";
+  version = "2.8.5";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "sipyourdrink-ltd";
     repo = "bernstein";
     tag = "v${version}";
-    hash = "sha256-VT/qS+LdCqNgd1ww2XV3iTq50xPxwnqj+e0VCNwJ2kc=";
+    hash = "sha256-UxBEv61JLdCbLF+55NZx7vRm5Jn4V+jfVFZ5yhReJoY=";
   };
 
   # Upstream sometimes tags a release without bumping the version in
@@ -104,6 +104,7 @@ python3.pkgs.buildPythonApplication rec {
     "pillow"
     "pydantic-settings"
     "python-dotenv"
+    "reportlab"
     "starlette"
   ];
 

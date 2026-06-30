@@ -58,7 +58,13 @@ buildNpmPackage (finalAttrs: {
     # clipboardy 5.2.0 vs 5.2.1). The offline npm cache is built from the
     # lockfile, so `npm ci` cannot satisfy the package.json pins and fails with
     # ETARGET. Rewrite each exact pin to the version the lockfile resolves.
-    node ${./align-pins-to-lock.mjs}
+    # Guard on node: postPatch also runs inside the npm-deps fetcher FOD, where
+    # node is unavailable. The cache is built from the lockfile (independent of
+    # these package.json edits), so skipping the alignment there is harmless;
+    # it only needs to run before `npm ci` in the main build.
+    if command -v node > /dev/null; then
+      node ${./align-pins-to-lock.mjs}
+    fi
 
     # Point resolveRipgrepPath() at our ripgrep: no bundled rg binaries exist
     # and the trusted-path check rejects /nix/store, so allow the store dir.
