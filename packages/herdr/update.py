@@ -10,6 +10,7 @@ the source hash, cargoHash, and the per-platform Darwin binary hashes.
 """
 
 import sys
+import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
@@ -27,8 +28,23 @@ from updater.nix import NixCommandError
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
 
+# zon2nix-generated Zig dependency lockfile, vendored in-tree so package.nix
+# can import it without import-from-derivation (disabled repo-wide).  Kept in
+# sync with the pinned source on every version bump.
+ZIG_DEPS_FILE = Path(__file__).parent / "build.zig.zon.nix"
+ZIG_DEPS_PATH = "vendor/libghostty-vt/build.zig.zon.nix"
+
 OWNER = "ogulcancelik"
 REPO = "herdr"
+
+
+def update_vendored_zig_deps(version: str) -> None:
+    """Refresh the vendored build.zig.zon.nix from the pinned source tag."""
+    url = f"https://raw.githubusercontent.com/{OWNER}/{REPO}/v{version}/{ZIG_DEPS_PATH}"
+    print(f"Fetching {ZIG_DEPS_PATH} from v{version}")
+    with urllib.request.urlopen(url) as response:
+        ZIG_DEPS_FILE.write_bytes(response.read())
+
 
 DARWIN_PLATFORMS = {
     "aarch64-darwin": "macos-aarch64",
@@ -60,6 +76,8 @@ def main() -> None:
     data["hash"] = calculate_url_hash(src_url, unpack=True)
     data["binaryHashes"] = calculate_platform_hashes(bin_url, DARWIN_PLATFORMS)
     save_hashes(HASHES_FILE, data)
+
+    update_vendored_zig_deps(latest)
 
     try:
         data["cargoHash"] = calculate_dependency_hash(
