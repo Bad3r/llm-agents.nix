@@ -17,7 +17,7 @@ buildGoModule rec {
     owner = "sipeed";
     repo = "picoclaw";
     tag = "v${version}";
-    hash = "sha256-pdI6SS05aPiuqAflJW7kVk49ljDA+CXuo9syoyRBBTw=";
+    hash = "sha256-QYfHXIHJjeZJdkhGNNhdO91Q8EFgSP+ubqGJ8VgTEtc=";
   };
 
   vendorHash = "sha256-mN+eI8JtqIqBCxheVlTw7nL200WgVAd8xLhUsrYdohE=";
