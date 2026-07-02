@@ -74,6 +74,12 @@ stdenv.mkDerivation {
     bun build packages/omo-opencode/src/index.ts --outdir dist --target bun --format esm --external zod
     bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm
 
+    # Reproduce upstream `build:shared-skills-assets`: materialize frontend refs
+    # from the (already-fetched) submodules into dist/skills, read at load time.
+    bun packages/shared-skills/scripts/materialize-frontend-refs.mjs --strict
+    rm -rf dist/skills
+    cp -R packages/shared-skills/skills dist/skills
+
     # Generate the config schema (non-fatal if it fails)
     bun run build:schema || true
 
@@ -116,6 +122,17 @@ stdenv.mkDerivation {
       --add-flags "run $out/lib/oh-my-opencode/dist/cli/index.js"
 
     runHook postInstall
+  '';
+
+  # Evaluate the installed bundle so any module-load failure (missing runtime
+  # assets, broken bundle, etc.) fails the build instead of shipping silently.
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+
+    ${bun}/bin/bun -e "await import('$out/lib/oh-my-opencode/dist/index.js'); console.log('ok')"
+
+    runHook postInstallCheck
   '';
 
   passthru.category = "AI Coding Agents";
