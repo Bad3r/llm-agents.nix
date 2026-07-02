@@ -47,19 +47,11 @@ buildNpmPackage (finalAttrs: {
     runHook preBuild
 
     npm run generate
-    # The CLI esbuild bundle resolves imports against workspace dist/ output,
-    # so build the workspaces it depends on first (subset of upstream's
-    # scripts/build.js buildOrder; we skip webui/sdk/vscode as the bundled
-    # CLI does not pull them in). The CLI registry auto-imports every channel
-    # adapter under packages/channels, so glob them instead of hardcoding:
-    # upstream adds new channels between releases (e.g. feishu in 0.17.0).
-    npm run build --workspace=packages/web-templates
-    npm run build --workspace=packages/channels/base
-    for ws in packages/channels/*; do
-      if [ -d "$ws" ] && [ "$ws" != packages/channels/base ]; then
-        npm run build --workspace=$ws
-      fi
-    done
+    # The CLI esbuild bundle resolves imports against workspace dist/ output.
+    # Use upstream's --cli-only build order so every workspace the bundle pulls
+    # in (core, channels, acp-bridge, sdk-typescript, ...) is built, without
+    # us having to track the dependency list by hand across releases.
+    node scripts/build.js --cli-only
     npm run bundle
 
     runHook postBuild
