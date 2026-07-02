@@ -39,9 +39,11 @@ let
     inherit cargoHash;
 
     # Upstream ships ghostty's zon2nix-generated build.zig.zon.nix alongside
-    # the vendored libghostty-vt sources; use it to pre-fetch the Zig package
-    # cache so zig can build offline.
-    zigDeps = callPackage "${finalAttrs.src}/vendor/libghostty-vt/build.zig.zon.nix" {
+    # the vendored libghostty-vt sources; it pre-fetches the Zig package cache
+    # so zig can build offline.  We vendor a copy in-tree (kept in sync by
+    # update.py) and import that instead of reading it from ${finalAttrs.src},
+    # which would require import-from-derivation (disabled repo-wide).
+    zigDeps = callPackage ./build.zig.zon.nix {
       name = "herdr-libghostty-vt-zig-deps";
       inherit zig_0_15;
     };
