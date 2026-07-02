@@ -123,13 +123,13 @@ let
     };
   };
 
-  version = "2026.6.19";
+  version = "2026.7.1";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     rev = "v${version}";
-    hash = "sha256-Oyl6Cpg2bTiX9MyBxFT5q4yVdYf3lCIptzFdiVULmjo=";
+    hash = "sha256-Wt72AQtA6Eizi7Ubj23JBhwZ7GKYcjY4mcV6upqHOaU=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -140,7 +140,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-sKI7LhkmyIPw8cFS2efjQVOZ/dEu4ERRpeqKhAq3jzs=";
+    npmDepsHash = "sha256-qDXGL/INHPW0pTF4SRVL1dS5XVh2X85dEE4JhrAQeqU=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -200,6 +200,7 @@ let
       edge-tts
       # Skills Hub
       pyjwt
+      cryptography
     ]
     # faster-whisper -> av SIGKILLs during import on darwin; voice is optional.
     ++ lib.optionals stdenv.hostPlatform.isLinux [ faster-whisper ]
@@ -330,6 +331,7 @@ python3.pkgs.buildPythonApplication {
     "pathspec"
     "firecrawl-py"
     "pyjwt"
+    "cryptography"
     "certifi"
     "packaging"
     "urllib3"
