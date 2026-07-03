@@ -1,6 +1,7 @@
 {
   pkgs,
   flake,
+  perSystem,
   ...
 }:
 let
@@ -8,4 +9,5 @@ let
 in
 pkgs.callPackage ./package.nix {
   inherit bun2nix;
+  autoPatchelfHook = perSystem.self.formatelf;
 }

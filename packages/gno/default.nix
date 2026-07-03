@@ -1,6 +1,7 @@
 {
   pkgs,
   flake,
+  perSystem,
   cudaSupport ? pkgs.config.cudaSupport or false,
   ...
 }:
@@ -10,4 +11,5 @@ in
 pkgs.callPackage ./package.nix {
   inherit flake cudaSupport bun2nix;
   inherit (pkgs) vulkan-loader autoAddDriverRunpath cudaPackages;
+  autoPatchelfHook = perSystem.self.formatelf;
 }
