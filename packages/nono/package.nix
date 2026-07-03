@@ -5,7 +5,6 @@
   fetchFromGitHub,
   dbus,
   pkg-config,
-  autoPatchelfHook,
   versionCheckHook,
   unpinCargoMsrvHook,
   ...
@@ -37,7 +36,6 @@ rustPlatform.buildRustPackage rec {
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     pkg-config
-    autoPatchelfHook
   ];
 
   doCheck = false;
