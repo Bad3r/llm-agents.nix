@@ -40,6 +40,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>claude-desktop</strong> - Desktop application for Claude.ai</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://claude.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#claude-desktop -- --help`
+- **Nix**: [packages/claude-desktop/package.nix](packages/claude-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>claw-code</strong> - Claude Code rewrite CLI built from the official claw-code Rust workspace</summary>
 
 - **Source**: source
