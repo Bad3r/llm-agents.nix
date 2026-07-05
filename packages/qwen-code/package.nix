@@ -16,16 +16,16 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "qwen-code";
-  version = "0.19.5";
+  version = "0.19.6";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ELeFxH7zcrZbyQALu1n59juY44GDvd/oVOKGgBTwmmg=";
+    hash = "sha256-EK9pHOeaCbcGYpd7++zZIe/E+83jVIlq655rHNBEXNo=";
   };
 
-  npmDepsHash = "sha256-5RIZbW/kC1DgH9VtwIkGFoabxnD26ORmvqD2VpI+eWo=";
+  npmDepsHash = "sha256-tiCX584sgFC/aawegtt82LHDL00EkU2vk+cUbRtoHEI=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [
@@ -62,13 +62,18 @@ buildNpmPackage (finalAttrs: {
 
     mkdir -p $out/bin $out/share/qwen-code
     cp -r dist/* $out/share/qwen-code/
+    # The bundled dist/cli.js has no shebang; upstream ships a bin wrapper
+    # (scripts/cli-entry.js) that relaunches cli.js with node --expose-gc and
+    # reads package.json for the reported version. Install both next to cli.js.
+    cp scripts/cli-entry.js $out/share/qwen-code/cli-entry.js
+    cp package.json $out/share/qwen-code/package.json
     # Install production dependencies only
     npm prune --production
     cp -r node_modules $out/share/qwen-code/
     # Remove broken symlinks that cause issues in Nix environment
     find $out/share/qwen-code/node_modules -type l -delete || true
     patchShebangs $out/share/qwen-code
-    ln -s $out/share/qwen-code/cli.js $out/bin/qwen
+    ln -s $out/share/qwen-code/cli-entry.js $out/bin/qwen
 
     runHook postInstall
   '';

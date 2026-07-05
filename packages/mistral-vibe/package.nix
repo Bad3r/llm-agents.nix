@@ -75,10 +75,9 @@ let
     };
   };
 
-  # mistral-vibe >=2.6 requires opentelemetry-semantic-conventions>=0.60b1 for
-  # GEN_AI_PROVIDER_NAME (issue #3668). nixpkgs ships 0.55b0. The otel packages
-  # are versioned in lockstep from a monorepo and all inherit src from
-  # opentelemetry-api, so bumping that one source bumps the whole stack.
+  # mistral-vibe >=2.6 needs opentelemetry-semantic-conventions>=0.60b1
+  # (GEN_AI_PROVIDER_NAME, issue #3668); nixpkgs ships 0.55b0. The otel stack is
+  # a lockstep monorepo, so bumping opentelemetry-api's src bumps everything.
   otelVersion = "1.40.0";
   otelContribVersion = "0.61b0";
   otelSrc = fetchFromGitHub {
@@ -99,10 +98,8 @@ let
     packageOverrides = _pyfinal: pyprev: {
       inherit textual-speedups tree-sitter-bash;
 
-      # mistral-vibe 2.12.1 pins textual==8.2.7 and sets DEFAULT_THEME="ansi-dark"
-      # (vibe/core/config/_settings.py), a built-in theme that only exists in
-      # textual >=8.2.5. Pinning textual to 8.2.4 crashed vibe at startup with
-      # `InvalidThemeError: Theme 'ansi-dark' has not been registered`.
+      # vibe uses DEFAULT_THEME="ansi-dark", a built-in theme added in
+      # textual >=8.2.5; older textual crashes at startup with InvalidThemeError.
       textual = pyprev.textual.overridePythonAttrs (old: rec {
         version = "8.2.7";
         src = old.src.override {
@@ -111,21 +108,19 @@ let
         };
       });
 
-      # mistral-vibe 2.7.5 imports `deep_update` from
-      # `pydantic_settings.sources.base`, a re-export added in 2.13.
+      # vibe imports deep_update from pydantic_settings.sources.base, a
+      # re-export added in 2.13.
       pydantic-settings = pyprev.pydantic-settings.overridePythonAttrs (_: rec {
-        version = "2.13.1";
+        version = "2.14.2";
         src = fetchPypi {
           pname = "pydantic_settings";
           inherit version;
-          hash = "sha256-tMEYR7FSN/sBceFGK/VA4pSv+5uG202apcAXML2+QCU=";
+          hash = "sha256-wZ3WSxkJfx3oAYTwzHsCcqE65uFwy/JAo+J+OB7RSl8=";
         };
       });
 
-      # Build mistralai/acp inside this set so they link against the
-      # overridden opentelemetry packages rather than stock python3.pkgs.
-      # Otherwise the prebuilt ones drag old otel into the closure and
-      # pythonRuntimeDepsCheck fails (or worse, succeeds and crashes at runtime).
+      # Build mistralai/acp in this set so they link the overridden otel
+      # packages; stock python3.pkgs would drag old otel into the closure.
       mistralai = callPackage ./mistralai.nix { python3 = python; };
       agent-client-protocol = callPackage ./agent-client-protocol.nix { python3 = python; };
 
@@ -135,8 +130,7 @@ let
         sourceRoot = "${otelSrc.name}/opentelemetry-api";
       });
 
-      # 1.40.0 added timing-sensitive tests that flake on loaded builders
-      # (assertions like `after - before < 0.2` fail by milliseconds on darwin).
+      # 1.40.0 added timing-sensitive tests that flake on loaded builders.
       opentelemetry-exporter-otlp-proto-http =
         pyprev.opentelemetry-exporter-otlp-proto-http.overridePythonAttrs
           (old: {
@@ -152,9 +146,8 @@ let
         sourceRoot = "${otelContribSrc.name}/opentelemetry-instrumentation";
       });
 
-      # In nixpkgs this inherits version from opentelemetry-instrumentation,
-      # but overridePythonAttrs doesn't re-evaluate that reference, so set it
-      # explicitly to keep the dist-info version in sync with src.
+      # Set explicitly: nixpkgs inherits this from opentelemetry-instrumentation,
+      # but overridePythonAttrs won't re-evaluate that reference.
       opentelemetry-semantic-conventions =
         pyprev.opentelemetry-semantic-conventions.overridePythonAttrs
           (_: {
@@ -165,14 +158,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.18.4";
+  version = "2.19.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     rev = "v${version}";
-    hash = "sha256-J+o0AV2CGkAK1YyFv4VeXtOwkueqKgD7LpFTnRBIBoA=";
+    hash = "sha256-PODG/SQsZsixBz/j+k8ALBhXS1fPg3v/o6TXkTyzSIQ=";
   };
 
   build-system = with python.pkgs; [
@@ -221,12 +214,20 @@ python.pkgs.buildPythonApplication rec {
     zstandard
   ];
 
-  # Upstream 2.10.0 pins the full transitive dependency closure with `==` in
-  # pyproject.toml. Relax everything; the opentelemetry API requirements
-  # (see issue #3668) are still met by the version overrides above.
+  # Upstream pins the whole dependency closure with `==`; overrides above still
+  # satisfy the otel requirements (issue #3668).
   pythonRelaxDeps = true;
 
-  pythonImportsCheck = [ "vibe" ];
+  # `import vibe` alone is lazy and misses dependency drift: mistralai 2.1.3
+  # lacked mistralai.extra.observability.telemetry yet built fine and crashed
+  # at runtime (issue #6462). Import submodules that pull in the vendored deps
+  # so drift fails the build.
+  pythonImportsCheck = [
+    "vibe"
+    "vibe.cli.cli"
+    "vibe.core.llm.backend.mistral"
+    "vibe.core.transcribe.mistral_transcribe_client"
+  ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
