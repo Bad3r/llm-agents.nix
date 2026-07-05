@@ -82,6 +82,13 @@ meta = with lib; {
 };
 ```
 
+### Pinning GitHub Sources by Tag
+
+Use `fetchFromGitHub`'s `tag = "v${version}"`, not `rev = "v${version}"`. `rev`
+fetches the ambiguous `archive/v${version}.tar.gz`, which errors when a repo has
+a branch and tag of the same name; `tag` uses `refs/tags/` and is hash-identical.
+Enforced by an ast-grep rule (see below).
+
 The `changelog` attribute is **required** — our updater uses it to generate release notes. Use a version-specific URL matching the upstream tag format (e.g. `v${version}`, `${version}`, `rust-v${version}`). Fall back to `/releases` when tags are inconsistent. Verify the URL doesn't 404.
 
 ### Package Categories
@@ -189,6 +196,11 @@ nativeInstallCheckInputs = [ versionCheckHook ];
      ];
    }
    ```
+
+## Linting with ast-grep
+
+Structural lint rules live in `rules/*.yml` (wired via `sgconfig.yml`). Run
+`ast-grep scan packages`; the `ast-grep` flake check enforces them in CI.
 
 ## Testing Guidelines
 

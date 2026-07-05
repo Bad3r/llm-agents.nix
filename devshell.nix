@@ -1,6 +1,9 @@
 { pkgs, perSystem }:
 pkgs.mkShellNoCC {
   packages = [
+    # Linter for package definitions (see rules/, sgconfig.yml)
+    pkgs.ast-grep
+
     # Tools needed for update scripts
     pkgs.bash
     pkgs.coreutils

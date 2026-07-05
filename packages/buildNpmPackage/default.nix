@@ -35,7 +35,9 @@ pkgs.emptyDirectory.overrideAttrs { name = "buildNpmPackage-guard"; }
   __functor =
     _:
     assert lib.assertMsg hasFetcherVersion msg;
+    # ast-grep-ignore: use-perSystem-buildNpmPackage
     pkgs.buildNpmPackage;
+  # ast-grep-ignore: use-perSystem-buildNpmPackage
   override = pkgs.buildNpmPackage.override;
   passthru.hideFromDocs = true;
   meta = {

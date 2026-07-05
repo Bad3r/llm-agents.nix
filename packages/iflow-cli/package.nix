@@ -56,6 +56,7 @@ buildNpmPackage {
   meta = {
     description = "AI coding agent for the terminal with free model access via the iFlow platform";
     homepage = "https://github.com/iflow-ai/iflow-cli";
+    changelog = "https://github.com/iflow-ai/iflow-cli/releases";
     license = lib.licenses.asl20;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     mainProgram = "iflow";

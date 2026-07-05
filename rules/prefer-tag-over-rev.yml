@@ -1,0 +1,20 @@
+id: prefer-tag-over-rev
+language: nix
+severity: error
+message: >-
+  Use `tag = "v${version}"` instead of `rev = "v${version}"` for GitHub sources. A bare `rev` fetches the ambiguous `archive/v${version}.tar.gz` URL, which breaks when a repo has both a branch and a tag of that name. `tag` resolves to `refs/tags/` and is hash-identical.
+note: |
+  fetchFromGitHub {
+    owner = "owner";
+    repo = "repo";
+    tag = "v${version}";  # not: rev = "v${version}";
+    hash = "sha256-...";
+  }
+rule:
+  kind: string_expression
+  regex: '^"v\$\{'
+  inside:
+    kind: binding
+    has:
+      field: attrpath
+      regex: '^rev$'
