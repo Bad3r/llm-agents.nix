@@ -1,0 +1,39 @@
+---
+name: Sync Fork With Upstream
+"on":
+  schedule:
+    - cron: "17 */8 * * *" # Every 8 hours, offset from :00 scheduler congestion
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Merge upstream into this branch
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          # Server-side merge of the same-named branch from the parent
+          # repository. A merge conflict fails the run with HTTP 409 instead
+          # of rewriting history; resolve locally with git-fork-sync.
+          before="$(gh api "repos/${REPO}/branches/${BRANCH}" --jq .commit.sha)"
+          gh api --method POST "repos/${REPO}/merge-upstream" -f "branch=${BRANCH}" | tee /tmp/sync-result.json
+          after="$(gh api "repos/${REPO}/branches/${BRANCH}" --jq .commit.sha)"
+          {
+            echo "## Upstream sync: ${BRANCH}"
+            echo "- result: $(jq -r '.merge_type' /tmp/sync-result.json)"
+            echo "- message: $(jq -r '.message' /tmp/sync-result.json)"
+            echo "- before: ${before}"
+            echo "- after: ${after}"
+          } >>"$GITHUB_STEP_SUMMARY"
