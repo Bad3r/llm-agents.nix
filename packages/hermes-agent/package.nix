@@ -123,13 +123,13 @@ let
     };
   };
 
-  version = "2026.7.1";
+  version = "2026.7.7";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-Wt72AQtA6Eizi7Ubj23JBhwZ7GKYcjY4mcV6upqHOaU=";
+    hash = "sha256-Yk/BXRlNJgfeqjy8hDOT/HbKgevWTH786Df+sQ3g9MU=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
