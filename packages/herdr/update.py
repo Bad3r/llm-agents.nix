@@ -24,9 +24,10 @@ from updater import (
     save_hashes,
     should_update,
 )
-from updater.nix import NixCommandError
+from updater.nix import NixCommandError, run_command
 
 HASHES_FILE = Path(__file__).parent / "hashes.json"
+FLAKE_ROOT = Path(__file__).parent.parent.parent
 
 # zon2nix-generated Zig dependency lockfile, vendored in-tree so package.nix
 # can import it without import-from-derivation (disabled repo-wide).  Kept in
@@ -44,6 +45,9 @@ def update_vendored_zig_deps(version: str) -> None:
     print(f"Fetching {ZIG_DEPS_PATH} from v{version}")
     with urllib.request.urlopen(url) as response:
         ZIG_DEPS_FILE.write_bytes(response.read())
+    # Upstream's zon2nix output is not nixfmt-clean; normalise so
+    # formatter-check does not fail on the vendored file.
+    run_command(["nix", "fmt", "--", str(ZIG_DEPS_FILE)], cwd=FLAKE_ROOT)
 
 
 DARWIN_PLATFORMS = {
