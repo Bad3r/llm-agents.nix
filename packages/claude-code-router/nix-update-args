@@ -1,0 +1,4 @@
+--version-regex
+^v(\d+\.\d+\.\d+)$
+--custom-dep
+dist

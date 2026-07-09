@@ -499,7 +499,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>claude-code-router</strong> - Use Claude Code without an Anthropics account and route it to another LLM provider</summary>
 
-- **Source**: bytecode
+- **Source**: source
 - **License**: MIT
 - **Homepage**: https://github.com/musistudio/claude-code-router
 - **Usage**: `nix run github:numtide/llm-agents.nix#claude-code-router -- --help`
