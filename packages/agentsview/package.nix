@@ -9,6 +9,7 @@
   versionCheckHook,
   makeBinaryWrapper,
   unpinGoModVersionHook,
+  sqlite,
 }:
 
 let
@@ -64,6 +65,9 @@ buildGoModule {
     makeBinaryWrapper
     unpinGoModVersionHook
   ];
+
+  # sqlite-vec-go-bindings/cgo needs <sqlite3.h> at build time.
+  buildInputs = [ sqlite ];
 
   subPackages = [ "cmd/agentsview" ];
   tags = [ "fts5" ];
