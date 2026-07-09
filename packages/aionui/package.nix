@@ -8,7 +8,6 @@
   python3,
   electron,
   fetchFromGitHub,
-  fetchzip,
   runCommand,
   makeWrapper,
   glib,
@@ -39,11 +38,6 @@ let
     repo = "AionUi";
     tag = "v${version}";
     inherit hash;
-  };
-
-  electronHeaders = fetchzip {
-    url = "https://www.electronjs.org/headers/v${electron.version}/node-v${electron.version}-headers.tar.gz";
-    hash = "sha256-tSDbTN6rJeyYGT2aeLuWmiXdegmdctlr3jVa+vW6r1k=";
   };
 
   runtimeKey =
@@ -115,7 +109,7 @@ stdenv.mkDerivation {
     export npm_config_build_from_source=true
     export npm_config_runtime=electron
     export npm_config_target=${electron.version}
-    export npm_config_nodedir=${electronHeaders}
+    export npm_config_nodedir=${electron.headers}
     export PYTHON=${python3}/bin/python3
 
     betterSqliteDir=$(echo node_modules/.bun/better-sqlite3@*/node_modules/better-sqlite3)
