@@ -1,90 +1,49 @@
 {
   lib,
-  stdenv,
+  buildNpmPackage,
   fetchFromGitHub,
-  rustPlatform,
-  pkg-config,
-  openssl,
-  libcap,
-  mkRustyV8Archive,
-  versionData ? builtins.fromJSON (builtins.readFile ./hashes.json),
-  version ? versionData.version,
-  hash ? versionData.hash,
-  src ? null,
-  sourceRoot ? "source",
-  cargoVendor ? {
-    cargoHash = versionData.cargoHash;
-  },
-  codexOwner ? versionData.codexOwner,
-  codexRev ? versionData.codexRev,
-  codexSrcHash ? versionData.codexSrcHash,
-  codexSrc ? fetchFromGitHub {
-    owner = codexOwner;
-    repo = "codex";
-    rev = codexRev;
-    hash = codexSrcHash;
-  },
-  codexBwrapSourceDir ? "${codexSrc}/codex-rs/vendor/bubblewrap",
-  librusty_v8 ? mkRustyV8Archive versionData.librusty_v8,
+  makeWrapper,
+  codex,
 }:
-let
-  actualSrc =
-    if src != null then
-      src
-    else
-      fetchFromGitHub {
-        owner = "zed-industries";
-        repo = "codex-acp";
-        tag = "v${version}";
-        inherit hash;
-      };
-in
-rustPlatform.buildRustPackage (
-  {
-    pname = "codex-acp";
-    inherit version sourceRoot;
-    src = actualSrc;
 
-    env = {
-      RUSTY_V8_ARCHIVE = librusty_v8;
-    }
-    // lib.optionalAttrs stdenv.hostPlatform.isLinux {
-      # Point the codex-linux-sandbox build.rs at the vendored bubblewrap source
-      CODEX_BWRAP_SOURCE_DIR = codexBwrapSourceDir;
-    };
+buildNpmPackage rec {
+  npmDepsFetcherVersion = 2;
+  pname = "codex-acp";
+  version = "1.1.2";
 
-    nativeBuildInputs = [
-      pkg-config
-    ];
+  src = fetchFromGitHub {
+    owner = "agentclientprotocol";
+    repo = "codex-acp";
+    tag = "v${version}";
+    hash = "sha256-XN65SdHfuHoRwQUIXYFZXR++QzW7+rNUps2kY4a4JQ4=";
+  };
 
-    buildInputs = [
-      openssl
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [
-      libcap
-    ];
+  npmDepsHash = "sha256-J1MnJBfLoI2B0phWdgfyF7gVb4U0GMp7LBKYYODQqBI=";
+  makeCacheWritable = true;
 
-    doCheck = false;
+  # Disable install scripts to avoid platform-specific dependency fetching issues
+  npmFlags = [ "--ignore-scripts" ];
 
-    passthru = {
-      category = "ACP Ecosystem";
-      inherit mkRustyV8Archive;
-      inherit librusty_v8;
-    };
+  nativeBuildInputs = [ makeWrapper ];
 
-    meta = with lib; {
-      description = "An ACP-compatible coding agent powered by Codex";
-      homepage = "https://github.com/zed-industries/codex-acp";
-      changelog = "https://github.com/zed-industries/codex-acp/releases/tag/v${version}";
-      license = licenses.asl20;
-      maintainers = with maintainers; [ ];
-      platforms = platforms.unix;
-      sourceProvenance = with sourceTypes; [
-        fromSource
-        binaryNativeCode
-      ];
-      mainProgram = "codex-acp";
-    };
-  }
-  // cargoVendor
-)
+  # The bundled @openai/codex npm dependency ships prebuilt binaries that are
+  # not usable on NixOS; point the adapter at this flake's codex package
+  # instead, unless the user overrides CODEX_PATH themselves.
+  postInstall = ''
+    wrapProgram $out/bin/codex-acp \
+      --set-default CODEX_PATH ${lib.getExe codex}
+  '';
+
+  passthru.category = "ACP Ecosystem";
+
+  meta = with lib; {
+    description = "ACP-compatible coding agent powered by the Codex App Server";
+    homepage = "https://github.com/agentclientprotocol/codex-acp";
+    changelog = "https://github.com/agentclientprotocol/codex-acp/releases/tag/v${version}";
+    license = licenses.asl20;
+    sourceProvenance = with sourceTypes; [ fromSource ];
+    maintainers = with maintainers; [ ];
+    mainProgram = "codex-acp";
+    platforms = platforms.all;
+  };
+}
