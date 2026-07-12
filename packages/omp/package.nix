@@ -45,17 +45,6 @@ let
     platformsBySystem.${stdenv.hostPlatform.system}
       or (throw "Unsupported platform for omp: ${stdenv.hostPlatform.system}");
   rustTarget = stdenv.hostPlatform.rust.rustcTarget;
-  rustTargetEnv = "CARGO_TARGET_${
-    lib.toUpper (builtins.replaceStrings [ "-" ] [ "_" ] rustTarget)
-  }_RUSTFLAGS";
-  glimmerRustFlags = lib.concatStringsSep " " [
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_create"
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_destroy"
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_reset"
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_scan"
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_serialize"
-    "-Clink-arg=-Wl,-u,tree_sitter_glimmer_external_scanner_deserialize"
-  ];
 
   src = fetchFromGitHub {
     owner = "can1357";
@@ -95,7 +84,6 @@ stdenv.mkDerivation {
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
   env = {
     RUSTC_BOOTSTRAP = 1;
-    ${rustTargetEnv} = glimmerRustFlags;
   };
 
   bunDeps = bun2nix.fetchBunDeps {
