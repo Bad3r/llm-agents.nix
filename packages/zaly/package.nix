@@ -2,7 +2,6 @@
   lib,
   buildNpmPackage,
   fetchurl,
-  nodejs,
   runCommand,
   versionCheckHook,
   versionCheckHomeHook,
@@ -23,9 +22,8 @@ let
     cp ${./package-lock.json} $out/package-lock.json
   '';
 in
-buildNpmPackage rec {
+buildNpmPackage {
   npmDepsFetcherVersion = 2;
-  inherit nodejs;
   pname = "zaly";
   inherit version;
 
@@ -33,14 +31,12 @@ buildNpmPackage rec {
 
   npmDepsHash = versionData.npmDepsHash;
 
-  npmInstallFlags = [ "--ignore-scripts" ];
+  # Skip dependency install scripts; sharp ships prebuilt binaries and the
+  # root postinstall only rewrites the already-correct node shebang.
   npmRebuildFlags = [ "--ignore-scripts" ];
 
-  # The package from npm ships a prebuilt dist/
+  # The npm tarball ships a prebuilt dist/
   dontNpmBuild = true;
-
-  # Forcefully disable all scripts (the package has a postinstall script)
-  NPM_CONFIG_IGNORE_SCRIPTS = "true";
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
