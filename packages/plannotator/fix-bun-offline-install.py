@@ -28,6 +28,9 @@ HOISTED = {
     "chokidar",
     "parse5",
     "turndown",
+    # 0.23.0 added a packages/core workspace whose typescript devDependency
+    # triggers another offline manifest lookup.
+    "typescript",
 }
 
 # Dependencies from workspaces that are not built for this package.  Removing
