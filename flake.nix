@@ -31,7 +31,11 @@
     let
       inherit (nixpkgs) lib;
 
-      systems = import inputs.systems;
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
       eachSystem = lib.genAttrs systems;
 
       # The flake itself, as passed to packages/checks (`flake.lib`,
