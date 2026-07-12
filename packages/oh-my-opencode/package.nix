@@ -156,7 +156,7 @@ stdenv.mkDerivation {
     description = "The Best AI Agent Harness - Multi-Model Orchestration for OpenCode";
     homepage = "https://github.com/code-yeongyu/oh-my-openagent";
     changelog = "https://github.com/code-yeongyu/oh-my-openagent/releases/tag/v${version}";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ titaniumtown ];
     mainProgram = "oh-my-opencode";

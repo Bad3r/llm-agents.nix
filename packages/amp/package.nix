@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -89,7 +90,7 @@ stdenv.mkDerivation {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";
     homepage = "https://ampcode.com/";
     changelog = "https://ampcode.com/chronicle";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [

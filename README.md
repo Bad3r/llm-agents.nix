@@ -221,6 +221,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>kimi-code</strong> - The Starting Point for Next-Gen Agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/MoonshotAI/kimi-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#kimi-code -- --help`
+- **Nix**: [packages/kimi-code/package.nix](packages/kimi-code/package.nix)
+
+</details>
+<details>
 <summary><strong>letta-code</strong> - Memory-first coding agent that learns and evolves across sessions</summary>
 
 - **Source**: bytecode
@@ -358,6 +368,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/get-vix/vix
 - **Usage**: `nix run github:numtide/llm-agents.nix#vix -- --help`
 - **Nix**: [packages/vix/package.nix](packages/vix/package.nix)
+
+</details>
+<details>
+<summary><strong>zaly</strong> - Hackable terminal coding agent</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/folke/zaly
+- **Usage**: `nix run github:numtide/llm-agents.nix#zaly -- --help`
+- **Nix**: [packages/zaly/package.nix](packages/zaly/package.nix)
 
 </details>
 
@@ -530,14 +550,13 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>codex-acp</strong> - An ACP-compatible coding agent powered by Codex</summary>
+<summary><strong>codex-acp</strong> - ACP-compatible coding agent powered by the Codex App Server</summary>
 
 - **Source**: source
 - **License**: Apache-2.0
-- **Homepage**: https://github.com/zed-industries/codex-acp
+- **Homepage**: https://github.com/agentclientprotocol/codex-acp
 - **Usage**: `nix run github:numtide/llm-agents.nix#codex-acp -- --help`
 - **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
-- **Documentation**: See [packages/codex-acp/README.md](packages/codex-acp/README.md) for detailed usage
 
 </details>
 
@@ -640,7 +659,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <summary><strong>but</strong> - GitButler CLI - virtual branches and AI-assisted Git workflow from the terminal</summary>
 
 - **Source**: source
-- **License**: Check package
+- **License**: FSL-1.1-MIT
 - **Homepage**: https://github.com/gitbutlerapp/gitbutler
 - **Usage**: `nix run github:numtide/llm-agents.nix#but -- --help`
 - **Nix**: [packages/but/package.nix](packages/but/package.nix)
@@ -867,6 +886,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://jscpd.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#jscpd -- --help`
 - **Nix**: [packages/jscpd/package.nix](packages/jscpd/package.nix)
+
+</details>
+<details>
+<summary><strong>open-code-review</strong> - AI-powered code review CLI</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/alibaba/open-code-review
+- **Usage**: `nix run github:numtide/llm-agents.nix#open-code-review -- --help`
+- **Nix**: [packages/open-code-review/package.nix](packages/open-code-review/package.nix)
 
 </details>
 <details>
@@ -1319,44 +1348,6 @@ Add to your system configuration:
 > get the combination we ship in CI — and lets you pull pre-built binaries
 > from our [binary cache](#binary-cache) instead of rebuilding everything
 > against your nixpkgs.
-
-### Using Overlay
-
-Alternatively, use an overlay to access packages under the `llm-agents`
-namespace. Two are provided:
-
-- `overlays.default` exposes `packages.${system}` as-is. Packages are built
-  against this flake's pinned nixpkgs, so the [binary cache](#binary-cache)
-  hits regardless of your nixpkgs revision, at the cost of evaluating a second
-  nixpkgs instance.
-- `overlays.shared-nixpkgs` rebuilds each package against **your** nixpkgs, so
-  dependencies are shared with the rest of your system and no extra nixpkgs is
-  evaluated. The binary cache will only hit when your nixpkgs revision matches
-  ours.
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    llm-agents.url = "github:numtide/llm-agents.nix";
-  };
-
-  outputs = { nixpkgs, llm-agents, ... }: {
-    # NixOS / nix-darwin configuration
-    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [{
-        nixpkgs.overlays = [ llm-agents.overlays.default ];
-        environment.systemPackages = [
-          pkgs.llm-agents.claude-code
-          pkgs.llm-agents.codex
-          pkgs.llm-agents.gemini-cli
-        ];
-      }];
-    };
-  };
-}
-```
 
 ### Try Without Installing
 

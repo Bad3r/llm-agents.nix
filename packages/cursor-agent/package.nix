@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -86,7 +87,7 @@ stdenv.mkDerivation rec {
     description = "Cursor Agent - CLI tool for Cursor AI code editor";
     homepage = "https://cursor.com/";
     changelog = "https://www.cursor.com/changelog";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     platforms = [

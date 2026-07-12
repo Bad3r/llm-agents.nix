@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   unzip,
@@ -60,7 +61,7 @@ stdenv.mkDerivation {
     description = "AI code review CLI from cubic.dev - fast pre-flight review before you push";
     homepage = "https://cubic.dev";
     changelog = "https://docs.cubic.dev/ide/cli-review";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ryoppippi ];
     platforms = [

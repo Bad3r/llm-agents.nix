@@ -4,6 +4,7 @@
   rustPlatform,
   fetchFromGitHub,
   installShellFiles,
+  llvmPackages,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -21,7 +22,17 @@ rustPlatform.buildRustPackage rec {
 
   cargoHash = "sha256-phGByXhDoh0d9UhCeBKDm+0EX4YwigKS8A3j44bNUiI=";
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [
+    installShellFiles
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ llvmPackages.lld ];
+
+  # nixpkgs' classic ld64 crashes in its stubs pass when linking the
+  # mac-notification-sys Objective-C object (NixOS/nixpkgs#540450); use lld
+  # on darwin until the ld64 fix (NixOS/nixpkgs#536365) lands.
+  env = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    NIX_CFLAGS_LINK = "-fuse-ld=lld";
+  };
 
   # Some tests require filesystem access outside the sandbox
   doCheck = false;

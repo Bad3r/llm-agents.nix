@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -109,7 +110,7 @@ stdenv.mkDerivation {
     description = "Grok Build, xAI's agentic coding tool";
     homepage = "https://x.ai";
     changelog = "https://x.ai";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ryoppippi ];
     mainProgram = "grok";

@@ -99,7 +99,7 @@ buildNpmPackage (finalAttrs: {
     description = "Graph-powered code intelligence for AI agents";
     homepage = "https://github.com/abhigyanpatwari/GitNexus";
     changelog = "https://github.com/abhigyanpatwari/GitNexus/releases";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ PieterPel ];
     mainProgram = "gitnexus";

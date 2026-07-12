@@ -1,6 +1,7 @@
 {
   fetchurl,
   lib,
+  flake,
   autoPatchelfHook,
   makeWrapper,
   stdenvNoCC,
@@ -117,7 +118,7 @@ let
     homepage = "https://claude.ai";
     # No upstream versioned changelog or release tags exist.
     changelog = "https://claude.ai/download";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ flexiondotorg ];
     platforms = [

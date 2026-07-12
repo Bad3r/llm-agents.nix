@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -88,7 +89,7 @@ stdenv.mkDerivation {
     description = "Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster";
     homepage = "https://claude.ai/code";
     changelog = "https://github.com/anthropics/claude-code/releases";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [
       malo

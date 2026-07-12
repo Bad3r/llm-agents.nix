@@ -113,7 +113,8 @@ rustPlatform.buildRustPackage {
     # cross-compile builds, which forces a from-source openssl build that
     # needs perl regardless of the host openssl present in buildInputs.
     perl
-  ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ llvmPackages.lld ];
   buildInputs = [
     openssl
     libgit2
@@ -130,6 +131,12 @@ rustPlatform.buildRustPackage {
   env = {
     SQLX_OFFLINE = "true";
     LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
+  }
+  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+    # nixpkgs' classic ld64 crashes in its stubs pass when linking the
+    # mac-notification-sys Objective-C object (NixOS/nixpkgs#540450); use lld
+    # on darwin until the ld64 fix (NixOS/nixpkgs#536365) lands.
+    NIX_CFLAGS_LINK = "-fuse-ld=lld";
   };
 
   doCheck = false;

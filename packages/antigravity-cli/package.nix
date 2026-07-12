@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   autoPatchelfHook,
@@ -60,7 +61,7 @@ stdenv.mkDerivation {
     description = "CLI for Google Antigravity, an agentic development platform";
     homepage = "https://antigravity.google/";
     changelog = "https://antigravity.google/cli";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ryoppippi ];
     mainProgram = "agy";

@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -84,7 +85,7 @@ stdenv.mkDerivation {
     homepage = "https://factory.ai";
     changelog = "https://docs.factory.ai/changelog/cli-updates";
     downloadPage = "https://factory.ai/product/ide";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
     mainProgram = "droid";

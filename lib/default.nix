@@ -1,6 +1,18 @@
 { inputs, ... }:
 inputs.nixpkgs.lib.extend (
   _final: prev: {
+    licenses = prev.licenses // {
+      # nixpkgs' unfree license, but with `free = true` so evaluating these
+      # packages does not require `allowUnfree`. They are still labelled as
+      # unfree in metadata and docs.
+      unfree = prev.licenses.unfree // {
+        free = true;
+      };
+      fsl11Mit = prev.licenses.fsl11Mit // {
+        free = true;
+      };
+    };
+
     maintainers = prev.maintainers // {
       ak2k = {
         github = "ak2k";
@@ -151,6 +163,11 @@ inputs.nixpkgs.lib.extend (
         github = "hobr";
         githubId = 13460388;
         name = "Hobr";
+      };
+      mnixry = {
+        github = "mnixry";
+        githubId = 32300164;
+        name = "Mix";
       };
     };
   }

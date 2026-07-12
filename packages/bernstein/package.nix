@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   flake,
   python3,
   fetchFromGitHub,
@@ -9,7 +10,28 @@
 }:
 
 let
-  terminaltexteffects = python3.pkgs.buildPythonPackage rec {
+  # opentelemetry-exporter-otlp-proto-grpc 1.43.0 has timing-sensitive retry
+  # tests that fail on the darwin builders with python 3.14; skip its test
+  # suite there until nixpkgs sorts this out.
+  python =
+    if stdenv.hostPlatform.isDarwin then
+      python3.override {
+        self = python;
+        packageOverrides = _final: prev: {
+          opentelemetry-exporter-otlp-proto-grpc =
+            prev.opentelemetry-exporter-otlp-proto-grpc.overridePythonAttrs
+              (_: {
+                doCheck = false;
+                # opentelemetry-sdk only ends up in the closure via the test
+                # env, so the runtime deps check must be skipped as well.
+                dontCheckRuntimeDeps = true;
+              });
+        };
+      }
+    else
+      python3;
+
+  terminaltexteffects = python.pkgs.buildPythonPackage rec {
     pname = "terminaltexteffects";
     version = "0.14.2";
     pyproject = true;
@@ -19,7 +41,7 @@ let
       hash = "sha256-ITyJnOS492Q9LQVorxROEnThHkST259bBDh70XwhdxQ=";
     };
 
-    build-system = with python3.pkgs; [
+    build-system = with python.pkgs; [
       hatchling
     ];
 
@@ -34,7 +56,7 @@ let
     };
   };
 in
-python3.pkgs.buildPythonApplication rec {
+python.pkgs.buildPythonApplication rec {
   pname = "bernstein";
   version = "3.4.3";
   pyproject = true;
@@ -57,11 +79,11 @@ python3.pkgs.buildPythonApplication rec {
     sed -i '/^exclude = \[/,/^\]/d' pyproject.toml
   '';
 
-  build-system = with python3.pkgs; [
+  build-system = with python.pkgs; [
     hatchling
   ];
 
-  dependencies = with python3.pkgs; [
+  dependencies = with python.pkgs; [
     asn1crypto
     click
     cryptography
@@ -117,7 +139,7 @@ python3.pkgs.buildPythonApplication rec {
     "--prefix"
     "PYTHONPATH"
     ":"
-    "${placeholder "out"}/${python3.sitePackages}:${python3.pkgs.makePythonPath dependencies}"
+    "${placeholder "out"}/${python.sitePackages}:${python.pkgs.makePythonPath dependencies}"
   ];
 
   pythonImportsCheck = [ "bernstein" ];

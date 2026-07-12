@@ -78,12 +78,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "GitButler CLI - virtual branches and AI-assisted Git workflow from the terminal";
     homepage = "https://github.com/gitbutlerapp/gitbutler";
     changelog = "https://github.com/gitbutlerapp/gitbutler/releases/tag/release/${finalAttrs.version}";
-    # Functional Source License 1.1 (MIT future license)
-    license = {
-      fullName = "Functional Source License, Version 1.1, MIT Future License";
-      url = "https://github.com/gitbutlerapp/gitbutler/blob/master/LICENSE.md";
-      free = false;
-    };
+    license = flake.lib.licenses.fsl11Mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ mic92 ];
     mainProgram = "but";

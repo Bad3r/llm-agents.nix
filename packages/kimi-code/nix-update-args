@@ -1,0 +1,3 @@
+--use-github-releases
+--version-regex
+^@moonshot-ai/kimi-code@([0-9]+\.[0-9]+\.[0-9]+)$

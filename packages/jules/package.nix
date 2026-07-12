@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   makeWrapper,
@@ -55,7 +56,7 @@ stdenv.mkDerivation {
     description = "Jules, the asynchronous coding agent from Google, in the terminal";
     homepage = "https://jules.google";
     changelog = "https://jules.google/docs/changelog";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     mainProgram = "jules";
     platforms = [

@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   wrapBuddy,
@@ -50,7 +51,7 @@ stdenv.mkDerivation {
     homepage = "https://qoder.com";
     changelog = "https://qoder.com/changelog";
     downloadPage = "https://qoder.com/download";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     maintainers = with maintainers; [ ];
     platforms = [
       "x86_64-linux"

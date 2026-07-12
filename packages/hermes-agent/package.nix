@@ -218,10 +218,18 @@ let
     };
   });
 
+  # pyramid dropped its pkg_resources shim on python 3.14, so slack-bolt's
+  # pyramid adapter tests fail at collection with ModuleNotFoundError.
+  slack-bolt' = python3.pkgs.slack-bolt.overridePythonAttrs (old: {
+    disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+      "tests/adapter_tests/pyramid/"
+    ];
+  });
+
   optionalDeps = with python3.pkgs; {
     gateway = [
       # [messaging] / [slack]
-      slack-bolt
+      slack-bolt'
       slack-sdk
       python-telegram-bot
       discordpy
@@ -336,6 +344,9 @@ python3.pkgs.buildPythonApplication {
     "packaging"
     "urllib3"
     "websockets"
+    # nixpkgs moved past upstream's == pins
+    "rich"
+    "pillow"
   ];
 
   pythonImportsCheck = [

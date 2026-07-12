@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   unzip,
@@ -64,7 +65,7 @@ stdenv.mkDerivation rec {
     description = "AI-powered code review CLI tool";
     homepage = "https://coderabbit.ai";
     changelog = "https://docs.coderabbit.ai/changelog";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
       "x86_64-linux"

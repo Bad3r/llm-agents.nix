@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   stdenv,
   fetchurl,
   unzip,
@@ -130,7 +131,7 @@ stdenv.mkDerivation {
     description = "Junie, JetBrains AI coding agent CLI";
     homepage = "https://github.com/JetBrains/junie";
     changelog = "https://github.com/JetBrains/junie/releases/tag/${version}";
-    license = licenses.unfree;
+    license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     platforms = [
       "x86_64-linux"
