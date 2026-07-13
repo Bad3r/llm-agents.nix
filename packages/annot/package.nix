@@ -12,6 +12,8 @@
   pnpmConfigHook,
   nodejs,
   cargo-tauri,
+  git,
+  jujutsu,
   pkg-config,
   wrapGAppsHook3,
   makeBinaryWrapper,
@@ -67,6 +69,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     makeBinaryWrapper
+  ];
+
+  # Rust tests spawn git and jj to build fixture repositories.
+  nativeCheckInputs = [
+    git
+    jujutsu
   ];
 
   buildInputs =
