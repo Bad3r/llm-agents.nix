@@ -9,8 +9,8 @@
 #
 # The guard fires for every consumption path that swaps out nixpkgs
 # (overlays.shared-nixpkgs, `inputs.llm-agents.inputs.nixpkgs.follows`, direct
-# callPackage), because blueprint builds perSystem.self against whatever `pkgs`
-# is in effect.
+# callPackage), because perSystem.self is built against whatever `pkgs` is in
+# effect.
 let
   inherit (pkgs) lib;
   hasFetcherVersion = (lib.functionArgs pkgs.fetchNpmDeps) ? fetcherVersion;
@@ -22,8 +22,8 @@ let
     likely on nixos-25.11 or an early-2026 unstable via
     `overlays.shared-nixpkgs` or `inputs.llm-agents.inputs.nixpkgs.follows`.
 
-    Either use `overlays.default` / the flake packages directly, or bump
-    nixpkgs to at least 203662a570c4 (2026-02-15). See
+    Either use the flake packages directly, or bump nixpkgs to at least
+    203662a570c4 (2026-02-15). See
     https://github.com/numtide/llm-agents.nix/issues/4320.
   '';
 in

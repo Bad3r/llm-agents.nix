@@ -1349,6 +1349,37 @@ Add to your system configuration:
 > from our [binary cache](#binary-cache) instead of rebuilding everything
 > against your nixpkgs.
 
+### Using Overlay
+
+`overlays.shared-nixpkgs` exposes all packages under the `llm-agents`
+namespace, built against your nixpkgs. Dependencies are shared with the rest
+of your system and your nixpkgs `config` (e.g. `allowUnfreePredicate`)
+applies. The binary cache only hits when your nixpkgs revision matches ours.
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    llm-agents.url = "github:numtide/llm-agents.nix";
+  };
+
+  outputs = { nixpkgs, llm-agents, ... }: {
+    # NixOS / nix-darwin configuration
+    nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [({ pkgs, ... }: {
+        nixpkgs.overlays = [ llm-agents.overlays.shared-nixpkgs ];
+        environment.systemPackages = [
+          pkgs.llm-agents.claude-code
+          pkgs.llm-agents.codex
+          pkgs.llm-agents.gemini-cli
+        ];
+      })];
+    };
+  };
+}
+```
+
 ### Try Without Installing
 
 Browse all available tools with the interactive launcher:

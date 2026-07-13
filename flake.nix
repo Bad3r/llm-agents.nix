@@ -59,12 +59,11 @@
 
       pkgsFor = eachSystem (system: import nixpkgs { inherit system; });
 
-      # Every package under packages/, independent of the current platform.
+      # Every package under packages/, built against the given package set.
       # Cross-package references go through `perSystem.self.<name>`.
-      allPackages = eachSystem (
-        system:
+      mkPackagesFor =
+        pkgs:
         let
-          pkgs = pkgsFor.${system};
           perSystem = {
             self = packages;
           };
@@ -76,13 +75,15 @@
                 perSystem
                 flake
                 inputs
-                system
                 ;
+              system = pkgs.stdenv.hostPlatform.system;
             } (import (./packages + "/${name}"))
           );
         in
-        packages
-      );
+        packages;
+
+      # Every package under packages/, independent of the current platform.
+      allPackages = eachSystem (system: mkPackagesFor pkgsFor.${system});
 
       # Only expose packages that build on the given platform.
       available =
@@ -105,6 +106,10 @@
       lib = import ./lib { inherit inputs; };
 
       inherit packages devShells;
+
+      overlays.shared-nixpkgs = import ./overlays/shared-nixpkgs.nix {
+        inherit mkPackagesFor;
+      };
 
       formatter = eachSystem (system: allPackages.${system}.formatter);
 

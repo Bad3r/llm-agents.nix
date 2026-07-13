@@ -31,8 +31,7 @@ stdenv.mkDerivation {
     bunNix = ./bun.nix;
   };
 
-  # We handle build and install ourselves since we need a custom
-  # two-step build: CSS compilation then bun build --compile
+  # We handle build and install ourselves; upstream builds via scripts/build.ts
   dontUseBunBuild = true;
   dontUseBunInstall = true;
 
@@ -64,15 +63,9 @@ stdenv.mkDerivation {
       export LD_LIBRARY_PATH="${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}"
     ''}
 
-    # Step 1: Build CSS with tailwindcss
-    bun ./node_modules/@tailwindcss/cli/dist/index.mjs \
-      -i src/web/styles/source.css \
-      -o src/web/styles/style.css \
-      --minify
-
-    # Step 2: Compile standalone binary
-    bun build --production --compile --minify \
-      --outfile=dist/backlog src/cli.ts
+    # Upstream build script handles Tailwind CSS via bun-plugin-tailwind
+    # and compiles the standalone binary.
+    bun scripts/build.ts
 
     runHook postBuild
   '';

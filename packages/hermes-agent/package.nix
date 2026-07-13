@@ -318,6 +318,17 @@ python3.pkgs.buildPythonApplication {
     "--set"
     "HERMES_NODE"
     "${nodejs}/bin/node"
+    # Skills are copied to $out/share/hermes in postInstall; point hermes at them.
+    "--set"
+    "HERMES_BUNDLED_SKILLS"
+    "${placeholder "out"}/share/hermes/skills"
+    "--set"
+    "HERMES_OPTIONAL_SKILLS"
+    "${placeholder "out"}/share/hermes/optional-skills"
+    # Prevent `hermes update` from trying to modify the Nix store.
+    "--set"
+    "HERMES_MANAGED"
+    "nixos"
     # Disable runtime pip installs; absent extras disable cleanly.
     "--set"
     "HERMES_DISABLE_LAZY_INSTALLS"
@@ -328,6 +339,14 @@ python3.pkgs.buildPythonApplication {
     ":"
     "${nodejs}/bin"
   ];
+
+  # Skills are shipped as setup.py data_files, which the wheel build drops;
+  # install them manually.
+  postInstall = ''
+    mkdir -p $out/share/hermes
+    cp -r ${src}/skills $out/share/hermes/skills
+    cp -r ${src}/optional-skills $out/share/hermes/optional-skills
+  '';
 
   pythonRelaxDeps = [
     "openai"
@@ -373,8 +392,13 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_WEB_DIST $out/bin/hermes
     grep -q HERMES_PYTHON $out/bin/hermes
     grep -q HERMES_PYTHON_SRC_ROOT $out/bin/hermes
+    grep -q HERMES_BUNDLED_SKILLS $out/bin/hermes
+    grep -q HERMES_OPTIONAL_SKILLS $out/bin/hermes
+    grep -q HERMES_MANAGED $out/bin/hermes
     test -f ${hermes-frontend}/lib/hermes-tui/dist/entry.js
     test -f ${hermes-frontend}/share/hermes-web/index.html
+    test -d $out/share/hermes/skills
+    test -d $out/share/hermes/optional-skills
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
