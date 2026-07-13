@@ -12,6 +12,8 @@
   pnpmConfigHook,
   nodejs,
   cargo-tauri,
+  git,
+  jujutsu,
   pkg-config,
   wrapGAppsHook3,
   makeBinaryWrapper,
@@ -25,7 +27,7 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "annot";
-  version = "0.14.0";
+  version = "0.18.0";
 
   __structuredAttrs = true;
   strictDeps = true;
@@ -34,14 +36,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "denolehov";
     repo = "annot";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-DyvexYe9eKLUvcz8+RaK9dj+jUi1/jgSZHhyDn1VCCo=";
+    hash = "sha256-PrJTCVHkPjblXypyvCsLFkpx48z+meJNWewkod0e6Lk=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_10;
     fetcherVersion = 3;
-    hash = "sha256-OJJXMBiDiHDVUvZOVh1iynrPrUZC0n2KutrPuqiexsQ=";
+    hash = "sha256-OHsq/So4YhonxSnT4fByZnlPnpYvjcf0UuHHgBGVIf8=";
   };
 
   postPatch = ''
@@ -51,7 +53,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoRoot = "src-tauri";
   buildAndTestSubdir = finalAttrs.cargoRoot;
 
-  cargoHash = "sha256-Q99ERBA8+xGlH5lo1d7hDqgaFKOmP3wrBq6izfVWNvs=";
+  cargoHash = "sha256-e5kU6b+dq9fPMP6uj5Y42qeKz5P/Sufuci0bU5J/SiU=";
 
   nativeBuildInputs = [
     jq
@@ -67,6 +69,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     makeBinaryWrapper
+  ];
+
+  # Rust tests spawn git and jj to build fixture repositories.
+  nativeCheckInputs = [
+    git
+    jujutsu
   ];
 
   buildInputs =
