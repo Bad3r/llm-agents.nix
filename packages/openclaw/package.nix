@@ -25,19 +25,19 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.6.11";
+  version = "2026.7.1";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Ryj+aJ4Daql/ILs3Z/Gi+ltBGQfOdtXKJoOqr3YNoQ0=";
+    hash = "sha256-37LZ10P+XGzfU3KVpRhfEElYscoUlE+zi85hmvicjLI=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
-    hash = "sha256-n7Kdn37f825JTfJA+E5SujRRELmYRQ948bowXxG+LLo=";
+    hash = "sha256-mflaRDsSlYTpHc6irUjoStTFMd/TuA9ozqjf9cxy+ck=";
     fetcherVersion = 3;
     prePnpmInstall = stripPatchedDeps;
   };
