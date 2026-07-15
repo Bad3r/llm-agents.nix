@@ -41,27 +41,48 @@ buildNpmPackage {
   # The package from npm is already built
   dontNpmBuild = true;
 
-  # Run upstream's Bun entry point with Bun; keeps Node out of the closure
-  # and adds aarch64-linux support.
-  postInstall = ''
-    rm -f "$out/bin/pi"
+  nativeBuildInputs = [ bun ];
 
-    makeWrapper ${lib.getExe bun} "$out/bin/pi" \
-      --add-flags "${packageRoot}/dist/bun/cli.js" \
+  # Compile a standalone binary like upstream's build:binary script. Running
+  # dist/bun/cli.js directly with Bun breaks extension module aliasing (#6794).
+  postInstall = ''
+    pushd ${packageRoot}
+
+    # Upstream embeds the worker as ./src/utils/image-resize-worker.ts and
+    # loads it by that path at runtime; the npm tarball only ships dist/.
+    mkdir -p src/utils
+    echo 'import "../../dist/utils/image-resize-worker.js";' > src/utils/image-resize-worker.ts
+
+    bun build --compile ./dist/bun/cli.js ./src/utils/image-resize-worker.ts --outfile pi-binary
+
+    # Replicate upstream's copy-binary-assets layout next to the binary.
+    pkgdir=$out/libexec/pi
+    mkdir -p "$pkgdir/theme" "$pkgdir/assets" "$pkgdir/export-html/vendor"
+    install -m755 pi-binary "$pkgdir/pi"
+    cp package.json README.md CHANGELOG.md "$pkgdir/"
+    cp -r docs examples "$pkgdir/"
+    cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
+    cp dist/modes/interactive/assets/*.png "$pkgdir/assets/"
+    cp dist/core/export-html/template.html dist/core/export-html/template.css dist/core/export-html/template.js "$pkgdir/export-html/"
+    cp dist/core/export-html/vendor/*.js "$pkgdir/export-html/vendor/"
+    cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
+
+    popd
+
+    # The binary embeds all modules; drop the npm module tree.
+    rm -rf "$out/lib" "$out/bin"
+    mkdir -p "$out/bin"
+
+    makeWrapper "$pkgdir/pi" "$out/bin/pi" \
       --prefix PATH : ${
         lib.makeBinPath [
           fd
           ripgrep
         ]
       } \
-      --set PI_PACKAGE_DIR ${packageRoot} \
+      --set PI_PACKAGE_DIR "$pkgdir" \
       --set PI_SKIP_VERSION_CHECK 1 \
       --set PI_TELEMETRY 0
-  '';
-
-  # The npm install hook patches shebangs to Node; point them at Bun instead.
-  postFixup = ''
-    grep -rlE '^#!.*/node$' "$out/lib" | xargs -r sed -i '1s|.*|#!${lib.getExe bun}|'
   '';
 
   doInstallCheck = true;
