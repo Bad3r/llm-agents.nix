@@ -178,7 +178,7 @@ python.pkgs.buildPythonApplication rec {
   # pins so the nixpkgs-provided versions satisfy pypa build.
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace-fail 'requires = ["hatchling==1.30.1", "hatch-vcs==0.5.0", "editables==0.6"]' \
+      --replace-fail 'requires = ["hatchling==1.31.0", "hatch-vcs==0.5.0", "editables==0.6"]' \
         'requires = ["hatchling", "hatch-vcs", "editables"]'
   '';
 
