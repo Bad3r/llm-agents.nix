@@ -13,7 +13,6 @@
 let
   versionData = lib.importJSON ./hashes.json;
   version = versionData.version;
-  packageRoot = "$out/lib/node_modules/@earendil-works/pi-coding-agent";
 
   # Create a source with package-lock.json included
   srcWithLock = runCommand "pi-src-with-lock" { } ''
@@ -43,18 +42,8 @@ buildNpmPackage {
 
   nativeBuildInputs = [ bun ];
 
-  # copy-binary-assets reads ../../node_modules and src/ paths from upstream's
-  # monorepo layout; recreate it around the unpacked npm tarball.
-  postUnpack = ''
-    mkdir -p "$NIX_BUILD_TOP/monorepo/packages"
-    mv "$NIX_BUILD_TOP/$sourceRoot" "$NIX_BUILD_TOP/monorepo/packages/coding-agent"
-    ln -s packages/coding-agent/node_modules "$NIX_BUILD_TOP/monorepo/node_modules"
-    sourceRoot=monorepo/packages/coding-agent
-  '';
-
   # Compile a standalone binary like upstream's build:binary script. Running
   # dist/bun/cli.js directly with Bun breaks extension module aliasing (#6794).
-  # Runs before npmInstallHook so the shx dev dependency is still installed.
   preInstall = ''
     # Upstream embeds the worker as ./src/utils/image-resize-worker.ts and
     # loads it by that path at runtime; the npm tarball only ships dist/.
@@ -64,17 +53,23 @@ buildNpmPackage {
     ln -s ../../dist/core/export-html src/core/export-html
 
     bun build --compile ./dist/bun/cli.js ./src/utils/image-resize-worker.ts --outfile dist/pi
-    npm run copy-binary-assets
   '';
 
   postInstall = ''
     pkgdir=$out/libexec/pi
 
-    # The binary embeds all modules; ship only upstream's binary dist layout.
+    # The binary embeds all modules; assemble the release layout that
+    # upstream's scripts/build-binaries.sh ships.
     rm -rf "$out/lib" "$out/bin"
-    mkdir -p "$out/bin" "$out/libexec"
-    cp -r dist "$pkgdir"
-    # Keep patchShebangs from pulling Node into the closure via dist scripts.
+    mkdir -p "$out/bin" "$pkgdir/theme" "$pkgdir/assets"
+    cp dist/pi "$pkgdir/"
+    cp package.json README.md CHANGELOG.md "$pkgdir/"
+    cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
+    cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
+    cp dist/modes/interactive/assets/* "$pkgdir/assets/"
+    cp -r dist/core/export-html "$pkgdir/"
+    cp -r docs examples "$pkgdir/"
+    # Keep patchShebangs from pulling Node into the closure via shipped scripts.
     find "$pkgdir" -name '*.js' -exec chmod -x {} +
 
     makeWrapper "$pkgdir/pi" "$out/bin/pi" \
