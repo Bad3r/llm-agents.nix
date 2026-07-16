@@ -4,7 +4,7 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
-  electron_40,
+  electron_41,
   makeWrapper,
   copyDesktopItems,
   makeDesktopItem,
@@ -12,10 +12,10 @@
 }:
 
 let
-  # Upstream pins electron ^39, but electron_39 is EOL/insecure in nixpkgs.
-  # Electron majors are backwards compatible enough for this app; the build
-  # guard below catches the day upstream jumps ahead of what we ship.
-  electron = electron_40;
+  # Upstream pins electron ^39, but electron_39 and _40 are EOL/insecure in
+  # nixpkgs. Electron majors are backwards compatible enough for this app; the
+  # build guard below catches the day upstream jumps ahead of what we ship.
+  electron = electron_41;
 in
 buildNpmPackage rec {
   pname = "hermes-desktop";

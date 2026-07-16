@@ -50,6 +50,8 @@ stdenv.mkDerivation {
     "liblcms2.so.2"
     "libpng16.so.16"
     "libpcsclite.so.1"
+    "libwayland-client.so.0"
+    "libwayland-cursor.so.0"
     "libX11.so.6"
     "libXext.so.6"
     "libXi.so.6"

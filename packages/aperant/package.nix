@@ -4,10 +4,16 @@
   buildNpmPackage,
   fetchFromGitHub,
   makeWrapper,
-  electron_40,
+  electron_41,
   python3,
 }:
 
+let
+  # Upstream pins electron 40, but electron_40 is EOL/insecure in nixpkgs.
+  # Electron majors are backwards compatible enough for this app; the build
+  # guard below catches the day upstream jumps ahead of what we ship.
+  electron = electron_41;
+in
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "aperant";
@@ -34,14 +40,13 @@ buildNpmPackage rec {
   buildPhase = ''
     runHook preBuild
 
-    # Ensure our electron major version matches what upstream expects.
-    # This will fail loudly on version bumps instead of silently diverging.
+    # Fail loudly if upstream moves to an Electron major newer than ours.
     upstream_electron=$(node -p "require('./apps/frontend/package.json').devDependencies.electron")
     upstream_major=''${upstream_electron%%.*}
-    nix_major=${lib.versions.major electron_40.version}
-    if [[ "$upstream_major" != "$nix_major" ]]; then
-      echo "error: upstream expects electron $upstream_electron (major $upstream_major), but we provide electron ${electron_40.version} (major $nix_major)"
-      echo "Update the electron_40 input in package.nix to match."
+    nix_major=${lib.versions.major electron.version}
+    if (( upstream_major > nix_major )); then
+      echo "error: upstream expects electron $upstream_electron (major $upstream_major), but we provide electron ${electron.version} (major $nix_major)"
+      echo "Update the electron input in package.nix to match."
       exit 1
     fi
 
@@ -78,7 +83,7 @@ buildNpmPackage rec {
     # venv and pip-install backend dependencies at first launch.
     # ELECTRON_FORCE_IS_PACKAGED makes app.isPackaged return true so the
     # app uses production code paths (no DevTools, venv in userData, etc.).
-    makeWrapper ${electron_40}/bin/electron $out/bin/aperant \
+    makeWrapper ${electron}/bin/electron $out/bin/aperant \
       --add-flags "$out/share/aperant" \
       --set ELECTRON_FORCE_IS_PACKAGED 1 \
       --prefix PATH : ${lib.makeBinPath [ python3 ]}
