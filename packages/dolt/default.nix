@@ -8,14 +8,14 @@ let
   };
 in
 (base.overrideAttrs (old: rec {
-  version = "2.2.0";
+  version = "2.2.1";
   src = pkgs.fetchFromGitHub {
     owner = "dolthub";
     repo = "dolt";
     tag = "v${version}";
-    hash = "sha256-Wisa9ej5IGf4pXeePw1pDAGxeU3gf4aRCAbHXTC271g=";
+    hash = "sha256-SyoTBkIjZ1yZQXYo1qcdU18Yo84U1xjkNYU4pYlX748=";
   };
-  vendorHash = "sha256-mvoy/ChZVGG9QxRGUG902Eda37SuJGjYLOi87OqjF68=";
+  vendorHash = "sha256-/NC/yKi/XJB0fhfgeH4Arao0lr+i16YsDGWlS5pmx+0=";
   passthru = (old.passthru or { }) // {
     hideFromDocs = true;
     updateEvenIfHidden = true;
