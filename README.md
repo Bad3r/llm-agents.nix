@@ -1225,6 +1225,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ctx</strong> - Search the coding agent history already on your machine</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/ctxrs/ctx
+- **Usage**: `nix run github:numtide/llm-agents.nix#ctx -- --help`
+- **Nix**: [packages/ctx/package.nix](packages/ctx/package.nix)
+
+</details>
+<details>
 <summary><strong>git-surgeon</strong> - Git primitives for autonomous coding agents</summary>
 
 - **Source**: source

@@ -32,6 +32,15 @@ buildNpmPackage {
 
   dontNpmBuild = true;
 
+  postInstall = ''
+    # disable telemetry to silence warning note
+    export OPENSPEC_TELEMETRY=0
+    installShellCompletion --cmd openspec \
+      --bash <($out/bin/openspec completion generate bash) \
+      --fish <($out/bin/openspec completion generate fish) \
+      --zsh <($out/bin/openspec completion generate zsh)
+  '';
+
   passthru.category = "Workflow & Project Management";
 
   meta = {
