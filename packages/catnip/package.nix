@@ -1,14 +1,14 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  platformSource,
   wrapBuddy,
   gcc-unwrapped,
   versionCheckHook,
 }:
 
 let
-  source = import ../../lib/platform-source.nix { inherit stdenv fetchurl; } {
+  source = platformSource {
     hashesFile = ./hashes.json;
     platforms = {
       x86_64-linux = "linux_amd64";

@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   unzip,
   makeWrapper,
   formatelf,
@@ -12,26 +12,23 @@
 
 let
   pname = "junie";
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-amd64";
-    aarch64-linux = "linux-aarch64";
-    x86_64-darwin = "macos-amd64";
-    aarch64-darwin = "macos-aarch64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-amd64";
+      aarch64-linux = "linux-aarch64";
+      x86_64-darwin = "macos-amd64";
+      aarch64-darwin = "macos-aarch64";
+    };
+    url =
+      { version, platform }:
+      "https://github.com/JetBrains/junie/releases/download/${version}/junie-release-${version}-${platform}.zip";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+  inherit (source) version;
 in
 stdenv.mkDerivation {
-  inherit pname version;
-
-  src = fetchurl {
-    url = "https://github.com/JetBrains/junie/releases/download/${version}/junie-release-${version}-${platformSuffix}.zip";
-    hash = hashes.${platform};
-  };
+  inherit pname;
+  inherit (source) version src;
 
   nativeBuildInputs = [
     unzip
@@ -135,12 +132,7 @@ stdenv.mkDerivation {
     changelog = "https://github.com/JetBrains/junie/releases/tag/${version}";
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     mainProgram = "junie";
     maintainers = with lib.maintainers; [
       mic92
