@@ -2,8 +2,8 @@ id: use-perSystem-buildNpmPackage
 language: nix
 severity: error
 message: >-
-  In default.nix use `perSystem.self.buildNpmPackage`, not `pkgs.buildNpmPackage`. The perSystem builder adds an eval-time guard that fails fast with a helpful message on nixpkgs older than fetcherVersion = 2 (#4320), instead of a cryptic FOD hash mismatch.
+  Do not use `pkgs.buildNpmPackage`. Declare `buildNpmPackage` as a package.nix argument; the in-repo builder adds an eval-time guard that fails fast with a helpful message on nixpkgs older than fetcherVersion = 2 (#4320), instead of a cryptic FOD hash mismatch.
 files:
-  - '**/default.nix'
+  - 'packages/**'
 rule:
   pattern: pkgs.buildNpmPackage

@@ -2,11 +2,11 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  bun2nix,
+  bun2nixLib,
   bun,
   makeWrapper,
   sqlite,
-  autoPatchelfHook,
+  formatelf,
   flake,
 
   # GPU support
@@ -38,10 +38,10 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     makeWrapper
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ]
   ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
 
   buildInputs = [
@@ -58,7 +58,7 @@ stdenv.mkDerivation {
     vulkan-loader
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

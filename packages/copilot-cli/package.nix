@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   patchelf,
   cacert,
@@ -11,29 +11,25 @@
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
   # Since 1.0.64 the @github/copilot npm package is just a loader that resolves
   # and spawns a per-platform package (@github/copilot-<platform>-<arch>), which
   # ships the actual Node SEA binary plus bundled ripgrep/tgrep.
-  platformMap = {
-    x86_64-linux = "linux-x64";
-    aarch64-linux = "linux-arm64";
-    x86_64-darwin = "darwin-x64";
-    aarch64-darwin = "darwin-arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+      x86_64-darwin = "darwin-x64";
+      aarch64-darwin = "darwin-arm64";
+    };
+    url =
+      { version, platform }:
+      "https://registry.npmjs.org/@github/copilot-${platform}/-/copilot-${platform}-${version}.tgz";
   };
-  system = stdenv.hostPlatform.system;
-  suffix = platformMap.${system} or (throw "copilot-cli: unsupported platform ${system}");
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "copilot-cli";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://registry.npmjs.org/@github/copilot-${suffix}/-/copilot-${suffix}-${version}.tgz";
-    hash = hashes.${system};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = [
     makeWrapper
@@ -95,12 +91,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/github/copilot-cli/releases/tag/v${finalAttrs.version}";
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     mainProgram = "copilot";
   };
 })

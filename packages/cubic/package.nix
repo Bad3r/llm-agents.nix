@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   unzip,
   wrapBuddy,
   versionCheckHook,
@@ -10,27 +10,22 @@
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-x64";
-    aarch64-linux = "linux-arm64";
-    x86_64-darwin = "darwin-x64";
-    aarch64-darwin = "darwin-arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+      x86_64-darwin = "darwin-x64";
+      aarch64-darwin = "darwin-arm64";
+    };
+    url =
+      { version, platform }:
+      "https://mcafvrhahbqdwfrtncql.supabase.co/storage/v1/object/public/releases/v${version}/cubic-${platform}.zip";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "cubic";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://mcafvrhahbqdwfrtncql.supabase.co/storage/v1/object/public/releases/v${version}/cubic-${platformSuffix}.zip";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
@@ -64,12 +59,7 @@ stdenv.mkDerivation {
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ryoppippi ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     mainProgram = "cubic";
   };
 }

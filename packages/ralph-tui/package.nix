@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  bun2nix,
+  bun2nixLib,
   bun,
   fetchFromGitHub,
   makeWrapper,
@@ -24,11 +24,11 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     makeWrapper
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

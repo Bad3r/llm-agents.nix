@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  bun2nix,
+  bun2nixLib,
   bun,
   fetchFromGitHub,
   jq,
@@ -23,11 +23,11 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

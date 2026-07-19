@@ -9,7 +9,10 @@
   dbus,
   versionCheckHook,
   cacert,
-  librusty_v8,
+  callPackage,
+  librusty_v8 ? callPackage ./librusty_v8.nix {
+    inherit (callPackage ./fetchers.nix { }) fetchLibrustyV8;
+  },
 }:
 
 let

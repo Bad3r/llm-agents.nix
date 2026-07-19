@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  bun2nix,
+  bun2nixLib,
   bun,
   nodejs,
   python3,
@@ -55,7 +55,7 @@ stdenv.mkDerivation {
   inherit src;
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
     nodejs
     python3
@@ -68,7 +68,7 @@ stdenv.mkDerivation {
     libsecret
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     # bun.nix references workspace packages via relative paths that only
     # exist in the upstream monorepo, so remap them onto the fetched src.
     bunNix =

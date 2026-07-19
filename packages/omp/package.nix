@@ -2,14 +2,14 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  bun2nix,
+  bun2nixLib,
   bun,
   rustc,
   cargo,
   rustPlatform,
   pkg-config,
   makeWrapper,
-  autoPatchelfHook,
+  formatelf,
   zlib,
   libclang,
   python3,
@@ -64,7 +64,7 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
     rustc
     cargo
@@ -73,7 +73,7 @@ stdenv.mkDerivation {
     makeWrapper
     zig
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
@@ -86,7 +86,7 @@ stdenv.mkDerivation {
     RUSTC_BOOTSTRAP = 1;
   };
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

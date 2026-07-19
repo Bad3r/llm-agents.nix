@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   unzip,
   wrapBuddy,
   libsecret,
@@ -11,27 +11,22 @@
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-x64";
-    aarch64-linux = "linux-arm64";
-    x86_64-darwin = "darwin-x64";
-    aarch64-darwin = "darwin-arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+      x86_64-darwin = "darwin-x64";
+      aarch64-darwin = "darwin-arm64";
+    };
+    url =
+      { version, platform }:
+      "https://cli.coderabbit.ai/releases/${version}/coderabbit-${platform}.zip";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "coderabbit-cli";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://cli.coderabbit.ai/releases/${version}/coderabbit-${platformSuffix}.zip";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = [ unzip ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
@@ -67,12 +62,7 @@ stdenv.mkDerivation rec {
     changelog = "https://docs.coderabbit.ai/changelog";
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     mainProgram = "coderabbit";
   };
 }

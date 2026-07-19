@@ -1,34 +1,29 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  platformSource,
   wrapBuddy,
   gcc-unwrapped,
   versionCheckHook,
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux_amd64";
-    aarch64-linux = "linux_arm64";
-    x86_64-darwin = "darwin_amd64";
-    aarch64-darwin = "darwin_arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux_amd64";
+      aarch64-linux = "linux_arm64";
+      x86_64-darwin = "darwin_amd64";
+      aarch64-darwin = "darwin_arm64";
+    };
+    url =
+      { version, platform }:
+      "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_${platform}.tar.gz";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "catnip";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://github.com/wandb/catnip/releases/download/v${version}/catnip_${version}_${platformSuffix}.tar.gz";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
@@ -67,16 +62,11 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Developer environment that's like catnip for agentic programming";
     homepage = "https://github.com/wandb/catnip";
-    changelog = "https://github.com/wandb/catnip/releases/tag/v${version}";
+    changelog = "https://github.com/wandb/catnip/releases/tag/v${source.version}";
     downloadPage = "https://github.com/wandb/catnip/releases";
     license = licenses.asl20;
     maintainers = with maintainers; [ ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     mainProgram = "catnip";
   };

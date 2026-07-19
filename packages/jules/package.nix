@@ -2,34 +2,29 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   wrapBuddy,
   versionCheckHook,
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux_amd64";
-    aarch64-linux = "linux_arm64";
-    x86_64-darwin = "darwin_amd64";
-    aarch64-darwin = "darwin_arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux_amd64";
+      aarch64-linux = "linux_arm64";
+      x86_64-darwin = "darwin_amd64";
+      aarch64-darwin = "darwin_arm64";
+    };
+    url =
+      { version, platform }:
+      "https://storage.googleapis.com/jules-cli/v${version}/jules_external_v${version}_${platform}.tar.gz";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "jules";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://storage.googleapis.com/jules-cli/v${version}/jules_external_v${version}_${platformSuffix}.tar.gz";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
@@ -59,11 +54,6 @@ stdenv.mkDerivation {
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     mainProgram = "jules";
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
   };
 }

@@ -2,7 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  bun2nix,
+  bun2nixLib,
   bun,
   python3,
   versionCheckHook,
@@ -35,7 +35,7 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
   ];
 
@@ -50,7 +50,7 @@ stdenv.mkDerivation {
     ${lib.getExe python3} ${./fix-bun-offline-install.py}
   '';
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

@@ -2,12 +2,12 @@
   lib,
   flake,
   stdenv,
-  bun2nix,
+  bun2nixLib,
   bun,
   nodejs,
   fetchFromGitHub,
   makeWrapper,
-  autoPatchelfHook,
+  formatelf,
 }:
 
 let
@@ -47,18 +47,18 @@ stdenv.mkDerivation {
   ) ./fix-stale-bun-lock.patch;
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
     nodejs
     makeWrapper
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 

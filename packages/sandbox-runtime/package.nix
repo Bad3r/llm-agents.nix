@@ -4,7 +4,7 @@
   buildNpmPackage,
   fetchzip,
   makeWrapper,
-  nodejs,
+  nodejs_24,
   runCommand,
   # Linux dependencies
   bubblewrap,
@@ -30,7 +30,7 @@ let
 in
 buildNpmPackage {
   npmDepsFetcherVersion = 2;
-  inherit nodejs;
+  nodejs = nodejs_24;
   pname = "sandbox-runtime";
   inherit version src npmDepsHash;
   makeCacheWritable = true;

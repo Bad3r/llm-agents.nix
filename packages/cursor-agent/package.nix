@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   coreutils,
   wrapBuddy,
@@ -13,26 +13,22 @@
 
 let
   pname = "cursor-agent";
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux/x64";
-    aarch64-linux = "linux/arm64";
-    x86_64-darwin = "darwin/x64";
-    aarch64-darwin = "darwin/arm64";
-  };
-
-  platform = stdenv.hostPlatform.system;
-  platformPath = platformMap.${platform} or (throw "Unsupported system: ${platform}");
-
-  src = fetchurl {
-    url = "https://downloads.cursor.com/lab/${version}/${platformPath}/agent-cli-package.tar.gz";
-    hash = hashes.${platform};
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux/x64";
+      aarch64-linux = "linux/arm64";
+      x86_64-darwin = "darwin/x64";
+      aarch64-darwin = "darwin/arm64";
+    };
+    url =
+      { version, platform }:
+      "https://downloads.cursor.com/lab/${version}/${platform}/agent-cli-package.tar.gz";
   };
 in
 stdenv.mkDerivation rec {
-  inherit pname version src;
+  inherit pname;
+  inherit (source) version src;
 
   nativeBuildInputs = [
     makeWrapper
@@ -90,12 +86,7 @@ stdenv.mkDerivation rec {
     license = flake.lib.licenses.unfree;
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
     mainProgram = "cursor-agent";
   };
 }

@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   wrapBuddy,
   versionCheckHook,
@@ -14,17 +14,18 @@
 
 let
   pname = "grok";
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-x86_64";
-    aarch64-linux = "linux-aarch64";
-    aarch64-darwin = "macos-aarch64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x86_64";
+      aarch64-linux = "linux-aarch64";
+      aarch64-darwin = "macos-aarch64";
+    };
+    url =
+      { version, platform }:
+      "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-${version}-${platform}";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
+  inherit (source) version;
 
   # Grok's run_command tool spawns shells via portable_pty, which execve's
   # absolute paths like /bin/bash and /bin/zsh (derived from $SHELL, with
@@ -48,10 +49,7 @@ in
 stdenv.mkDerivation {
   inherit pname version;
 
-  src = fetchurl {
-    url = "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-${version}-${platformSuffix}";
-    hash = hashes.${platform};
-  };
+  inherit (source) src;
 
   dontUnpack = true;
 
@@ -114,10 +112,6 @@ stdenv.mkDerivation {
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ ryoppippi ];
     mainProgram = "grok";
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
   };
 }

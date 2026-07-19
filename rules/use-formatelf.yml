@@ -1,0 +1,12 @@
+id: use-formatelf
+language: nix
+severity: error
+message: >-
+  Use the in-repo `formatelf` hook, not nixpkgs' `autoPatchelfHook`. Declare `formatelf` as a package.nix argument (the callPackage scope provides it) and add it to nativeBuildInputs; it is a drop-in replacement.
+files:
+  - 'packages/**'
+ignores:
+  - 'packages/formatelf/**'
+rule:
+  pattern: autoPatchelfHook
+  kind: identifier

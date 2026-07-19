@@ -4,10 +4,18 @@
   fzf,
   nix,
   util-linux,
-  packageList,
+  allPackages,
 }:
 
 let
+  visibleNames = builtins.filter (
+    name: name != "default" && !(allPackages.${name}.passthru.hideFromDocs or false)
+  ) (builtins.attrNames allPackages);
+
+  packageList = builtins.concatStringsSep "\n" (
+    map (name: "${name}\t${allPackages.${name}.meta.description or ""}") visibleNames
+  );
+
   packageListFile = builtins.toFile "llm-agents-packages.tsv" packageList;
 in
 writeShellApplication {

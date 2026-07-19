@@ -1,34 +1,29 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  platformSource,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    "x86_64-linux" = "linux-amd64";
-    "aarch64-linux" = "linux-arm64";
-    "x86_64-darwin" = "darwin-amd64";
-    "aarch64-darwin" = "darwin-arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-amd64";
+      aarch64-linux = "linux-arm64";
+      x86_64-darwin = "darwin-amd64";
+      aarch64-darwin = "darwin-arm64";
+    };
+    url =
+      { version, platform }:
+      "https://github.com/alibaba/open-code-review/releases/download/v${version}/opencodereview-${platform}";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
-
+  inherit (source) version;
 in
 stdenv.mkDerivation {
   pname = "open-code-review";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://github.com/alibaba/open-code-review/releases/download/v${version}/opencodereview-${platformSuffix}";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   # Upstream releases are single statically linked Go binaries.
   dontUnpack = true;
@@ -57,11 +52,6 @@ stdenv.mkDerivation {
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     mainProgram = "ocr";
     maintainers = with maintainers; [ fridh ];
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
   };
 }

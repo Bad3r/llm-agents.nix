@@ -1,9 +1,10 @@
 {
   pkgs,
+  callPackage,
   # Make claude-code overridable
   claude-code,
   # Keep this so package.nix can be copied into llm-agents.nix
-  sourceDir ? ./src,
+  sourceDir ? "${callPackage ./source.nix { }}/src",
 }:
 let
   inherit (pkgs.stdenv) isLinux isDarwin;

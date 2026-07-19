@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   wrapBuddy,
   gcc-unwrapped,
@@ -9,27 +9,22 @@
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "x86_64-unknown-linux-gnu";
-    aarch64-linux = "aarch64-unknown-linux-gnu";
-    x86_64-darwin = "x86_64-apple-darwin";
-    aarch64-darwin = "aarch64-apple-darwin";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "x86_64-unknown-linux-gnu";
+      aarch64-linux = "aarch64-unknown-linux-gnu";
+      x86_64-darwin = "x86_64-apple-darwin";
+      aarch64-darwin = "aarch64-apple-darwin";
+    };
+    url =
+      { version, platform }:
+      "https://github.com/tailcallhq/forgecode/releases/download/v${version}/forge-${platform}";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformTriple = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation rec {
   pname = "forgecode";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://github.com/tailcallhq/forgecode/releases/download/v${version}/forge-${platformTriple}";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   nativeBuildInputs = [
     makeWrapper
@@ -76,11 +71,6 @@ stdenv.mkDerivation rec {
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     maintainers = with maintainers; [ mic92 ];
     mainProgram = "forge";
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
   };
 }

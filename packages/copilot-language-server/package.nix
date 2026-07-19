@@ -3,7 +3,7 @@
   buildNpmPackage,
   fetchzip,
   versionCheckHook,
-  nodejs,
+  nodejs_24,
   runCommand,
   makeWrapper,
 }:
@@ -26,7 +26,7 @@ let
 in
 buildNpmPackage {
   npmDepsFetcherVersion = 2;
-  inherit nodejs;
+  nodejs = nodejs_24;
   pname = "copilot-language-server";
   inherit version src npmDepsHash;
   makeCacheWritable = true;
@@ -45,7 +45,7 @@ buildNpmPackage {
   postInstall = ''
     rm -rf $out/bin
     mkdir -p $out/bin
-    makeWrapper ${nodejs}/bin/node $out/bin/copilot-language-server \
+    makeWrapper ${nodejs_24}/bin/node $out/bin/copilot-language-server \
       --add-flags "$out/lib/node_modules/@github/copilot-language-server/dist/language-server.js"
   '';
 

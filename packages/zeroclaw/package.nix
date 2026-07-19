@@ -7,7 +7,7 @@
   runCommand,
   nodejs,
   fetchNpmDeps,
-  npmConfigHook,
+  npmHooks,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -35,7 +35,7 @@ rustPlatform.buildRustPackage {
 
   nativeBuildInputs = [
     nodejs
-    npmConfigHook
+    npmHooks.npmConfigHook
   ];
 
   env.NIX_NPM_FETCHER_VERSION = "2";

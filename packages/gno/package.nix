@@ -4,10 +4,10 @@
   fetchFromGitHub,
   fetchurl,
   bun,
-  bun2nix,
+  bun2nixLib,
   makeWrapper,
   sqlite,
-  autoPatchelfHook,
+  formatelf,
   flake,
   libarchive,
   runCommandLocal,
@@ -94,10 +94,10 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     makeWrapper
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ]
   ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
 
   buildInputs = [
@@ -134,7 +134,7 @@ stdenv.mkDerivation {
     "libvulkan.so.1"
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
     overrides = fastifySendOverrides;
   };

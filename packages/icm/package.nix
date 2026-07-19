@@ -8,7 +8,7 @@
   openssl,
   onnxruntime,
   bun,
-  bun2nix,
+  bun2nixLib,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -33,10 +33,10 @@ let
 
     nativeBuildInputs = [
       bun
-      bun2nix.hook
+      bun2nixLib.hook
     ];
 
-    bunDeps = bun2nix.fetchBunDeps {
+    bunDeps = bun2nixLib.fetchBunDeps {
       bunNix = ./bun.nix;
     };
 

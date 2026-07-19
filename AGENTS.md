@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 
 - Root: `flake.nix`, `flake.lock`, `devshell.nix`, `README.md`.
-- Packages live under `packages/<tool>/` with `package.nix`, `default.nix`, optional `update.py`, and lockfiles when needed.
+- Packages live under `packages/<tool>/` with `package.nix`, optional `update.py`, and lockfiles when needed.
 - Formatting config: `packages/formatter/treefmt.nix`.
 - Utilities and docs: `scripts/`, `docs/`, `.github/`.
 
@@ -20,7 +20,7 @@
 
 - Indentation: 2 spaces; avoid tabs.
 - Nix: small, composable derivations; prefer `buildNpmPackage`/`rustPlatform.buildRustPackage`/`stdenv.mkDerivation` as in existing packages.
-- File layout per package: `package.nix` (definition), `default.nix` (wrapper), `update.py` (optional custom updater), `nix-update-args` (optional nix-update flags).
+- File layout per package: `package.nix` (definition), `update.py` (optional custom updater), `nix-update-args` (optional nix-update flags). `package.nix` is called from a scope that contains all in-repo packages and helpers (`buildNpmPackage`, `wrapBuddy`, `formatelf`, `versionCheckHomeHook`, `bun2nixLib`, `platformSource`, `flake`, ...), so declaring one of these names as a function argument is enough.
 - Tools via treefmt: nixfmt, deadnix, shfmt, shellcheck, mdformat, yamlfmt, taplo. Always run `nix fmt` before committing.
 
 ### Updating Packages
@@ -131,13 +131,8 @@ inputs.nixpkgs.lib.extend (
 )
 ```
 
-Then in `packages/<package>/default.nix`, pass `flake` to the package:
-
-```nix
-{ pkgs, flake }: pkgs.callPackage ./package.nix { inherit flake; }
-```
-
-And in `packages/<package>/package.nix`, reference custom maintainers:
+Then in `packages/<package>/package.nix`, declare `flake` as an argument (the
+scope provides it) and reference custom maintainers:
 
 ```nix
 {
@@ -164,38 +159,23 @@ doInstallCheck = true;
 nativeInstallCheckInputs = [ versionCheckHook ];
 ```
 
-**For tools that need a writable HOME directory** (many CLI tools try to create config/cache directories), use `versionCheckHomeHook`:
+**For tools that need a writable HOME directory** (many CLI tools try to create config/cache directories), use the in-repo `versionCheckHomeHook`. Declare it as a `package.nix` argument and add it to the install check inputs:
 
-1. In `packages/<package>/default.nix`, pass the hook:
-
-   ```nix
-   {
-     pkgs,
-     perSystem,
-     ...
-   }:
-   pkgs.callPackage ./package.nix {
-     inherit (perSystem.self) versionCheckHomeHook;
-   }
-   ```
-
-1. In `packages/<package>/package.nix`, add it to inputs and use it:
-
-   ```nix
-   {
-     versionCheckHook,
-     versionCheckHomeHook,
-     # ...
-   }:
-   stdenv.mkDerivation {
-     # ...
-     doInstallCheck = true;
-     nativeInstallCheckInputs = [
-       versionCheckHook
-       versionCheckHomeHook
-     ];
-   }
-   ```
+```nix
+{
+  versionCheckHook,
+  versionCheckHomeHook,
+  # ...
+}:
+stdenv.mkDerivation {
+  # ...
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+}
+```
 
 ## Linting with ast-grep
 
@@ -244,7 +224,7 @@ fi
 
 ### Common Issues and Solutions
 
-1. **npm packages**: Use `perSystem.self.buildNpmPackage` (not `pkgs.buildNpmPackage`) in `default.nix`. It is the same builder plus an eval-time guard that fails fast with a helpful message when the consumer's nixpkgs predates `fetcherVersion = 2`, instead of a cryptic FOD hash mismatch (#4320).
+1. **npm packages**: Declare `buildNpmPackage` as a `package.nix` argument; the scope provides the in-repo builder (packages/buildNpmPackage), which is nixpkgs' builder plus an eval-time guard that fails fast with a helpful message when the consumer's nixpkgs predates `fetcherVersion = 2`, instead of a cryptic FOD hash mismatch (#4320). Do not use `pkgs.buildNpmPackage`.
 
 1. **Rust packages with git dependencies**: May fail during cargo vendoring if dependencies have workspace inheritance issues. Consider using pre-built binaries as a workaround.
 

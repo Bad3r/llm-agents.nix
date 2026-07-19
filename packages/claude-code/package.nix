@@ -2,7 +2,7 @@
   lib,
   flake,
   stdenv,
-  fetchurl,
+  platformSource,
   makeWrapper,
   wrapBuddy,
   versionCheckHook,
@@ -12,27 +12,22 @@
 }:
 
 let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version hashes;
-
-  platformMap = {
-    x86_64-linux = "linux-x64";
-    aarch64-linux = "linux-arm64";
-    x86_64-darwin = "darwin-x64";
-    aarch64-darwin = "darwin-arm64";
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+      x86_64-darwin = "darwin-x64";
+      aarch64-darwin = "darwin-arm64";
+    };
+    url =
+      { version, platform }:
+      "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/${platform}/claude";
   };
-
-  platform = stdenv.hostPlatform.system;
-  platformSuffix = platformMap.${platform} or (throw "Unsupported system: ${platform}");
 in
 stdenv.mkDerivation {
   pname = "claude-code";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${version}/${platformSuffix}/claude";
-    hash = hashes.${platform};
-  };
+  inherit (source) version src;
 
   dontUnpack = true;
 
@@ -97,11 +92,6 @@ stdenv.mkDerivation {
       ryoppippi
     ];
     mainProgram = "claude";
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "x86_64-darwin"
-      "aarch64-darwin"
-    ];
+    platforms = source.platforms;
   };
 }

@@ -3,7 +3,7 @@
   flake,
   stdenv,
   fetchFromGitHub,
-  bun2nix,
+  bun2nixLib,
   bun,
   versionCheckHook,
   versionCheckHomeHook,
@@ -25,11 +25,11 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [
-    bun2nix.hook
+    bun2nixLib.hook
     bun
   ];
 
-  bunDeps = bun2nix.fetchBunDeps {
+  bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
   };
 
