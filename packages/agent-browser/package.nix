@@ -5,7 +5,7 @@
   fetchurl,
   chromium,
   makeBinaryWrapper,
-  nodejs-slim,
+  nodejs-slim_22,
   pnpmConfigHook,
   pnpm_11,
   rustPlatform,
@@ -15,6 +15,13 @@
 let
   pname = "agent-browser";
   version = "0.32.3";
+
+  # Node 24's worker_threads teardown double-closes file descriptors
+  # (Environment::RunCleanup closing an fd number that the OS has already
+  # recycled into a guarded fd), which the Darwin kernel punishes with
+  # EXC_GUARD/SIGKILL, so pnpm dies with "Killed: 9" right after the
+  # download phase. Run pnpm on Node 22 LTS, which does not exhibit this.
+  pnpm = pnpm_11.override { nodejs-slim = nodejs-slim_22; };
 
   # Vendored Geist variable font (OFL-1.1) pinned to a specific upstream
   # commit so the dashboard's next/font/local build is fully offline.
@@ -37,26 +44,19 @@ let
     inherit version src;
 
     nativeBuildInputs = [
-      nodejs-slim
-      pnpm_11
+      nodejs-slim_22
+      pnpm
       pnpmConfigHook
     ];
 
-    # Restrict the install to the dashboard workspace: the full workspace
-    # install (1200 packages) gets OOM-killed on the aarch64-darwin builders.
+    # Restrict the install to the dashboard workspace; the full workspace
+    # install pulls in ~1200 packages the dashboard build never uses.
     pnpmWorkspaces = [ "dashboard" ];
 
     pnpmDeps = fetchPnpmDeps {
       pname = "${pname}-dashboard";
-      inherit version src;
-      pnpm = pnpm_11;
+      inherit version src pnpm;
       pnpmWorkspaces = [ "dashboard" ];
-      # The 0.32.2 lockfile makes pnpm exceed the darwin builders' memory
-      # budget and get SIGKILLed; cap the heap and unpack concurrency.
-      prePnpmInstall = ''
-        export NODE_OPTIONS=--max-old-space-size=2048
-      '';
-      pnpmInstallFlags = [ "--child-concurrency=2" ];
       hash = "sha256-tkEhkGO5/JTkzySDEsTmjr5+SEXzk8V0217iQhFhfCw=";
       fetcherVersion = 4;
     };
