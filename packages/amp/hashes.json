@@ -3,7 +3,6 @@
   "binaryHashes": {
     "x86_64-linux": "sha256-CUlspv5Lmo6dUiOlm/49UT0LFmSIF3DGL1H/G5w8t5E=",
     "aarch64-linux": "sha256-cmkb2PokZRrUnfji3zO3NiFrnxFYJ7hgGZzpQ//eU/U=",
-    "x86_64-darwin": "sha256-kujkwX9AFyzeE4IUjYOKThuDTHUIBEPw+mLs9ClIzjw=",
     "aarch64-darwin": "sha256-lHhpaPDuNApcW2UUMjHr7ia4VEIxyRzEsSW/RcAwJsw="
   }
 }

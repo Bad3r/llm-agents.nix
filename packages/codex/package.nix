@@ -54,7 +54,6 @@ let
   # it via LK_CUSTOM_WEBRTC so the build stays sandboxed.
   livekitWebrtcTriple =
     {
-      x86_64-darwin = "mac-x64";
       aarch64-darwin = "mac-arm64";
     }
     .${stdenv.hostPlatform.system} or null;

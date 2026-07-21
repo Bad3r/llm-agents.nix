@@ -6,6 +6,7 @@
   fd,
   ripgrep,
   runCommand,
+  stdenv,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -13,6 +14,16 @@
 let
   versionData = lib.importJSON ./hashes.json;
   version = versionData.version;
+  # napi-rs target triple, e.g. darwin-arm64, linux-x64-gnu
+  napiTargets = {
+    aarch64-darwin = "darwin-arm64";
+    aarch64-linux = "linux-arm64-${if stdenv.hostPlatform.isMusl then "musl" else "gnu"}";
+    x86_64-linux = "linux-x64-${if stdenv.hostPlatform.isMusl then "musl" else "gnu"}";
+  };
+  napiTarget =
+    napiTargets.${stdenv.hostPlatform.system}
+      or (throw "Unsupported Pi platform: ${stdenv.hostPlatform.system}");
+  clipboardNativeFile = "clipboard.${napiTarget}.node";
 
   # Create a source with package-lock.json included
   srcWithLock = runCommand "pi-src-with-lock" { } ''
@@ -64,6 +75,17 @@ buildNpmPackage {
     mkdir -p "$out/bin" "$pkgdir/theme" "$pkgdir/assets"
     cp dist/pi "$pkgdir/"
     cp package.json README.md CHANGELOG.md "$pkgdir/"
+    # Mirror scripts/build-binaries.sh: Bun cannot embed these runtime assets.
+    mkdir -p "$pkgdir/node_modules/@mariozechner"
+    cp -r node_modules/@mariozechner/clipboard "$pkgdir/node_modules/@mariozechner/"
+    cp -r node_modules/@mariozechner/clipboard-${napiTarget} "$pkgdir/node_modules/@mariozechner/"
+    cp node_modules/@mariozechner/clipboard-${napiTarget}/${clipboardNativeFile} \
+      "$pkgdir/node_modules/@mariozechner/clipboard/"
+    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+      mkdir -p "$pkgdir/native/darwin/prebuilds/${napiTarget}"
+      cp node_modules/@earendil-works/pi-tui/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node \
+        "$pkgdir/native/darwin/prebuilds/${napiTarget}/"
+    ''}
     cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
     cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
     cp dist/modes/interactive/assets/* "$pkgdir/assets/"
@@ -90,6 +112,15 @@ buildNpmPackage {
     versionCheckHomeHook
   ];
 
+  postInstallCheck = ''
+    ${bun}/bin/bun --eval 'require(process.argv[1])' \
+      "$out/libexec/pi/node_modules/@mariozechner/clipboard/${clipboardNativeFile}"
+  ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
+    ${bun}/bin/bun --eval 'require(process.argv[1])' \
+      "$out/libexec/pi/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node"
+  '';
+
   passthru.category = "AI Coding Agents";
 
   meta = {
@@ -99,7 +130,7 @@ buildNpmPackage {
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with lib.maintainers; [ aos ];
-    platforms = bun.meta.platforms;
+    platforms = builtins.attrNames napiTargets;
     mainProgram = "pi";
   };
 }

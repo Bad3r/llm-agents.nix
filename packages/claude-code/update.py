@@ -27,7 +27,6 @@ BASE_URL = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8
 PLATFORMS = {
     "x86_64-linux": "linux-x64",
     "aarch64-linux": "linux-arm64",
-    "x86_64-darwin": "darwin-x64",
     "aarch64-darwin": "darwin-arm64",
 }
 

@@ -16,7 +16,6 @@ let
   platformMap = {
     x86_64-linux = "bun-linux-x64";
     aarch64-linux = "bun-linux-arm64";
-    x86_64-darwin = "bun-darwin-x64";
     aarch64-darwin = "bun-darwin-arm64";
   };
 
@@ -113,7 +112,6 @@ stdenv.mkDerivation {
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     mainProgram = "plannotator";

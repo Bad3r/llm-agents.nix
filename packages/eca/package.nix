@@ -89,13 +89,6 @@ else if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then
     url = "https://github.com/editor-code-assistant/eca/releases/download/${version}/eca-native-linux-aarch64.zip";
     hash = hashes."aarch64-linux";
   }
-else if pkgs.stdenv.hostPlatform.system == "x86_64-darwin" then
-  mkNativeBinary {
-    inherit wrapBuddy versionCheckHomeHook;
-    system = "x86_64-darwin";
-    url = "https://github.com/editor-code-assistant/eca/releases/download/${version}/eca-native-macos-amd64.zip";
-    hash = hashes."x86_64-darwin";
-  }
 else if pkgs.stdenv.hostPlatform.system == "aarch64-darwin" then
   mkNativeBinary {
     inherit wrapBuddy versionCheckHomeHook;

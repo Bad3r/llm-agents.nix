@@ -30,11 +30,6 @@ let
       nativeLib = "libpi_natives.so";
       nodeTag = "linux-arm64";
     };
-    x86_64-darwin = {
-      bunTarget = "bun-darwin-x64";
-      nativeLib = "libpi_natives.dylib";
-      nodeTag = "darwin-x64";
-    };
     x86_64-linux = {
       bunTarget = "bun-linux-x64-modern";
       nativeLib = "libpi_natives.so";

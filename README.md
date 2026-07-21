@@ -1475,18 +1475,7 @@ All packages support:
 
 - `x86_64-linux`
 - `aarch64-linux`
-- `x86_64-darwin`
 - `aarch64-darwin`
-
-## Experimental Features
-
-This repository serves as a laboratory for exploring how Nix can enhance AI-powered development:
-
-### Current Experiments
-
-- **Sandboxed execution**: claudebox demonstrates transparent, sandboxed AI agent execution
-- **Provider abstraction**: claude-code-router explores decoupling AI interfaces from specific providers
-- **Tool composition**: Investigating how multiple AI agents can work together in Nix environments
 
 ## Contributing
 

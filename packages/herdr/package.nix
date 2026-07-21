@@ -99,7 +99,6 @@ let
   });
 
   binaryAssetMap = {
-    x86_64-darwin = "herdr-macos-x86_64";
     aarch64-darwin = "herdr-macos-aarch64";
   };
 

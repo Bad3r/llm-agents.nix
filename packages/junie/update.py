@@ -21,7 +21,6 @@ UPDATE_INFO_URL = (
 PLATFORMS = {
     "x86_64-linux": "linux-amd64",
     "aarch64-linux": "linux-aarch64",
-    "x86_64-darwin": "macos-amd64",
     "aarch64-darwin": "macos-aarch64",
 }
 

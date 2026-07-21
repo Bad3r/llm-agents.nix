@@ -3,7 +3,6 @@
   "hash": "sha256-dBOQYLFitJ+E3XNz44Ag3CIrBxFj16CmVPp7qil0ssg=",
   "cargoHash": "sha256-XHzZy2tKLbMQy4POmXowUcGf77ZPunG/oQ3P2wOoVls=",
   "binaryHashes": {
-    "aarch64-darwin": "sha256-JJkuFiXb3LGDVKWeKZ5LJjwxJACzE5bNwHzUbtV/JKc=",
-    "x86_64-darwin": "sha256-3fQwEzNS4XEkE9XYZbNKSFVG9GWIk/yJmGJX1lp1hag="
+    "aarch64-darwin": "sha256-JJkuFiXb3LGDVKWeKZ5LJjwxJACzE5bNwHzUbtV/JKc="
   }
 }

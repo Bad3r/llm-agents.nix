@@ -1,0 +1,8 @@
+id: no-x86-64-darwin
+language: nix
+severity: error
+message: >-
+  x86_64-darwin is not a supported system in this repo (dropped from flake `systems`). Do not add platform mappings, hashes, or meta.platforms entries for it.
+rule:
+  kind: string_fragment
+  regex: 'x86_64-darwin'

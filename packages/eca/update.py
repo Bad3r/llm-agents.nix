@@ -21,7 +21,6 @@ HASHES_FILE = Path(__file__).parent / "hashes.json"
 PLATFORMS = {
     "x86_64-linux": "linux-amd64",
     "aarch64-linux": "linux-aarch64",
-    "x86_64-darwin": "macos-amd64",
     "aarch64-darwin": "macos-aarch64",
 }
 

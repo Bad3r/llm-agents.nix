@@ -27,10 +27,6 @@ let
       asset = "mimocode-linux-arm64.tar.gz";
       isZip = false;
     };
-    x86_64-darwin = {
-      asset = "mimocode-darwin-x64.zip";
-      isZip = true;
-    };
     aarch64-darwin = {
       asset = "mimocode-darwin-arm64.zip";
       isZip = true;
