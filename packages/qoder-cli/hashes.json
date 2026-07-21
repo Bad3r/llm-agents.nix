@@ -5,10 +5,6 @@
       "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.1.1/qodercli-darwin-arm64.tar.gz",
       "hash": "sha256-X6shaUQm2rGRfeoBorOqQBRIGQAbry4miajW3IezZf4="
     },
-    "x86_64-darwin": {
-      "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.1.1/qodercli-darwin-x64.tar.gz",
-      "hash": "sha256-DS9diKiaGlqe/Hc4m7WJUIPckUfXDBKKqVhyRBazkD0="
-    },
     "aarch64-linux": {
       "url": "https://qoder-ide.oss-accelerate.aliyuncs.com/qodercli/releases/1.1.1/qodercli-linux-arm64.tar.gz",
       "hash": "sha256-LUNUcP9ByzJRG2VC3jWXFkQyiC7xMJnLz06Qdoe7Llg="

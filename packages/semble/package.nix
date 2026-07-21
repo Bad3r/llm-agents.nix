@@ -222,12 +222,5 @@ python3.pkgs.buildPythonApplication rec {
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with flake.lib.maintainers; [ murlakatam ];
     mainProgram = "semble";
-    # x86_64-darwin excluded: arrow-cpp (transitive via tree-sitter-language-pack)
-    # is marked broken on that platform in nixpkgs.
-    platforms = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
   };
 }

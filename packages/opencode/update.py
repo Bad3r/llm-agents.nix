@@ -17,7 +17,6 @@ update_platform_binaries(
     platforms={
         "x86_64-linux": "opencode-linux-x64.tar.gz",
         "aarch64-linux": "opencode-linux-arm64.tar.gz",
-        "x86_64-darwin": "opencode-darwin-x64.zip",
         "aarch64-darwin": "opencode-darwin-arm64.zip",
     },
 )

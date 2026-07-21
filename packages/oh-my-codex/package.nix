@@ -31,14 +31,12 @@ let
   nodePlatformMap = {
     x86_64-linux = "linux";
     aarch64-linux = "linux";
-    x86_64-darwin = "darwin";
     aarch64-darwin = "darwin";
   };
 
   nodeArchMap = {
     x86_64-linux = "x64";
     aarch64-linux = "arm64";
-    x86_64-darwin = "x64";
     aarch64-darwin = "arm64";
   };
 
@@ -158,7 +156,6 @@ buildNpmPackage {
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
   };

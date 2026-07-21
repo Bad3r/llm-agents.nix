@@ -21,7 +21,6 @@ HASHES_FILE = Path(__file__).parent / "hashes.json"
 # Platform filenames use different patterns, not suitable for calculate_platform_hashes
 PLATFORMS = {
     "x86_64-linux": "Handy_{version}_amd64.deb",
-    "x86_64-darwin": "Handy_x64.app.tar.gz",
     "aarch64-darwin": "Handy_aarch64.app.tar.gz",
 }
 

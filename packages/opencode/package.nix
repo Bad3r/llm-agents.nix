@@ -27,10 +27,6 @@ let
       asset = "opencode-linux-arm64.tar.gz";
       isZip = false;
     };
-    x86_64-darwin = {
-      asset = "opencode-darwin-x64.zip";
-      isZip = true;
-    };
     aarch64-darwin = {
       asset = "opencode-darwin-arm64.zip";
       isZip = true;
@@ -140,7 +136,6 @@ stdenv.mkDerivation {
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     mainProgram = "opencode";

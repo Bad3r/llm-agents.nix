@@ -1,7 +1,6 @@
 {
   "version": "7.4.11",
   "hashes": {
-    "x86_64-darwin": "sha256-Ujj2fEwuOMHMWPq2nMq5uTfskA3d6uyCnz8WfZ15XnA=",
     "x86_64-linux": "sha256-zlMXlHfegcnVL0fWrZ1nsdpKgE4uJjzHJ+gZHqVsdUU=",
     "aarch64-linux": "sha256-CEQZRIZIuYG+RHYzn9fZcVnpzt1WRSZ/BkljcFoFiqQ=",
     "aarch64-darwin": "sha256-+3hILQQeZUfpIaBZn4fTIhc+e2ooxKkZXAkyeVjChaE="

@@ -52,7 +52,6 @@ def update_vendored_zig_deps(version: str) -> None:
 
 DARWIN_PLATFORMS = {
     "aarch64-darwin": "macos-aarch64",
-    "x86_64-darwin": "macos-x86_64",
 }
 
 

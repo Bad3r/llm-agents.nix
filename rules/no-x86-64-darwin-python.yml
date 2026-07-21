@@ -1,0 +1,8 @@
+id: no-x86-64-darwin-python
+language: python
+severity: error
+message: >-
+  x86_64-darwin is not a supported system in this repo (dropped from flake `systems`). Do not add it to update-script platform maps.
+rule:
+  kind: string_content
+  regex: 'x86_64-darwin'

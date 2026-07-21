@@ -31,14 +31,12 @@ HASHES_FILE = Path(__file__).parent / "hashes.json"
 RUSTY_V8_PLATFORMS = {
     "x86_64-linux": "x86_64-unknown-linux-gnu",
     "aarch64-linux": "aarch64-unknown-linux-gnu",
-    "x86_64-darwin": "x86_64-apple-darwin",
     "aarch64-darwin": "aarch64-apple-darwin",
 }
 
 # codex-realtime-webrtc only enables livekit/webrtc-sys on macOS, so we
 # only need to prefetch the darwin prebuilt archives.
 LIVEKIT_WEBRTC_PLATFORMS = {
-    "x86_64-darwin": "mac-x64",
     "aarch64-darwin": "mac-arm64",
 }
 

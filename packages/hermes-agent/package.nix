@@ -418,7 +418,6 @@ python3.pkgs.buildPythonApplication {
     changelog = "https://github.com/NousResearch/hermes-agent/releases/tag/v${version}";
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
-    # x86_64-darwin: pyarrow (via faster-whisper chain) broken there.
     platforms = [
       "x86_64-linux"
       "aarch64-linux"

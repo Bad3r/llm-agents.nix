@@ -34,10 +34,6 @@ let
       url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_${version}_amd64.deb";
       hash = hashes.x86_64-linux;
     };
-    x86_64-darwin = fetchurl {
-      url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_x64.app.tar.gz";
-      hash = hashes.x86_64-darwin;
-    };
     aarch64-darwin = fetchurl {
       url = "https://github.com/cjpais/Handy/releases/download/v${version}/Handy_aarch64.app.tar.gz";
       hash = hashes.aarch64-darwin;
@@ -46,7 +42,7 @@ let
 
   src =
     srcs.${stdenv.hostPlatform.system}
-      or (throw "Unsupported system: ${stdenv.hostPlatform.system}. Supported systems: x86_64-linux, x86_64-darwin, aarch64-darwin");
+      or (throw "Unsupported system: ${stdenv.hostPlatform.system}. Supported systems: x86_64-linux, aarch64-darwin");
 
   desktopItem = makeDesktopItem {
     name = "handy";
@@ -167,7 +163,6 @@ stdenv.mkDerivation {
     maintainers = with maintainers; [ ];
     platforms = [
       "x86_64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     mainProgram = "handy";

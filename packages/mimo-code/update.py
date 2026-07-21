@@ -17,7 +17,6 @@ update_platform_binaries(
     platforms={
         "x86_64-linux": "mimocode-linux-x64.tar.gz",
         "aarch64-linux": "mimocode-linux-arm64.tar.gz",
-        "x86_64-darwin": "mimocode-darwin-x64.zip",
         "aarch64-darwin": "mimocode-darwin-arm64.zip",
     },
 )

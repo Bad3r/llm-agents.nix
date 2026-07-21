@@ -30,7 +30,6 @@ MANIFEST_URL = (
 PLATFORM_MAP = {
     ("linux", "amd64"): "x86_64-linux",
     ("linux", "arm64"): "aarch64-linux",
-    ("darwin", "amd64"): "x86_64-darwin",
     ("darwin", "arm64"): "aarch64-darwin",
 }
 

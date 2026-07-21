@@ -3,7 +3,6 @@
   "hashes": {
     "x86_64-linux": "sha256-dN7KRSILgIDsdasJm9WlmA5BorWHmEagCPsRXUNt4IU=",
     "aarch64-linux": "sha256-njpq7MUWT2B+EYOuogksfXcF0UblBKYgffKRd2mWqOo=",
-    "x86_64-darwin": "sha256-4XzcUUN716gM4CRNJQRfVo1nshLupP+BuD7pD4Zm5C8=",
     "aarch64-darwin": "sha256-0BtJIQ1y7L4neiZl0QS6zM3fLSIYW+mURtKSng7fxI0="
   }
 }

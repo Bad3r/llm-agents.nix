@@ -66,7 +66,6 @@ python.pkgs.buildPythonApplication rec {
     license = licenses.mit;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ aldoborrero ];
-    # x86_64-darwin excluded: no upstream CI / not validated.
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
