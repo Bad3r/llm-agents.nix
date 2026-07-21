@@ -394,6 +394,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>codex-desktop-linux</strong> - Unofficial Linux build of ChatGPT Desktop</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://github.com/ilysenko/codex-desktop-linux
+- **Usage**: `nix run github:numtide/llm-agents.nix#codex-desktop-linux -- --help`
+- **Nix**: [packages/codex-desktop-linux/package.nix](packages/codex-desktop-linux/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
 
 - **Source**: source

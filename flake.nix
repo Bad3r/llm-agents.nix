@@ -9,6 +9,10 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
+      inputs.systems.follows = "systems";
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,6 +27,11 @@
       inputs.systems.follows = "systems";
       inputs.treefmt-nix.follows = "treefmt-nix";
       inputs.flake-parts.follows = "flake-parts";
+    };
+    codex-desktop-linux = {
+      url = "github:ilysenko/codex-desktop-linux";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
