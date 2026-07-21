@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   mypy-check = pkgs.writeShellApplication {
     name = "mypy-check";
@@ -44,6 +44,20 @@ in
   settings.formatter.ruff-check.priority = 1;
   settings.formatter.ruff-format.pipeline = "python";
   settings.formatter.ruff-format.priority = 2;
+
+  # ast-grep lint rules (../../rules via sgconfig.yml at project root) for
+  # anti-patterns Nix evaluation won't reject; check-only, no rewrites.
+  settings.formatter.ast-grep-check = {
+    command = lib.getExe pkgs.ast-grep;
+    options = [
+      "scan"
+      "--error"
+    ];
+    includes = [
+      "*.nix"
+      "*.py"
+    ];
+  };
 
   # Custom mypy check that handles our update.py scripts correctly
   settings.formatter.mypy-check = {
