@@ -325,10 +325,6 @@ python3.pkgs.buildPythonApplication {
     "--set"
     "HERMES_OPTIONAL_SKILLS"
     "${placeholder "out"}/share/hermes/optional-skills"
-    # Prevent `hermes update` from trying to modify the Nix store.
-    "--set"
-    "HERMES_MANAGED"
-    "nixos"
     # Disable runtime pip installs; absent extras disable cleanly.
     "--set"
     "HERMES_DISABLE_LAZY_INSTALLS"
@@ -394,7 +390,6 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_PYTHON_SRC_ROOT $out/bin/hermes
     grep -q HERMES_BUNDLED_SKILLS $out/bin/hermes
     grep -q HERMES_OPTIONAL_SKILLS $out/bin/hermes
-    grep -q HERMES_MANAGED $out/bin/hermes
     test -f ${hermes-frontend}/lib/hermes-tui/dist/entry.js
     test -f ${hermes-frontend}/share/hermes-web/index.html
     test -d $out/share/hermes/skills
