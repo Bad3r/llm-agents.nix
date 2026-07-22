@@ -2,6 +2,8 @@
   lib,
   buildNpmPackage,
   fetchFromGitHub,
+  makeWrapper,
+  claude-code,
 }:
 
 buildNpmPackage rec {
@@ -21,6 +23,17 @@ buildNpmPackage rec {
 
   # Disable install scripts to avoid platform-specific dependency fetching issues
   npmFlags = [ "--ignore-scripts" ];
+
+  nativeBuildInputs = [ makeWrapper ];
+
+  # The bundled @anthropic-ai/claude-agent-sdk platform packages ship a
+  # prebuilt dynamically linked `claude` binary that is not usable on NixOS;
+  # point the adapter at this flake's claude-code package instead, unless the
+  # user overrides CLAUDE_CODE_EXECUTABLE themselves.
+  postInstall = ''
+    wrapProgram $out/bin/claude-agent-acp \
+      --set-default CLAUDE_CODE_EXECUTABLE ${lib.getExe claude-code}
+  '';
 
   passthru.category = "ACP Ecosystem";
 
