@@ -15,16 +15,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "but";
-  version = "0.21.0";
+  version = "0.21.1";
 
   src = fetchFromGitHub {
     owner = "gitbutlerapp";
     repo = "gitbutler";
     tag = "release/${finalAttrs.version}";
-    hash = "sha256-V7lLzVADjaQMwQ8VeAlWTj5iNXRI0GNy/8Ec/q3NDUs=";
+    hash = "sha256-5Lqwpk3iGBQTwU06snoCNYadql3gr4hTmZHT2j7HDeE=";
   };
 
-  cargoHash = "sha256-XZUpK9vTlZyYcfrifru0tfM/zODzLOMAridd7ImAEc8=";
+  cargoHash = "sha256-bRQEFQw9XjUfG5SQab3BtsFNMV1JgDm8PiLoZAsrzQg=";
 
   # Upstream pins a specific stable channel; allow building with nixpkgs' rustc.
   postPatch = ''
