@@ -124,7 +124,7 @@ stdenv.mkDerivation {
         # whisper-cpp's libggml-cpu-cascadelake.so) in shared profiles.
         # The autoPatchelf hook (formatelf) rewrites the RPATHs to find them.
         mkdir -p $out/lib/handy
-        cp -a usr/lib/*.so* $out/lib/handy/
+        cp -a usr/lib/Handy/*.so* $out/lib/handy/
 
         mkdir -p $out/lib/Handy/resources
         cp -r usr/lib/Handy/resources/* $out/lib/Handy/resources/

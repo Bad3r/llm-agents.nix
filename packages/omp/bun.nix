@@ -1831,9 +1831,9 @@
     url = "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz";
     hash = "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==";
   };
-  "modern-tar@0.7.6" = fetchurl {
-    url = "https://registry.npmjs.org/modern-tar/-/modern-tar-0.7.6.tgz";
-    hash = "sha512-sweCIVXzx1aIGTCdzcMlSZt1h8k5Tmk08VNAuRk3IU28XamGiOH5ypi11g6De2CH7PhYqSSnGy2A/EFhbWnVKg==";
+  "modern-tar@0.7.7" = fetchurl {
+    url = "https://registry.npmjs.org/modern-tar/-/modern-tar-0.7.7.tgz";
+    hash = "sha512-t9VmxaqrmANnEOBhpSDI6HD192Ge48k8vmWqQQL7hSFEqHEYwZbbsu49+aKLWZeRvFs3j1pMhXOqqF4kPlvjkQ==";
   };
   "moment@2.30.1" = fetchurl {
     url = "https://registry.npmjs.org/moment/-/moment-2.30.1.tgz";
