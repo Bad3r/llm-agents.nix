@@ -97,6 +97,7 @@ stdenv.mkDerivation {
   '';
 
   doInstallCheck = true;
+  versionCheckProgram = "${placeholder "out"}/libexec/grok/grok-launcher";
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
