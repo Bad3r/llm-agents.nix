@@ -11,9 +11,10 @@
   makeWrapper,
   formatelf,
   zlib,
-  libclang,
+  libopus,
   python3,
   zig,
+  cmake,
 }:
 
 let
@@ -64,21 +65,35 @@ stdenv.mkDerivation {
     rustc
     cargo
     rustPlatform.cargoSetupHook
+    # bindgen (zlob, maudio-sys) needs libclang plus the correct clang flags
+    # to find libc headers such as pthread.h.
+    rustPlatform.bindgenHook
     pkg-config
     makeWrapper
     zig
+    # audiopus_sys (new dependency in 17.1.3) builds bundled libopus via cmake
+    cmake
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
     zlib
+    # audiopus_sys links against opus (found via pkg-config)
+    libopus
   ];
+
+  # cmake is only needed by the audiopus_sys build script, not for configuring
+  # this derivation itself.
+  dontUseCmakeConfigure = true;
 
   # smallvec's `specialization` feature requires nightly Rust.
   # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
   env = {
     RUSTC_BOOTSTRAP = 1;
+    # audiopus_sys' bundled opus ships a cmake_minimum_required older than
+    # what nixpkgs' cmake 4.x still accepts.
+    CMAKE_POLICY_VERSION_MINIMUM = "3.5";
   };
 
   bunDeps = bun2nixLib.fetchBunDeps {
@@ -161,9 +176,6 @@ stdenv.mkDerivation {
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       export LD_LIBRARY_PATH="${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}"
     ''}
-
-    # bindgen (used by zlob crate) needs libclang
-    export LIBCLANG_PATH="${libclang.lib}/lib"
 
     # Build the Rust native addon
     echo "Building Rust native addon..."

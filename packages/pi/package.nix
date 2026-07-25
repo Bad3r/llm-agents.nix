@@ -9,6 +9,7 @@
   stdenv,
   versionCheckHook,
   versionCheckHomeHook,
+  useBun ? true,
 }:
 
 let
@@ -51,11 +52,14 @@ buildNpmPackage {
   # The package from npm is already built
   dontNpmBuild = true;
 
-  nativeBuildInputs = [ bun ];
+  nativeBuildInputs = lib.optional useBun bun;
 
   # Compile a standalone binary like upstream's build:binary script. Running
   # dist/bun/cli.js directly with Bun breaks extension module aliasing (#6794).
-  preInstall = ''
+  # Pi's standalone binary uses Bun, but the npm package also ships a Node
+  # entry point. The Node mode is useful on older CPUs where Bun's binary
+  # requires unsupported instruction sets.
+  preInstall = lib.optionalString useBun ''
     # Upstream embeds the worker as ./src/utils/image-resize-worker.ts and
     # loads it by that path at runtime; the npm tarball only ships dist/.
     mkdir -p src/utils src/modes src/core
@@ -66,45 +70,59 @@ buildNpmPackage {
     bun build --compile ./dist/bun/cli.js ./src/utils/image-resize-worker.ts --outfile dist/pi
   '';
 
-  postInstall = ''
-    pkgdir=$out/libexec/pi
+  postInstall =
+    if useBun then
+      ''
+        pkgdir=$out/libexec/pi
 
-    # The binary embeds all modules; assemble the release layout that
-    # upstream's scripts/build-binaries.sh ships.
-    rm -rf "$out/lib" "$out/bin"
-    mkdir -p "$out/bin" "$pkgdir/theme" "$pkgdir/assets"
-    cp dist/pi "$pkgdir/"
-    cp package.json README.md CHANGELOG.md "$pkgdir/"
-    # Mirror scripts/build-binaries.sh: Bun cannot embed these runtime assets.
-    mkdir -p "$pkgdir/node_modules/@mariozechner"
-    cp -r node_modules/@mariozechner/clipboard "$pkgdir/node_modules/@mariozechner/"
-    cp -r node_modules/@mariozechner/clipboard-${napiTarget} "$pkgdir/node_modules/@mariozechner/"
-    cp node_modules/@mariozechner/clipboard-${napiTarget}/${clipboardNativeFile} \
-      "$pkgdir/node_modules/@mariozechner/clipboard/"
-    ${lib.optionalString stdenv.hostPlatform.isDarwin ''
-      mkdir -p "$pkgdir/native/darwin/prebuilds/${napiTarget}"
-      cp node_modules/@earendil-works/pi-tui/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node \
-        "$pkgdir/native/darwin/prebuilds/${napiTarget}/"
-    ''}
-    cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
-    cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
-    cp dist/modes/interactive/assets/* "$pkgdir/assets/"
-    cp -r dist/core/export-html "$pkgdir/"
-    cp -r docs examples "$pkgdir/"
-    # Keep patchShebangs from pulling Node into the closure via shipped scripts.
-    find "$pkgdir" -name '*.js' -exec chmod -x {} +
+        # The binary embeds all modules; assemble the release layout that
+        # upstream's scripts/build-binaries.sh ships.
+        rm -rf "$out/lib" "$out/bin"
+        mkdir -p "$out/bin" "$pkgdir/theme" "$pkgdir/assets"
+        cp dist/pi "$pkgdir/"
+        cp package.json README.md CHANGELOG.md "$pkgdir/"
+        # Mirror scripts/build-binaries.sh: Bun cannot embed these runtime assets.
+        mkdir -p "$pkgdir/node_modules/@mariozechner"
+        cp -r node_modules/@mariozechner/clipboard "$pkgdir/node_modules/@mariozechner/"
+        cp -r node_modules/@mariozechner/clipboard-${napiTarget} "$pkgdir/node_modules/@mariozechner/"
+        cp node_modules/@mariozechner/clipboard-${napiTarget}/${clipboardNativeFile} \
+          "$pkgdir/node_modules/@mariozechner/clipboard/"
+        ${lib.optionalString stdenv.hostPlatform.isDarwin ''
+          mkdir -p "$pkgdir/native/darwin/prebuilds/${napiTarget}"
+          cp node_modules/@earendil-works/pi-tui/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node \
+            "$pkgdir/native/darwin/prebuilds/${napiTarget}/"
+        ''}
+        cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
+        cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
+        cp dist/modes/interactive/assets/* "$pkgdir/assets/"
+        cp -r dist/core/export-html "$pkgdir/"
+        cp -r docs examples "$pkgdir/"
+        # Keep patchShebangs from pulling Node into the closure via shipped scripts.
+        find "$pkgdir" -name '*.js' -exec chmod -x {} +
 
-    makeWrapper "$pkgdir/pi" "$out/bin/pi" \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          fd
-          ripgrep
-        ]
-      } \
-      --set PI_PACKAGE_DIR "$pkgdir" \
-      --set PI_SKIP_VERSION_CHECK 1 \
-      --set PI_TELEMETRY 0
-  '';
+        makeWrapper "$pkgdir/pi" "$out/bin/pi" \
+          --prefix PATH : ${
+            lib.makeBinPath [
+              fd
+              ripgrep
+            ]
+          } \
+          --set PI_PACKAGE_DIR "$pkgdir" \
+          --set PI_SKIP_VERSION_CHECK 1 \
+          --set PI_TELEMETRY 0
+      ''
+    else
+      ''
+        wrapProgram "$out/bin/pi" \
+          --prefix PATH : ${
+            lib.makeBinPath [
+              fd
+              ripgrep
+            ]
+          } \
+          --set PI_SKIP_VERSION_CHECK 1 \
+          --set PI_TELEMETRY 0
+      '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
@@ -112,14 +130,15 @@ buildNpmPackage {
     versionCheckHomeHook
   ];
 
-  postInstallCheck = ''
-    ${bun}/bin/bun --eval 'require(process.argv[1])' \
-      "$out/libexec/pi/node_modules/@mariozechner/clipboard/${clipboardNativeFile}"
-  ''
-  + lib.optionalString stdenv.hostPlatform.isDarwin ''
-    ${bun}/bin/bun --eval 'require(process.argv[1])' \
-      "$out/libexec/pi/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node"
-  '';
+  postInstallCheck =
+    lib.optionalString useBun ''
+      ${bun}/bin/bun --eval 'require(process.argv[1])' \
+        "$out/libexec/pi/node_modules/@mariozechner/clipboard/${clipboardNativeFile}"
+    ''
+    + lib.optionalString (useBun && stdenv.hostPlatform.isDarwin) ''
+      ${bun}/bin/bun --eval 'require(process.argv[1])' \
+        "$out/libexec/pi/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node"
+    '';
 
   passthru.category = "AI Coding Agents";
 
@@ -130,7 +149,7 @@ buildNpmPackage {
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with lib.maintainers; [ aos ];
-    platforms = builtins.attrNames napiTargets;
+    platforms = if useBun then builtins.attrNames napiTargets else lib.platforms.all;
     mainProgram = "pi";
   };
 }
