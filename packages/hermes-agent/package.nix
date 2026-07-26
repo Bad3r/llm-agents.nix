@@ -193,7 +193,7 @@ let
       mcp
       # Tools
       exa-py
-      firecrawl-py
+      firecrawl-py'
       parallel-web
       fal-client
       # Text-to-speech
@@ -217,6 +217,14 @@ let
       knownVulnerabilities = [ ];
     };
   });
+
+  # nixpkgs' firecrawl-py 2.8.0 builds from the firecrawl monorepo tag v2.8.0,
+  # whose python-sdk pyproject declares a different SDK version, so the new
+  # pythonMetadataCheckPhase fails. Skip the check until nixpkgs fixes the
+  # version mismatch.
+  firecrawl-py' = python3.pkgs.firecrawl-py.overridePythonAttrs {
+    dontCheckPythonMetadata = true;
+  };
 
   # pyramid dropped its pkg_resources shim on python 3.14, so slack-bolt's
   # pyramid adapter tests fail at collection with ModuleNotFoundError.
@@ -298,6 +306,10 @@ python3.pkgs.buildPythonApplication {
     substituteInPlace tools/lazy_deps.py \
       --replace-fail 'Version(installed) in SpecifierSet(spec_tail)' 'True'
   '';
+
+  # Upstream pins setuptools<83 in build-system.requires, which nixpkgs'
+  # setuptools 83 no longer satisfies; the pin is only about metadata quirks.
+  pypaBuildFlags = [ "--skip-dependency-check" ];
 
   dependencies = hermesDeps;
   optional-dependencies = optionalDeps;

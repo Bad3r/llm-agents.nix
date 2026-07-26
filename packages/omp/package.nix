@@ -15,6 +15,7 @@
   python3,
   zig,
   cmake,
+  libpulseaudio,
 }:
 
 let
@@ -255,6 +256,7 @@ stdenv.mkDerivation {
       lib.makeLibraryPath [
         zlib
         stdenv.cc.cc.lib
+        libpulseaudio
       ]
     }"}
 
