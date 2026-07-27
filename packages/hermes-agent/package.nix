@@ -374,6 +374,7 @@ python3.pkgs.buildPythonApplication {
     # nixpkgs moved past upstream's == pins
     "rich"
     "pillow"
+    "croniter"
   ];
 
   pythonImportsCheck = [

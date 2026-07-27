@@ -22,13 +22,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "kimi-code";
-  version = "0.29.1";
+  version = "0.29.2";
 
   src = fetchFromGitHub {
     owner = "MoonshotAI";
     repo = "kimi-code";
     tag = "@moonshot-ai/kimi-code@${finalAttrs.version}";
-    hash = "sha256-JJPB1COZxawHpQaKxtHkc7MckzLyqLGBRpnXGD4F22Y=";
+    hash = "sha256-DTV0PhhcgGFEvAd6mCmO1NJNPtOuUA+3vMAEgcb22Xc=";
   };
 
   pnpmDeps = fetchPnpmDeps {

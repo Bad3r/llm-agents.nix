@@ -31,6 +31,8 @@
   makeDesktopItem,
   electron_41,
   libuv,
+  formatelf,
+  gcc-unwrapped,
 }:
 
 buildNpmPackage (finalAttrs: {
@@ -57,9 +59,13 @@ buildNpmPackage (finalAttrs: {
     python3 # for node-gyp (node-pty)
     makeWrapper
     copyDesktopItems
+    formatelf
   ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libuv ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    libuv
+    gcc-unwrapped.lib
+  ];
 
   dontNpmBuild = true;
 

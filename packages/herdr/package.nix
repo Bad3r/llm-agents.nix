@@ -93,7 +93,7 @@ let
     passthru.category = "Workflow & Project Management";
 
     meta = commonMeta // {
-      sourceProvenance = with lib.sourceTypes; [ fromSource ];
+      sourceProvenance = [ lib.sourceTypes.fromSource ];
       platforms = lib.platforms.linux;
     };
   });

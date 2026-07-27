@@ -45,6 +45,8 @@ rustPlatform.buildRustPackage {
     "${stdenv.cc}/bin/${stdenv.cc.targetPrefix}cc";
 
   npmDeps = fetchNpmDeps {
+    # nix-update needs a version attribute to update the subpackage hash
+    inherit version;
     src = frontendSrc;
     name = "${pname}-${version}-npm-deps";
     hash = "sha256-5lj/KyxZ87LYLR8jHbIiAohpXrqrQNwqLdenDgCmk5k=";
