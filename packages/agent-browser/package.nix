@@ -14,7 +14,7 @@
 
 let
   pname = "agent-browser";
-  version = "0.33.0";
+  version = "0.33.1";
 
   # Node 24's worker_threads teardown double-closes file descriptors
   # (Environment::RunCleanup closing an fd number that the OS has already
@@ -36,7 +36,7 @@ let
     # Upstream has a branch and a tag both named v<version>, so the plain
     # archive URL is ambiguous ("multiple possibilities"). Pin the tag ref.
     tag = "v${version}";
-    hash = "sha256-praWvAgWoDmWqXzh/kxdfQAPGkVS4qkb0pPYtMWO/N8=";
+    hash = "sha256-vKCs0nkU/fHIFCv6M3sq6oSfJjPWz546ZlhlqB8TKu8=";
   };
 
   dashboard = stdenv.mkDerivation {
@@ -91,7 +91,7 @@ rustPlatform.buildRustPackage {
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-j2tkoO334dtl22ykqBz5A0RTLrefyREAiXFKqTXEsgM=";
+  cargoHash = "sha256-psWmw8re19jlyiG6xTQzbHWY543Ev6Tc8ZRoOLoK9cE=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
