@@ -587,7 +587,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 - **Source**: source
 - **License**: MIT
-- **Homepage**: https://github.com/ryoppippi/ccusage
+- **Homepage**: https://ccusage.com/
 - **Usage**: `nix run github:numtide/llm-agents.nix#ccusage -- --help`
 - **Nix**: [packages/ccusage/package.nix](packages/ccusage/package.nix)
 
@@ -1202,6 +1202,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/microsoft/apm
 - **Usage**: `nix run github:numtide/llm-agents.nix#apm -- --help`
 - **Nix**: [packages/apm/package.nix](packages/apm/package.nix)
+
+</details>
+<details>
+<summary><strong>ax</strong> - The AI-era curl: fetch, discover, extract. One command</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/yusukebe/ax
+- **Usage**: `nix run github:numtide/llm-agents.nix#ax -- --help`
+- **Nix**: [packages/ax/package.nix](packages/ax/package.nix)
 
 </details>
 <details>

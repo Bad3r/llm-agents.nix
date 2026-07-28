@@ -76,6 +76,18 @@
               platformSource = import ./lib/platform-source.nix {
                 inherit (pkgs) stdenv fetchurl;
               };
+              # `bun build --compile` copies the running bun binary into the
+              # executable it produces, so bun ends up inside our outputs
+              # rather than being a build tool we can leave to the consumer.
+              # bun 1.3.14 miscomputes where its own runtime image ends once
+              # patchelf has rewritten the ELF, and emits a standalone binary
+              # that embeds the runtime twice and segfaults on startup. Via
+              # overlays.shared-nixpkgs we get whatever bun the consumer's
+              # overlays provide, so take bun from our own nixpkgs instead.
+              # Pinning it also keeps the bun packages substitutable for
+              # shared-nixpkgs consumers, whose bun would otherwise change
+              # every store path in the set.
+              bun = pkgsFor.${system}.bun or pkgs.bun;
               # bun2nix builder set (hook, fetchBunDeps, ...); the `bun2nix`
               # scope attribute is the CLI package.
               bun2nixLib = (pkgs.extend inputs.bun2nix.overlays.default).bun2nix;
