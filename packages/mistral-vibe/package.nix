@@ -158,14 +158,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.22.0";
+  version = "2.23.1";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     tag = "v${version}";
-    hash = "sha256-+wIjJrGWN9CkCUuyLn2t5189E41KCcjz3rl3U6wg7j4=";
+    hash = "sha256-WEyzBhkqh/B4NZD8tKoRkQGrw/85xVCftFyRamlMaYg=";
   };
 
   build-system = with python.pkgs; [
@@ -235,7 +235,7 @@ python.pkgs.buildPythonApplication rec {
     "vibe"
     "vibe.cli.cli"
     "vibe.core.llm.backend.mistral"
-    "vibe.core.transcribe.mistral_transcribe_client"
+    "vibe.cli.transcribe.mistral_transcribe_client"
   ];
 
   doInstallCheck = true;
