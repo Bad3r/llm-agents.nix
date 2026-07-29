@@ -4,6 +4,7 @@
   bun,
   fetchurl,
   fd,
+  rcodesign,
   ripgrep,
   runCommand,
   stdenv,
@@ -52,7 +53,10 @@ buildNpmPackage {
   # The package from npm is already built
   dontNpmBuild = true;
 
-  nativeBuildInputs = lib.optional useBun bun;
+  nativeBuildInputs = lib.optional useBun bun
+    ++ lib.optionals (useBun && stdenv.hostPlatform.isDarwin) [
+      rcodesign
+    ];
 
   # Compile a standalone binary like upstream's build:binary script. Running
   # dist/bun/cli.js directly with Bun breaks extension module aliasing (#6794).
@@ -123,6 +127,14 @@ buildNpmPackage {
           --set PI_SKIP_VERSION_CHECK 1 \
           --set PI_TELEMETRY 0
       '';
+
+  # Re-sign the bun-compiled binary after fixup, following the amp pattern.
+  # fixDarwinDylibNames may run install_name_tool which invalidates the
+  # signature; bun's embedded code-signing can also produce invalid
+  # signatures on newer macOS versions.
+  postFixup = lib.optionalString (useBun && stdenv.hostPlatform.isDarwin) ''
+    ${lib.getExe rcodesign} sign --code-signature-flags linker-signed $out/libexec/pi/pi
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [

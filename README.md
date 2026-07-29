@@ -869,6 +869,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>crit</strong> - Local-first review tool for coding-agent plans, diffs, and web pages</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/tomasz-tomczyk/crit
+- **Usage**: `nix run github:numtide/llm-agents.nix#crit -- --help`
+- **Nix**: [packages/crit/package.nix](packages/crit/package.nix)
+
+</details>
+<details>
 <summary><strong>cubic</strong> - AI code review CLI from cubic.dev - fast pre-flight review before you push</summary>
 
 - **Source**: binary

@@ -174,6 +174,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 321014;
         name = "Iain Lane";
       };
+      ahacop = {
+        github = "ahacop";
+        githubId = 1678968;
+        name = "Ara Hacopian";
+      };
     };
   }
 )
