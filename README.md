@@ -60,6 +60,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>cline</strong> - Autonomous coding agent CLI</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://cline.bot
+- **Usage**: `nix run github:numtide/llm-agents.nix#cline -- --help`
+- **Nix**: [packages/cline/package.nix](packages/cline/package.nix)
+
+</details>
+<details>
 <summary><strong>code</strong> - Fork of codex. Orchestrate agents from OpenAI, Claude, Gemini or any provider.</summary>
 
 - **Source**: source
@@ -613,6 +623,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/asheshgoplani/agent-deck
 - **Usage**: `nix run github:numtide/llm-agents.nix#agent-deck -- --help`
 - **Nix**: [packages/agent-deck/package.nix](packages/agent-deck/package.nix)
+
+</details>
+<details>
+<summary><strong>aven</strong> - Local-first task manager for power users and agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/raine/aven
+- **Usage**: `nix run github:numtide/llm-agents.nix#aven -- --help`
+- **Nix**: [packages/aven/package.nix](packages/aven/package.nix)
 
 </details>
 <details>

@@ -12,7 +12,6 @@
   fetchPnpmDeps,
   glib-networking,
   jq,
-  libgit2,
   makeBinaryWrapper,
   moreutils,
   nodejs,
@@ -34,13 +33,13 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "gitbutler";
-  version = "0.21.2";
+  version = "0.22.0";
 
   src = fetchFromGitHub {
     owner = "gitbutlerapp";
     repo = "gitbutler";
     tag = "release/${finalAttrs.version}";
-    hash = "sha256-aFKy761lkcWbeGeET+RB+kjuyhaNK3qitptXC8i6Y9A=";
+    hash = "sha256-iiUgqpoLixyBG+MKQZBQbt4aCsRPrM8lPmwJHReAgPk=";
   };
 
   # Pin the user-facing version into the Tauri release config and disable the
@@ -59,13 +58,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   '';
 
-  cargoHash = "sha256-f6Xz6PfF/wnOKc910tS88kXKWx7bvksfIFjQG5UWxgE=";
+  cargoHash = "sha256-iuEDFrB/ZMhRAoHopuSwH1r7mE/0hLv/bnZzdYMWGRY=";
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 3;
-    hash = "sha256-JgF+MiOh/jiMlJsx4yFROHAUcMy3CcQoosADwC0U8B4=";
+    hash = "sha256-jQD06RWI7+DZMAUuF9LZREcy6hjayIhMKYD8WCDCxxY=";
   };
 
   nativeBuildInputs = [
@@ -87,7 +86,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ++ lib.optional stdenv.hostPlatform.isDarwin makeBinaryWrapper;
 
   buildInputs = [
-    libgit2
     openssl
   ]
   ++ lib.optional stdenv.hostPlatform.isDarwin curl
@@ -120,7 +118,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     TURBO_TELEMETRY_DISABLED = 1;
 
     OPENSSL_NO_VENDOR = true;
-    LIBGIT2_NO_VENDOR = 1;
+    # 0.22.0 uses a libgit2-sys fork that requires "libgit2-experimental",
+    # which nixpkgs does not provide; build the vendored copy instead.
   };
 
   preBuild = ''

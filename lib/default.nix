@@ -179,6 +179,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 1678968;
         name = "Ara Hacopian";
       };
+      poelzi = {
+        github = "poelzi";
+        githubId = 66107;
+        name = "Daniel Poelzleithner";
+      };
     };
   }
 )

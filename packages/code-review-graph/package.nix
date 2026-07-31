@@ -45,6 +45,14 @@ python.pkgs.buildPythonApplication rec {
     watchdog
   ];
 
+  # The parser probe runs `sys.executable -I`, which lacks the wrapper's
+  # sys.path; use an interpreter that ships the language pack (#7216).
+  postPatch = ''
+    substituteInPlace code_review_graph/parser.py \
+      --replace-fail 'sys.executable, "-I"' \
+        '"${python.withPackages (ps: [ ps.tree-sitter-language-pack ])}/bin/python", "-I"'
+  '';
+
   # Relax version constraints — nixpkgs versions are newer but compatible.
   # fastmcp: upstream v2.3.6 pins `<3` but main already moved to `>=3.2.4`
   # (no API breaks for the tool/prompt decorators used here), so accept the

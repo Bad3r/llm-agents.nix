@@ -5,7 +5,9 @@
   buildNpmPackage,
   cacert,
   fetchFromGitHub,
+  fetchNpmDeps,
   fetchurl,
+  prefetch-npm-deps,
   versionCheckHook,
   makeBinaryWrapper,
   unpinGoModVersionHook,
@@ -36,11 +38,29 @@ let
     inherit (litellmSnapshot) url hash;
   };
 
+  # @kenn-io/kit-ui is a git dependency whose repo contains symlinks. When
+  # prefetch-npm-deps repacks it, the recorded symlink mode differs between
+  # Linux (777) and darwin (755), so the FOD hash diverges per platform.
+  # Normalize member modes while repacking to keep npmDepsHash identical.
+  prefetch-npm-deps' = prefetch-npm-deps.overrideAttrs (old: {
+    postPatch = (old.postPatch or "") + ''
+      substituteInPlace src/parse/mod.rs \
+        --replace-fail '"--sort=name",' '"--sort=name", "--mode=go-w",'
+    '';
+  });
+
   frontend = buildNpmPackage {
     pname = "agentsview-frontend";
     inherit version src;
     sourceRoot = "${src.name}/frontend";
-    inherit npmDepsHash;
+    npmDeps = fetchNpmDeps {
+      inherit src;
+      sourceRoot = "${src.name}/frontend";
+      name = "agentsview-frontend-${version}-npm-deps";
+      hash = npmDepsHash;
+      forceGitDeps = true;
+      nativeBuildInputs = [ prefetch-npm-deps' ];
+    };
     # @kenn-io/kit-ui is a git dependency with install scripts but no lockfile.
     forceGitDeps = true;
     makeCacheWritable = true;

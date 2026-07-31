@@ -89,7 +89,10 @@ def create_or_update_pr(config: PrConfig, *, labels: str, auto_merge: bool) -> N
     commit the updater's changes on top and force-push.
     """
     run(["git", "add", "."])
-    run(["git", "commit", "-m", config.commit_message, "--signoff"])
+    # The commit may already exist on the reused branch if a previous run
+    # pushed it but failed before creating the PR.
+    if run(["git", "diff", "--quiet", "--cached"], check=False).returncode != 0:
+        run(["git", "commit", "-m", config.commit_message, "--signoff"])
     run(["git", "push", "--force", "origin", f"HEAD:{config.branch}"])
 
     pr_number = gh_get_pr_number(config.branch)
