@@ -1,25 +1,27 @@
 {
   lib,
+  stdenv,
   fetchFromGitHub,
   rustPlatform,
   cacert,
   git,
   sqlite,
+  libredirect,
   versionCheckHook,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.19";
+  version = "0.1.21";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-O061QVxle2f9UdGBNdgovBskpT1tpUiEqAVHbyChDtI=";
+    hash = "sha256-R2W/Iv0nlh8LVQWsgEcFF/Onnszdy0OmyYW5qTJF3MA=";
   };
 
-  cargoHash = "sha256-fDM1ymMOmCUc7q7onb5Fn49frzXtmZO4hk9ESgbCBww=";
+  cargoHash = "sha256-oi59kBTWzt+aiNq0e+UB3ClWdzZAfbglFRQmh/Cez/s=";
 
   # Some tests infer the project key from the checkout directory name
   # ("aven" -> "AVN"), but Nix unpacks into "source".
@@ -63,6 +65,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
     export HOME=$(mktemp -d)
     export SSL_CERT_FILE=${cacert}/etc/ssl/certs/ca-bundle.crt
     git init -q .
+  ''
+  # iana-time-zone resolves the local zone from /etc/localtime or
+  # /etc/timezone (never $TZ); the Linux sandbox has neither, so redirect
+  # /etc/timezone to a file naming UTC.
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    echo UTC > "$TMPDIR/timezone"
+    export NIX_REDIRECTS=/etc/timezone=$TMPDIR/timezone
+    export LD_PRELOAD=${libredirect}/lib/libredirect.so
   '';
 
   doInstallCheck = true;
