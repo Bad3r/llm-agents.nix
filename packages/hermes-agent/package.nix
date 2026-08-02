@@ -3,6 +3,7 @@
   stdenv,
   flake,
   python3,
+  rustPlatform,
   fetchFromGitHub,
   fetchPypi,
   buildNpmPackage,
@@ -13,6 +14,45 @@
 }:
 
 let
+  # Native (PyO3) runtime for hermes' Relay lifecycle and shared metrics;
+  # PyPI ships wheels only, so build from source with maturin.
+  nemo-relay = python3.pkgs.buildPythonPackage rec {
+    pname = "nemo-relay";
+    version = "0.6.0";
+    pyproject = true;
+
+    src = fetchFromGitHub {
+      owner = "NVIDIA";
+      repo = "NeMo-Relay";
+      tag = version;
+      hash = "sha256-mqI1tDl01a+FCv1FSMqvzYGuS/7hNlc99jcFiN6dRIM=";
+    };
+
+    cargoDeps = rustPlatform.fetchCargoVendor {
+      inherit src;
+      name = "nemo-relay-${version}";
+      hash = "sha256-KxPNGhYHmMFCSiEJomZztrc2P/knYA0It+vuurIccCQ=";
+    };
+
+    nativeBuildInputs = with rustPlatform; [
+      cargoSetupHook
+      maturinBuildHook
+    ];
+
+    pythonImportsCheck = [
+      "nemo_relay"
+      "nemo_relay._native"
+    ];
+
+    meta = with lib; {
+      description = "Python bindings for the NeMo Relay agent runtime";
+      homepage = "https://github.com/NVIDIA/NeMo-Relay";
+      license = licenses.asl20;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.unix;
+    };
+  };
+
   exa-py = python3.pkgs.buildPythonPackage rec {
     pname = "exa-py";
     version = "2.10.2";
@@ -123,13 +163,13 @@ let
     };
   };
 
-  version = "2026.7.20";
+  version = "2026.7.30";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-QJEiBOLAVGeYBym4EUtnDgeIyJyDQWgmat70/yujiz4=";
+    hash = "sha256-JVpdkcgrx+TGKayql/hzhTx+zuyaFATGEtVkBo1aPCc=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -140,7 +180,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-fKtCPJ45okmHGDKw41sSrhrVe1AUdT7tBMQHu5vfPRA=";
+    npmDepsHash = "sha256-ZeZcsYELAqUO9/QjHJt6BWdFJ9o4zMgsK9JB6SfnouI=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -201,6 +241,8 @@ let
       # Skills Hub
       pyjwt
       cryptography
+      # Relay lifecycle + shared metrics
+      nemo-relay
     ]
     # faster-whisper -> av SIGKILLs during import on darwin; voice is optional.
     ++ lib.optionals stdenv.hostPlatform.isLinux [ faster-whisper ]
@@ -307,6 +349,10 @@ python3.pkgs.buildPythonApplication {
       --replace-fail 'Version(installed) in SpecifierSet(spec_tail)' 'True'
   '';
 
+  # setup.py refuses to build wheels/sdists unless it knows this is a Nix
+  # (uv2nix-style) build; upstream gates it behind this env var.
+  env.HERMES_NIX_BUILD = "1";
+
   # Upstream pins setuptools<83 in build-system.requires, which nixpkgs'
   # setuptools 83 no longer satisfies; the pin is only about metadata quirks.
   pypaBuildFlags = [ "--skip-dependency-check" ];
@@ -386,6 +432,9 @@ python3.pkgs.buildPythonApplication {
     "discord"
     "telegram.ext"
     "croniter"
+    # relay_runtime imports this lazily and silently degrades to a noop
+    # runtime when missing, so assert it imports.
+    "nemo_relay"
   ];
 
   doInstallCheck = true;
