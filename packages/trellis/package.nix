@@ -22,13 +22,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "trellis";
-  version = "0.6.11";
+  version = "0.6.12";
 
   src = fetchFromGitHub {
     owner = "mindfold-ai";
     repo = "trellis";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-LeMLOzh6wQtBNKG9ZGDDweP2sOA5wjqzBiiIU5hMuWA=";
+    hash = "sha256-uYKJoWEG1W5S2E9Zp7ebACks3gFCKCk/RJbNcOsTwCk=";
   };
 
   pnpmDeps = fetchPnpmDeps {

@@ -450,6 +450,10 @@
     url = "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-1.29.0.tgz";
     hash = "sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==";
   };
+  "@napi-rs/canvas-android-arm64@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.100.tgz";
+    hash = "sha512-hjhCKhntPv9+t4ckHymdx0phYNcVW+GKQR6Lzw2zE+pOVjOplSmtx9nNNknTjbEDLcuLZqA1y8ufKg1XfgftzQ==";
+  };
   "@napi-rs/canvas-android-arm64@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.80.tgz";
     hash = "sha512-sk7xhN/MoXeuExlggf91pNziBxLPVUqF2CAVnB57KLG/pz7+U5TKG8eXdc3pm0d7Od0WreB6ZKLj37sX9muGOQ==";
@@ -457,6 +461,10 @@
   "@napi-rs/canvas-android-arm64@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-android-arm64/-/canvas-android-arm64-0.1.88.tgz";
     hash = "sha512-KEaClPnZuVxJ8smUWjV1wWFkByBO/D+vy4lN+Dm5DFH514oqwukxKGeck9xcKJhaWJGjfruGmYGiwRe//+/zQQ==";
+  };
+  "@napi-rs/canvas-darwin-arm64@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.100.tgz";
+    hash = "sha512-2PcswRaC7Ly645DGt88///zuFDhJxJYdKAs1uU3mfk1atYkXufgcgLfBpk6Tm12nCQBaNt1wpybuPZ4qOhTo8A==";
   };
   "@napi-rs/canvas-darwin-arm64@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.80.tgz";
@@ -466,6 +474,10 @@
     url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-arm64/-/canvas-darwin-arm64-0.1.88.tgz";
     hash = "sha512-Xgywz0dDxOKSgx3eZnK85WgGMmGrQEW7ZLA/E7raZdlEE+xXCozobgqz2ZvYigpB6DJFYkqnwHjqCOTSDGlFdg==";
   };
+  "@napi-rs/canvas-darwin-x64@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.100.tgz";
+    hash = "sha512-ePNZtj7pNIva/siZMg+HmbeozkIjqUIYdoymH8HaA3qK7LfzFN4WMBM8G6HQ9ZC+H3+Dnn5pqtiXpgLykaPOhw==";
+  };
   "@napi-rs/canvas-darwin-x64@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.80.tgz";
     hash = "sha512-FqqSU7qFce0Cp3pwnTjVkKjjOtxMqRe6lmINxpIZYaZNnVI0H5FtsaraZJ36SiTHNjZlUB69/HhxNDT1Aaa9vA==";
@@ -473,6 +485,10 @@
   "@napi-rs/canvas-darwin-x64@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-darwin-x64/-/canvas-darwin-x64-0.1.88.tgz";
     hash = "sha512-Yz4wSCIQOUgNucgk+8NFtQxQxZV5NO8VKRl9ePKE6XoNyNVC8JDqtvhh3b3TPqKK8W5p2EQpAr1rjjm0mfBxdg==";
+  };
+  "@napi-rs/canvas-linux-arm-gnueabihf@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.100.tgz";
+    hash = "sha512-d5cDB48oWFGU8/XPhUOFAlySgb/VAu7D+s8fi55K1Pcfg8aPplHWqMgibhVLU8ky7Pyg/fuiVLz4Nf3JrSTuUA==";
   };
   "@napi-rs/canvas-linux-arm-gnueabihf@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.80.tgz";
@@ -482,6 +498,10 @@
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm-gnueabihf/-/canvas-linux-arm-gnueabihf-0.1.88.tgz";
     hash = "sha512-9gQM2SlTo76hYhxHi2XxWTAqpTOb+JtxMPEIr+H5nAhHhyEtNmTSDRtz93SP7mGd2G3Ojf2oF5tP9OdgtgXyKg==";
   };
+  "@napi-rs/canvas-linux-arm64-gnu@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.100.tgz";
+    hash = "sha512-rDxgxRu69RvDlX/bh9o22DxLsGr8EqsNgotL9+RwQE1S0b0cqeatqsw6aW45mukm0B42DIAaAacKaYQ8cqS1nw==";
+  };
   "@napi-rs/canvas-linux-arm64-gnu@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.80.tgz";
     hash = "sha512-qwA63t8A86bnxhuA/GwOkK3jvb+XTQaTiVML0vAWoHyoZYTjNs7BzoOONDgTnNtr8/yHrq64XXzUoLqDzU+Uuw==";
@@ -489,6 +509,10 @@
   "@napi-rs/canvas-linux-arm64-gnu@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-gnu/-/canvas-linux-arm64-gnu-0.1.88.tgz";
     hash = "sha512-7qgaOBMXuVRk9Fzztzr3BchQKXDxGbY+nwsovD3I/Sx81e+sX0ReEDYHTItNb0Je4NHbAl7D0MKyd4SvUc04sg==";
+  };
+  "@napi-rs/canvas-linux-arm64-musl@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.100.tgz";
+    hash = "sha512-K3mDW66N+xT2/V439u1alFANiBUjdEx2gLiNYnCmUsva5jZMxWTjafBYwTzYK+EMFMHrUoabuU+T1BIP5CgbYQ==";
   };
   "@napi-rs/canvas-linux-arm64-musl@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.80.tgz";
@@ -498,6 +522,10 @@
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-arm64-musl/-/canvas-linux-arm64-musl-0.1.88.tgz";
     hash = "sha512-kYyNrUsHLkoGHBc77u4Unh067GrfiCUMbGHC2+OTxbeWfZkPt2o32UOQkhnSswKd9Fko/wSqqGkY956bIUzruA==";
   };
+  "@napi-rs/canvas-linux-riscv64-gnu@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.100.tgz";
+    hash = "sha512-mooqUBTIsccZpnoQC4NgrC1v6C1vof39etLNMnBwCY+p0gajWJvAHLGQ6g/gGyS5YrpDW+GefSN4+Cvcr08UWw==";
+  };
   "@napi-rs/canvas-linux-riscv64-gnu@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.80.tgz";
     hash = "sha512-XTzR125w5ZMs0lJcxRlS1K3P5RaZ9RmUsPtd1uGt+EfDyYMu4c6SEROYsxyatbbu/2+lPe7MPHOO/0a0x7L/gw==";
@@ -505,6 +533,10 @@
   "@napi-rs/canvas-linux-riscv64-gnu@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-riscv64-gnu/-/canvas-linux-riscv64-gnu-0.1.88.tgz";
     hash = "sha512-HVuH7QgzB0yavYdNZDRyAsn/ejoXB0hn8twwFnOqUbCCdkV+REna7RXjSR7+PdfW0qMQ2YYWsLvVBT5iL/mGpw==";
+  };
+  "@napi-rs/canvas-linux-x64-gnu@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.100.tgz";
+    hash = "sha512-1eCvkDCazm7FFhsT7DfGOdSaHgZVK3bt/dSBl5EWHOWmnz+I7j8tPseJqqD81NF+MH21jKUK4wQSDjN0mdhnTg==";
   };
   "@napi-rs/canvas-linux-x64-gnu@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.80.tgz";
@@ -514,6 +546,10 @@
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-gnu/-/canvas-linux-x64-gnu-0.1.88.tgz";
     hash = "sha512-hvcvKIcPEQrvvJtJnwD35B3qk6umFJ8dFIr8bSymfrSMem0EQsfn1ztys8ETIFndTwdNWJKWluvxztA41ivsEw==";
   };
+  "@napi-rs/canvas-linux-x64-musl@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.100.tgz";
+    hash = "sha512-20arT6lnI19S68qNlii73TSEDbECNgzMz2EpldC1V3mZFuRkeujXkcebRk0LRJe9SEUAooYiLokfMViY8IX7yA==";
+  };
   "@napi-rs/canvas-linux-x64-musl@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.80.tgz";
     hash = "sha512-x0XvZWdHbkgdgucJsRxprX/4o4sEed7qo9rCQA9ugiS9qE2QvP0RIiEugtZhfLH3cyI+jIRFJHV4Fuz+1BHHMg==";
@@ -522,9 +558,17 @@
     url = "https://registry.npmjs.org/@napi-rs/canvas-linux-x64-musl/-/canvas-linux-x64-musl-0.1.88.tgz";
     hash = "sha512-eSMpGYY2xnZSQ6UxYJ6plDboxq4KeJ4zT5HaVkUnbObNN6DlbJe0Mclh3wifAmquXfrlgTZt6zhHsUgz++AK6g==";
   };
+  "@napi-rs/canvas-win32-arm64-msvc@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-win32-arm64-msvc/-/canvas-win32-arm64-msvc-0.1.100.tgz";
+    hash = "sha512-DZFFT1wIAg37LJw37yhMRFfjATd3vTQzjZ1Yki8u2vhO6Hi5VE6BVaGQ1aaDu7xb4iMErz+9EOwjpS7xcxFeBw==";
+  };
   "@napi-rs/canvas-win32-arm64-msvc@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-win32-arm64-msvc/-/canvas-win32-arm64-msvc-0.1.88.tgz";
     hash = "sha512-qcIFfEgHrchyYqRrxsCeTQgpJZ/GqHiqPcU/Fvw/ARVlQeDX1VyFH+X+0gCR2tca6UJrq96vnW+5o7buCq+erA==";
+  };
+  "@napi-rs/canvas-win32-x64-msvc@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.100.tgz";
+    hash = "sha512-MyT1j3mHC2+Lu4pBi9mKyMJhtP6U7k7EldY7sj/uS5gJA65gTXt8MefJQXLJo5d/vZbuWmfxzkEUNc/urV3pHA==";
   };
   "@napi-rs/canvas-win32-x64-msvc@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.80.tgz";
@@ -533,6 +577,10 @@
   "@napi-rs/canvas-win32-x64-msvc@0.1.88" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas-win32-x64-msvc/-/canvas-win32-x64-msvc-0.1.88.tgz";
     hash = "sha512-ROVqbfS4QyZxYkqmaIBBpbz/BQvAR+05FXM5PAtTYVc0uyY8Y4BHJSMdGAaMf6TdIVRsQsiq+FG/dH9XhvWCFQ==";
+  };
+  "@napi-rs/canvas@0.1.100" = fetchurl {
+    url = "https://registry.npmjs.org/@napi-rs/canvas/-/canvas-0.1.100.tgz";
+    hash = "sha512-xglYA6q3XO5P3BNJYxVZ1IV7DLVjp1Py6nwag88YntrS+3vKHyYcMqXVS4ZztJmwz2uGvz1FWhI/4LgbR5uQDA==";
   };
   "@napi-rs/canvas@0.1.80" = fetchurl {
     url = "https://registry.npmjs.org/@napi-rs/canvas/-/canvas-0.1.80.tgz";
@@ -3261,6 +3309,10 @@
   "pdfjs-dist@5.4.530" = fetchurl {
     url = "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.4.530.tgz";
     hash = "sha512-r1hWsSIGGmyYUAHR26zSXkxYWLXLMd6AwqcaFYG9YUZ0GBf5GvcjJSeo512tabM4GYFhxhl5pMCmPr7Q72Rq2Q==";
+  };
+  "pdfjs-dist@5.7.284" = fetchurl {
+    url = "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-5.7.284.tgz";
+    hash = "sha512-h4EdYQczmGhbOlqc3PPZwxevn7ApdWPbovAuWXOB/DjIyigSnwfy2oze7c6mRcSr9XgLp3eN3EeL4DyySTPMFw==";
   };
   "peek-readable@4.1.0" = fetchurl {
     url = "https://registry.npmjs.org/peek-readable/-/peek-readable-4.1.0.tgz";

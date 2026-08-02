@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "ctxrs";
     repo = "ctx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-BaZvBlRE8PkUgacWDoNhR14YoenfKKKAoCZQUrv6TQk=";
+    hash = "sha256-x35LunE3EJWT3BCInk6LZT6r6e1jGfuKiEp2w1JLDug=";
   };
 
   cargoHash = "sha256-aOd7zN8U2w/nkoTxUUDrllngtUWZ/3KhGYIAJDa5F5w=";
