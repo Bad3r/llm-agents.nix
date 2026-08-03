@@ -344,6 +344,12 @@ python3.pkgs.buildPythonApplication {
   # into the read-only store on any drift, silently disabling the feature
   # (e.g. nixpkgs aiosqlite 0.21.0 vs hermes pin 0.22.1 disabled matrix).
   # The closure already provides every dep, so presence is sufficient.
+  # Dashboard slash workers re-exec the bare sys.executable, which cannot
+  # import Hermes modules or its dependencies under Nix; run them with the
+  # wrapper-provided interpreter and source root instead of leaking a global
+  # PYTHONPATH into every subprocess Hermes spawns.
+  patches = [ ./slash-worker-hermes-python.patch ];
+
   postPatch = ''
     substituteInPlace tools/lazy_deps.py \
       --replace-fail 'Version(installed) in SpecifierSet(spec_tail)' 'True'
@@ -457,6 +463,9 @@ python3.pkgs.buildPythonApplication {
     test -d $out/share/hermes/skills
     test -d $out/share/hermes/optional-skills
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
+    # Slash workers run HERMES_PYTHON with PYTHONPATH=HERMES_PYTHON_SRC_ROOT.
+    PYTHONPATH="$out/${python3.sitePackages}" \
+      ${pythonEnv}/bin/python3 -c 'import tui_gateway.slash_worker, yaml'
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
     # Matrix E2EE: mautrix.crypto must import and the disable switch wired in.

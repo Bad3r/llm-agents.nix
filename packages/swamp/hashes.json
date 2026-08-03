@@ -1,0 +1,8 @@
+{
+  "version": "20260730.185412.0-sha.ff15e73d",
+  "hashes": {
+    "x86_64-linux": "sha256-fJg12cPiiZ2Fqo/kM40v6WVqYpUY8OvVdj0UbLhDByI=",
+    "aarch64-linux": "sha256-XLn245vmP1VpiheYmX53M9wbs5KioX/HywMcDNn3skc=",
+    "aarch64-darwin": "sha256-LnKAgpkgUHSP5ekRyQC3Gd1+dJdamBE7EDwgsb9vMrQ="
+  }
+}

@@ -174,6 +174,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 321014;
         name = "Iain Lane";
       };
+      kmjayadeep = {
+        github = "kmjayadeep";
+        githubId = 6793260;
+        name = "Jayadeep KM";
+      };
       ahacop = {
         github = "ahacop";
         githubId = 1678968;
@@ -183,6 +188,11 @@ inputs.nixpkgs.lib.extend (
         github = "poelzi";
         githubId = 66107;
         name = "Daniel Poelzleithner";
+      };
+      selmison = {
+        github = "selmison";
+        githubId = 24687232;
+        name = "Selmison Miranda";
       };
     };
   }

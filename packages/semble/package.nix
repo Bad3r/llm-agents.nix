@@ -9,7 +9,9 @@
 }:
 
 let
-  # Three of semble's direct runtime dependencies are not in nixpkgs.
+  inherit (python3.pkgs) buildPythonPackage;
+
+  # Some of semble's direct runtime dependencies are not in nixpkgs.
   # Vendor them inline (same pattern as hermes-agent / parallel-cli), since
   # they have no consumer in this flake other than semble itself.
 
@@ -92,55 +94,69 @@ let
     };
   };
 
-  bm25s = python3.pkgs.buildPythonPackage rec {
-    pname = "bm25s";
-    version = "0.3.9";
-    pyproject = true;
+  # Prebuilt tree-sitter grammar bundle used by semble since 0.5.3. Building
+  # it from source would require pinning and compiling ~30 grammar
+  # repositories, so use upstream's platform wheels (pure C shared objects
+  # loaded via ctypes, no non-libc dependencies).
+  grammarWheels = {
+    x86_64-linux = {
+      platform = "manylinux2014_x86_64";
+      hash = "sha256-wEBZXKThF5aaNJgH3OBcGlHbs2joDegLAFU5/YbvnAc=";
+    };
+    aarch64-linux = {
+      platform = "manylinux2014_aarch64";
+      hash = "sha256-8k9joE5Wny3iiq85FmyN3djilqoDkKyBbfatG9gU478=";
+    };
+    aarch64-darwin = {
+      platform = "macosx_11_0_arm64";
+      hash = "sha256-dy5wEc5eL/XZNHovAnpEfHE9Pw1imD3ThFfwSqIhXGw=";
+    };
+    x86_64-darwin = {
+      platform = "macosx_10_13_x86_64";
+      hash = "sha256-Uv5pjx0kieatPmRiyTIud3lnabID90opT4AeWovRDxk=";
+    };
+  };
+
+  semble-grammars = buildPythonPackage rec {
+    pname = "semble-grammars";
+    version = "0.1.2";
+    format = "wheel";
 
     src = fetchPypi {
-      inherit pname version;
-      hash = "sha256-iVxnnZUrfeg1XttfPhpiCh4vKU0dQrkZvwghzOLi9Zc=";
+      pname = "semble_grammars";
+      inherit version;
+      format = "wheel";
+      dist = "py3";
+      python = "py3";
+      abi = "none";
+      inherit (grammarWheels.${python3.stdenv.hostPlatform.system}) platform hash;
     };
 
-    build-system = with python3.pkgs; [
-      setuptools
-    ];
-
     dependencies = with python3.pkgs; [
-      numpy
-      # bm25s declares orjson/tqdm/PyStemmer/numba only under the [core] extra,
-      # but semble exercises code paths that need them at runtime (tokenization,
-      # progress bars, JSON serialization, JIT-compiled scoring).
-      orjson
-      tqdm
-      pystemmer
-      numba
+      tree-sitter
     ];
 
-    # Tests need optional extras (jax, scipy, pytrec_eval, etc.).
-    doCheck = false;
-
-    pythonImportsCheck = [ "bm25s" ];
+    pythonImportsCheck = [ "semble_grammars" ];
 
     meta = with lib; {
-      description = "Fast lexical search using Best Matching 25 (BM25)";
-      homepage = "https://github.com/xhluca/bm25s";
+      description = "Prebuilt tree-sitter grammars for Semble";
+      homepage = "https://github.com/MinishLab/semble-grammars";
       license = licenses.mit;
-      sourceProvenance = with sourceTypes; [ fromSource ];
-      platforms = platforms.all;
+      sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+      platforms = builtins.attrNames grammarWheels;
     };
   };
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "semble";
-  version = "0.5.2";
+  version = "0.5.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "MinishLab";
     repo = "semble";
     tag = "v${version}";
-    hash = "sha256-ja+uA1grnt6BDgJwN/GcCViAJaIxwfj/AbvsrAG/PdE=";
+    hash = "sha256-I/JR0sYcpm0uvMtBfOh/sOhUMJdyaRA94eoiFeNfWCg=";
   };
 
   build-system = with python3.pkgs; [
@@ -161,15 +177,13 @@ python3.pkgs.buildPythonApplication rec {
     model2vec
     vicinity
     numpy
-    bm25s
     pathspec
     questionary
     tree-sitter
-    tree-sitter-language-pack
+    semble-grammars
     orjson
     # [mcp] extra:
     mcp
-    watchfiles
   ];
 
   nativeBuildInputs = [ makeWrapper ];
@@ -204,7 +218,7 @@ python3.pkgs.buildPythonApplication rec {
 
   passthru = {
     category = "Memory & Code Intelligence";
-    inherit model2vec vicinity bm25s;
+    inherit model2vec vicinity semble-grammars;
   };
 
   meta = with lib; {
