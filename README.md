@@ -622,6 +622,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/entire/package.nix](packages/entire/package.nix)
 
 </details>
+<details>
+<summary><strong>mindwalk</strong> - Visualization tool that replays coding-agent sessions on a 3D map of your codebase</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/cosmtrek/mindwalk
+- **Usage**: `nix run github:numtide/llm-agents.nix#mindwalk -- --help`
+- **Nix**: [packages/mindwalk/package.nix](packages/mindwalk/package.nix)
+
+</details>
 
 ### Workflow & Project Management
 
