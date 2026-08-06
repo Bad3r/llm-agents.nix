@@ -1,40 +1,31 @@
 diff --git a/bun.lock b/bun.lock
-index b5a4666..e3df8a7 100644
+index a9bce8c..36178b6 100644
 --- a/bun.lock
 +++ b/bun.lock
 @@ -63,7 +63,7 @@
      },
      "apps/opencode-plugin": {
        "name": "@plannotator/opencode",
--      "version": "0.24.1",
-+      "version": "0.25.1",
-       "dependencies": {
-         "@opencode-ai/plugin": "^1.1.10",
-       },
-@@ -85,7 +85,7 @@
+-      "version": "0.25.1",
++      "version": "0.26.1",
+       "devDependencies": {
+         "@opencode-ai/plugin": "0.0.0-next-16775",
+         "@plannotator/server": "workspace:*",
+@@ -80,7 +80,7 @@
      },
      "apps/pi-extension": {
        "name": "@plannotator/pi-extension",
--      "version": "0.24.1",
-+      "version": "0.25.1",
+-      "version": "0.25.1",
++      "version": "0.26.1",
        "dependencies": {
          "@joplin/turndown-plugin-gfm": "^1.0.64",
-         "@pierre/diffs": "1.2.8",
-@@ -148,7 +148,7 @@
-     },
-     "apps/vscode-extension": {
-       "name": "plannotator-webview",
--      "version": "0.16.7",
-+      "version": "0.16.8",
-       "devDependencies": {
-         "@types/bun": "latest",
-         "@types/vscode": "^1.85.0",
-@@ -224,7 +224,7 @@
+         "@pierre/diffs": "1.3.2",
+@@ -219,7 +219,7 @@
      },
      "packages/server": {
        "name": "@plannotator/server",
--      "version": "0.24.1",
-+      "version": "0.25.1",
+-      "version": "0.25.1",
++      "version": "0.26.1",
        "dependencies": {
-         "@pierre/diffs": "1.2.8",
+         "@pierre/diffs": "1.3.2",
          "@plannotator/ai": "workspace:*",

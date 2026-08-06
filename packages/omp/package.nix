@@ -160,12 +160,6 @@ stdenv.mkDerivation {
     sed -i 's/"bun": ">=[0-9.]*"/"bun": ">='"$(bun --version)"'"/' \
       packages/utils/package.json
 
-    # swarm-extension pins @oh-my-pi/pi-coding-agent to a stale major, which
-    # bun can't satisfy locally and would fetch from npm. Use the workspace
-    # reference instead.
-    sed -i 's|"@oh-my-pi/pi-coding-agent": "[0-9][^"]*"|"@oh-my-pi/pi-coding-agent": "workspace:*"|' \
-      packages/swarm-extension/package.json bun.lock
-
     # Placeholder client bundle avoids building the full React dashboard.
     cat > packages/stats/src/embedded-client.generated.txt <<'PLACEHOLDER'
     export const EMBEDDED_CLIENT_ARCHIVE_TAR_GZ_BASE64 = "";

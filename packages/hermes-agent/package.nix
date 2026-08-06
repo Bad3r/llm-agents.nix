@@ -163,13 +163,13 @@ let
     };
   };
 
-  version = "2026.7.30";
+  version = "2026.8.3";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-JVpdkcgrx+TGKayql/hzhTx+zuyaFATGEtVkBo1aPCc=";
+    hash = "sha256-S6TSGgpf37N8YgbTv70dT+LaPiiaQ4/lJV+js2hnCPk=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -180,11 +180,17 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-ZeZcsYELAqUO9/QjHJt6BWdFJ9o4zMgsK9JB6SfnouI=";
+    npmDepsHash = "sha256-33ALD6Th++LCp8JiVO6ba27GhuP3GBuLGUuyoJg99iM=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
-    npmFlags = [ "--ignore-scripts" ];
+    # Upstream's .npmrc sets engine-strict=true and package.json rejects the
+    # npm range shipped with nixpkgs' nodejs to work around a min-release-age
+    # bug, which is irrelevant for the offline install here.
+    npmFlags = [
+      "--ignore-scripts"
+      "--engine-strict=false"
+    ];
     env.ELECTRON_SKIP_BINARY_DOWNLOAD = "1";
 
     buildPhase = ''

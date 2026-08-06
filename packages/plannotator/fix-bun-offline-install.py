@@ -26,10 +26,9 @@ HOISTED = {
     "@pierre/diffs",
     "@plannotator/webtui",
     "chokidar",
+    "jsonc-parser",
     "parse5",
     "turndown",
-    # 0.23.0 added a packages/core workspace whose typescript devDependency
-    # triggers another offline manifest lookup.
     "typescript",
 }
 
