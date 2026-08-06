@@ -12,16 +12,21 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.21";
+  version = "0.1.24";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-R2W/Iv0nlh8LVQWsgEcFF/Onnszdy0OmyYW5qTJF3MA=";
+    hash = "sha256-4EyI8pjWQoA6aSsViNGCGU/TY+1oApPPmTOg7elApr0=";
   };
 
-  cargoHash = "sha256-oi59kBTWzt+aiNq0e+UB3ClWdzZAfbglFRQmh/Cez/s=";
+  cargoHash = "sha256-WOtKAoY1W0FY0bEXl0IEc4GQukkIgh+KHfyHhtU4lpQ=";
+
+  # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
+  # build user, which has no per-user launchd domain, making every doctor
+  # invocation (and thus its tests) error out. Degrade to "unknown" instead.
+  patches = [ ./daemon-status-unknown-without-gui-domain.patch ];
 
   # Some tests infer the project key from the checkout directory name
   # ("aven" -> "AVN"), but Nix unpacks into "source".

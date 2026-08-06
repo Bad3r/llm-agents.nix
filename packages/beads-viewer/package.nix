@@ -29,8 +29,8 @@ buildGoModule rec {
   ldflags = [
     "-s"
     "-w"
-    # Since 0.19.0 the version is injected into the unexported `version`
-    # variable and resolved in init(); the exported `Version` is overwritten.
+    # Upstream resolves the exported Version in init() from the unexported
+    # `version` variable, so inject there.
     "-X github.com/Dicklesworthstone/beads_viewer/pkg/version.version=v${version}"
   ];
 
