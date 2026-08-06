@@ -517,16 +517,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>catnip</strong> - Developer environment that's like catnip for agentic programming</summary>
-
-- **Source**: binary
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/wandb/catnip
-- **Usage**: `nix run github:numtide/llm-agents.nix#catnip -- --help`
-- **Nix**: [packages/catnip/package.nix](packages/catnip/package.nix)
-
-</details>
-<details>
 <summary><strong>cc-switch-cli</strong> - CLI version of CC Switch - All-in-One Assistant for Claude Code, Codex & Gemini CLI</summary>
 
 - **Source**: source

@@ -9,6 +9,7 @@
   rustPlatform,
   pkg-config,
   makeWrapper,
+  rcodesign,
   formatelf,
   zlib,
   libopus,
@@ -75,7 +76,8 @@ stdenv.mkDerivation {
     # audiopus_sys (new dependency in 17.1.3) builds bundled libopus via cmake
     cmake
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ rcodesign ];
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
@@ -261,6 +263,12 @@ stdenv.mkDerivation {
     }"}
 
     runHook postInstall
+  '';
+
+  # Re-sign the bun-compiled binary after fixup. fixDarwinDylibNames may run
+  # install_name_tool, and Bun can produce invalid signatures on newer macOS.
+  postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    ${lib.getExe rcodesign} sign --code-signature-flags linker-signed $out/lib/omp/omp
   '';
 
   # Workers and the stats dashboard only fail at runtime when their bunfs

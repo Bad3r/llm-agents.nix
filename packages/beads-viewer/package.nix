@@ -8,13 +8,13 @@
 
 buildGoModule rec {
   pname = "beads-viewer";
-  version = "0.18.0";
+  version = "0.19.0";
 
   src = fetchFromGitHub {
     owner = "Dicklesworthstone";
     repo = "beads_viewer";
     tag = "v${version}";
-    hash = "sha256-jVqC3UtvshTngKFOL3/F+NpBQ8qdVs5GgBXL0lqE2lE=";
+    hash = "sha256-7vXDhVPFKxRu/04VkpILjmljfkgpKBrkEU2uSy8Oeks=";
   };
 
   vendorHash = null;
@@ -29,7 +29,9 @@ buildGoModule rec {
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/Dicklesworthstone/beads_viewer/pkg/version.Version=v${version}"
+    # Since 0.19.0 the version is injected into the unexported `version`
+    # variable and resolved in init(); the exported `Version` is overwritten.
+    "-X github.com/Dicklesworthstone/beads_viewer/pkg/version.version=v${version}"
   ];
 
   doCheck = false;

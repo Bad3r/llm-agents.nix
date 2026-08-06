@@ -7,6 +7,7 @@
   rustPlatform,
   callPackage,
   zig_0_15,
+  installShellFiles,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -50,6 +51,7 @@ let
 
     nativeBuildInputs = [
       zig_0_15
+      installShellFiles
     ];
 
     # zig's setup hook overrides buildPhase/installPhase with `zig build`,
@@ -84,6 +86,13 @@ let
     # sandbox.
     doCheck = false;
 
+    postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd herdr \
+        --bash <("$out/bin/herdr" completion bash) \
+        --fish <("$out/bin/herdr" completion fish) \
+        --zsh <("$out/bin/herdr" completion zsh)
+    '';
+
     doInstallCheck = true;
     nativeInstallCheckInputs = [
       versionCheckHook
@@ -115,10 +124,21 @@ let
 
     dontUnpack = true;
 
+    nativeBuildInputs = [
+      installShellFiles
+    ];
+
     installPhase = ''
       runHook preInstall
       install -Dm755 $src $out/bin/herdr
       runHook postInstall
+    '';
+
+    postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd herdr \
+        --bash <("$out/bin/herdr" completion bash) \
+        --fish <("$out/bin/herdr" completion fish) \
+        --zsh <("$out/bin/herdr" completion zsh)
     '';
 
     doInstallCheck = true;
