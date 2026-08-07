@@ -9,16 +9,16 @@
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "codex-acp";
-  version = "1.1.9";
+  version = "1.1.13";
 
   src = fetchFromGitHub {
     owner = "agentclientprotocol";
     repo = "codex-acp";
     tag = "v${version}";
-    hash = "sha256-c8Sgj9XNDAO25UOa+vEy619mSi3tG3NJHbKnV1QzOo8=";
+    hash = "sha256-tP0eF6zWeTxgRfrrYgWBC79b0gMr6odnfqQcPw5J7mc=";
   };
 
-  npmDepsHash = "sha256-Ix8r1YOQgCQl3fAK+PYY5dflTjXfMrsTGnUFpOqVDhw=";
+  npmDepsHash = "sha256-Z+5Xykj7dKr0UiR5g4RtJdOMQt1H8KSwPHV3JsKdEE4=";
   makeCacheWritable = true;
 
   # Disable install scripts to avoid platform-specific dependency fetching issues

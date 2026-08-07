@@ -3319,10 +3319,6 @@
     url = "https://registry.npmjs.org/highlight.js/-/highlight.js-10.7.3.tgz";
     hash = "sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==";
   };
-  "highlight.js@11.11.1" = fetchurl {
-    url = "https://registry.npmjs.org/highlight.js/-/highlight.js-11.11.1.tgz";
-    hash = "sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==";
-  };
   "hono@4.12.25" = fetchurl {
     url = "https://registry.npmjs.org/hono/-/hono-4.12.25.tgz";
     hash = "sha512-2NFaIyNVgJmBs/ecmtGzlmluTFs5cHEWGTdu0t1HBwYzoGXOL5nUQBRMXsXWla5i4KkG//QMzVP88m1+I3fdAQ==";
