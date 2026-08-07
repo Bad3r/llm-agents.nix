@@ -351,6 +351,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>prime-agent</strong> - A self-improving RLM agent for coding workflows and long-running autonomous tasks.</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/PrimeIntellect-ai/prime-agent
+- **Usage**: `nix run github:numtide/llm-agents.nix#prime-agent -- --help`
+- **Nix**: [packages/prime-agent/package.nix](packages/prime-agent/package.nix)
+
+</details>
+<details>
 <summary><strong>qoder-cli</strong> - Qoder AI CLI tool - Terminal-based AI assistant for code development</summary>
 
 - **Source**: binary
@@ -378,6 +388,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/esengine/DeepSeek-Reasonix
 - **Usage**: `nix run github:numtide/llm-agents.nix#reasonix -- --help`
 - **Nix**: [packages/reasonix/package.nix](packages/reasonix/package.nix)
+
+</details>
+<details>
+<summary><strong>t3code</strong> - Control surface for coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://t3.codes
+- **Usage**: `nix run github:numtide/llm-agents.nix#t3code -- --help`
+- **Nix**: [packages/t3code/package.nix](packages/t3code/package.nix)
+
+</details>
+<details>
+<summary><strong>t3code-desktop</strong> - Desktop control surface for coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://t3.codes
+- **Usage**: `nix run github:numtide/llm-agents.nix#t3code-desktop -- --help`
+- **Nix**: [packages/t3code-desktop/package.nix](packages/t3code-desktop/package.nix)
 
 </details>
 <details>
@@ -723,6 +753,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/dollspace-gay/chainlink
 - **Usage**: `nix run github:numtide/llm-agents.nix#chainlink -- --help`
 - **Nix**: [packages/chainlink/package.nix](packages/chainlink/package.nix)
+
+</details>
+<details>
+<summary><strong>collie</strong> - Mobile web UI to monitor and reply to your Herdr agent herd over Tailscale</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/AltanS/collie
+- **Usage**: `nix run github:numtide/llm-agents.nix#collie -- --help`
+- **Nix**: [packages/collie/package.nix](packages/collie/package.nix)
 
 </details>
 <details>

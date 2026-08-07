@@ -388,13 +388,16 @@ python3.pkgs.buildPythonApplication {
     "--set"
     "HERMES_NODE"
     "${nodejs}/bin/node"
-    # Skills are copied to $out/share/hermes in postInstall; point hermes at them.
+    # Runtime data is copied to $out/share/hermes in postInstall; point Hermes at it.
     "--set"
     "HERMES_BUNDLED_SKILLS"
     "${placeholder "out"}/share/hermes/skills"
     "--set"
     "HERMES_OPTIONAL_SKILLS"
     "${placeholder "out"}/share/hermes/optional-skills"
+    "--set"
+    "HERMES_BUNDLED_PLUGINS"
+    "${placeholder "out"}/share/hermes/plugins"
     # Disable runtime pip installs; absent extras disable cleanly.
     "--set"
     "HERMES_DISABLE_LAZY_INSTALLS"
@@ -406,12 +409,14 @@ python3.pkgs.buildPythonApplication {
     "${nodejs}/bin"
   ];
 
-  # Skills are shipped as setup.py data_files, which the wheel build drops;
-  # install them manually.
+  # Upstream keeps runtime data outside site-packages and locates it through
+  # wrapper environment variables. Preserve that layout because setuptools
+  # intentionally omits plugin manifests from the wheel since 2026.8.3.
   postInstall = ''
     mkdir -p $out/share/hermes
     cp -r ${src}/skills $out/share/hermes/skills
     cp -r ${src}/optional-skills $out/share/hermes/optional-skills
+    cp -r ${src}/plugins $out/share/hermes/plugins
   '';
 
   pythonRelaxDeps = [
@@ -464,10 +469,12 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_PYTHON_SRC_ROOT $out/bin/hermes
     grep -q HERMES_BUNDLED_SKILLS $out/bin/hermes
     grep -q HERMES_OPTIONAL_SKILLS $out/bin/hermes
+    grep -q HERMES_BUNDLED_PLUGINS $out/bin/hermes
     test -f ${hermes-frontend}/lib/hermes-tui/dist/entry.js
     test -f ${hermes-frontend}/share/hermes-web/index.html
     test -d $out/share/hermes/skills
     test -d $out/share/hermes/optional-skills
+    test -n "$(find $out/share/hermes/plugins -name plugin.yaml -print -quit)"
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
     # Slash workers run HERMES_PYTHON with PYTHONPATH=HERMES_PYTHON_SRC_ROOT.
     PYTHONPATH="$out/${python3.sitePackages}" \

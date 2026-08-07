@@ -29,6 +29,11 @@ inputs.nixpkgs.lib.extend (
         githubId = 73943355;
         name = "chernistry";
       };
+      dancodes = {
+        github = "dan-online";
+        githubId = 41877062;
+        name = "DanCodes";
+      };
       ypares = {
         github = "YPares";
         githubId = 1377233;
