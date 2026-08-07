@@ -6,13 +6,13 @@
 
 buildGoModule rec {
   pname = "mindwalk";
-  version = "0.4.0";
+  version = "0.5.0";
 
   src = fetchFromGitHub {
     owner = "cosmtrek";
     repo = "mindwalk";
     tag = "v${version}";
-    hash = "sha256-kKqW+yeHYR1eZopxspJ8xiZszQcrW+MvMBynhbtzKpU=";
+    hash = "sha256-CZ+E66X/sfytCmqYD96iNesLZYmbWZ/u9V6pDiljxaA=";
   };
 
   vendorHash = "sha256-qVoj03LNLbdoCUAOydK7oEHsuZ1BZ6Z2jwYB3gPOfrw=";
