@@ -78,6 +78,7 @@
         "openai": "^5.12.2",
         "png-chunk-text": "1.0.0",
         "png-chunks-extract": "1.0.0",
+        "postcss": "^8.5.8",
         "pptx2json": "^0.0.10",
         "process": "^0.11.10",
         "qrcode-terminal": "^0.12.0",

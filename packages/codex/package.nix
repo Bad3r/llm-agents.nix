@@ -75,6 +75,12 @@ rustPlatform.buildRustPackage (
 
     env = {
       RUSTY_V8_ARCHIVE = librusty_v8;
+    }
+    // lib.optionalAttrs (librusty_v8 ? srcBinding) {
+      # rusty_v8 >= 150 include!s this instead of running bindgen.
+      RUSTY_V8_SRC_BINDING_PATH = librusty_v8.srcBinding;
+    }
+    // {
       # Cap concurrent rustc jobs to keep peak RSS bounded with ThinLTO on the
       # 16 GiB aarch64 builder.
       CARGO_BUILD_JOBS = "2";
