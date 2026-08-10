@@ -17,13 +17,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "mcporter";
-  version = "0.13.1";
+  version = "0.13.2";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "mcporter";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-CutzNS7n2ngQUNbh7l96vLbtTMsqUdifz0ynlaT8Lvo=";
+    hash = "sha256-GLb7SgUyeuq/+Wya1fxO91RSmLkFLz6LEgzVRb1gnik=";
   };
 
   # Upstream's lockfile was generated before the pnpm.overrides entry for vite
