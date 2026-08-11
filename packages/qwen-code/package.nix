@@ -16,16 +16,16 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "qwen-code";
-  version = "0.21.8";
+  version = "0.21.9";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-NsYB6AbAn2xKuqjyb50XMqNTaqAgA2SoXcttohImjVA=";
+    hash = "sha256-7HKrd28LMN0WFsOycZDYsQOiQJcPGwimvWd77doLJ5U=";
   };
 
-  npmDepsHash = "sha256-Vk9W0Q3ysJlgoVp6tytczD29JVnwa1U5G66OcA1dCWU=";
+  npmDepsHash = "sha256-XESo75Mw+PUPTTYy0Ur8++XlYHKcE0jrrzK1wDB9YRw=";
   makeCacheWritable = true;
 
   nativeBuildInputs = [
