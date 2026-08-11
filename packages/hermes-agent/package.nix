@@ -282,6 +282,23 @@ let
     ];
   });
 
+  # Upstream pins agent-client-protocol==0.9.0; nixpkgs' 0.11.x regenerated the
+  # ACP schema and dropped ModelInfo/SetSessionModelResponse/SessionModelState,
+  # which acp_adapter still imports, so hermes-acp fails at startup (#7650).
+  agent-client-protocol' = python3.pkgs.agent-client-protocol.overridePythonAttrs (old: {
+    version = "0.9.0";
+    src = old.src.override {
+      tag = "0.9.0";
+      hash = "sha256-8Xf2S85yNsP/HhpCw9UqdoDdeDHdggvYcnvJbilAVuU=";
+    };
+    # 0.9.0 predates the tests/http suite that nixpkgs' expression disables.
+    disabledTestPaths = [ ];
+    disabledTests = (old.disabledTests or [ ]) ++ [
+      # subprocess spawn exceeds the 2s timeout in the sandbox
+      "test_run_agent_stdio_buffer_limit"
+    ];
+  });
+
   optionalDeps = with python3.pkgs; {
     gateway = [
       # [messaging] / [slack]
@@ -316,7 +333,7 @@ let
       # [pty]
       ptyprocess
       # [acp]
-      agent-client-protocol
+      agent-client-protocol'
       # [voice]
       sounddevice
       numpy
@@ -354,7 +371,13 @@ python3.pkgs.buildPythonApplication {
   # import Hermes modules or its dependencies under Nix; run them with the
   # wrapper-provided interpreter and source root instead of leaking a global
   # PYTHONPATH into every subprocess Hermes spawns.
-  patches = [ ./slash-worker-hermes-python.patch ];
+  # DaemonThreadPoolExecutor mirrors CPython <=3.13 ThreadPoolExecutor
+  # internals; Python 3.14 refactored _worker around WorkerContext, so every
+  # tool call fails with AttributeError: no attribute '_initializer' (#7725).
+  patches = [
+    ./slash-worker-hermes-python.patch
+    ./daemon-pool-python314.patch
+  ];
 
   postPatch = ''
     substituteInPlace tools/lazy_deps.py \
@@ -444,6 +467,8 @@ python3.pkgs.buildPythonApplication {
     "hermes_cli"
     "hermes_cli.dashboard_auth"
     "hermes_cli.proxy"
+    # #7650: acp_adapter needs the pre-0.11 ACP schema; assert it imports.
+    "acp_adapter.server"
     # #4175: adapters swallow ImportError, so assert these import.
     "slack_bolt"
     "discord"
@@ -479,6 +504,10 @@ python3.pkgs.buildPythonApplication {
     # Slash workers run HERMES_PYTHON with PYTHONPATH=HERMES_PYTHON_SRC_ROOT.
     PYTHONPATH="$out/${python3.sitePackages}" \
       ${pythonEnv}/bin/python3 -c 'import tui_gateway.slash_worker, yaml'
+    # #7725: DaemonThreadPoolExecutor mirrors CPython ThreadPoolExecutor
+    # internals; assert submit() actually executes work on this Python.
+    PYTHONPATH="$out/${python3.sitePackages}" \
+      ${pythonEnv}/bin/python3 -c 'from tools.daemon_pool import DaemonThreadPoolExecutor; assert DaemonThreadPoolExecutor(max_workers=1).submit(lambda: 42).result(timeout=30) == 42'
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
     # Matrix E2EE: mautrix.crypto must import and the disable switch wired in.

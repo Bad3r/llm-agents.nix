@@ -1,5 +1,5 @@
 # Vendored from upstream's own from-source nix expression:
-#   https://github.com/getpaseo/paseo/blob/v0.1.85/nix/desktop-package.nix
+#   https://github.com/getpaseo/paseo/blob/v0.3.1/nix/desktop-package.nix
 #
 # Adaptations for this repo:
 #   - src: fetchFromGitHub of the release tag instead of `cleanSourceWith ./..`
@@ -37,18 +37,18 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "paseo-desktop";
-  version = "0.2.5";
+  version = "0.3.1";
 
   src = fetchFromGitHub {
     owner = "getpaseo";
     repo = "paseo";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-3IMEyJS0z83peC1Vzvtj2m+7hm3Uss1qOoE5sMGFITM=";
+    hash = "sha256-m97Pf857LNv871b95cJ2y34OFxoES8JsWsp0wD3Em4I=";
   };
 
   nodejs = nodejs_22;
 
-  npmDepsHash = "sha256-hfgL1mP4le75DQZbVTrOFJ1EqQQJK2HOMc0TFbnKneg=";
+  npmDepsHash = "sha256-8W/OAcEqysf4CQlCFFOyh9Qgvs0EModfBWrMU6MQX9k=";
   npmDepsFetcherVersion = 2;
 
   # Prevent onnxruntime-node's install script from running during automatic
@@ -82,8 +82,8 @@ buildNpmPackage (finalAttrs: {
     # Native deps (terminal emulation; libuv-linked on Linux).
     # node-gyp-build skips compilation when a matching prebuilt binary exists,
     # so remove the bundled prebuilds first to force a real build.
-    rm -rf node_modules/node-pty/prebuilds
-    npm rebuild node-pty
+    rm -rf packages/server/node_modules/node-pty/prebuilds
+    npm rebuild node-pty --workspace=@getpaseo/server
 
     # Server workspaces (highlight + relay + protocol + client + server + cli)
     npm run build:server
@@ -138,7 +138,7 @@ buildNpmPackage (finalAttrs: {
       echo packages/desktop/package.json
       # node-pty's compiled addon: loaded via a runtime-computed path that
       # static tracing cannot follow (build/Release is checked first).
-      find node_modules/node-pty/build/Release -maxdepth 1 -type f
+      find packages/server/node_modules/node-pty/build/Release -maxdepth 1 -type f
       if [ -d skills ]; then find skills -type f; fi
       # Root package.json lets node resolve the workspace layout.
       echo package.json

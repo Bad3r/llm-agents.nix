@@ -45,6 +45,7 @@ ignore = [
   "EXE003", # nix shebang is valid
   "EXE005", # nix multi-line shebang is valid
   "COM812", # conflicts with formatter
+  "CPY",    # no copyright header requirement
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -53,5 +54,5 @@ ignore = [
 ] # shared module for standalone CI scripts, not a package
 
 [tool.ruff.lint.pylint]
-max-args = 7     # Allow more arguments for updater classes
+max-args = 8     # Allow more arguments for updater classes
 max-returns = 10

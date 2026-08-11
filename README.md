@@ -504,6 +504,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>paperclip</strong> - Open-source control plane for managing teams of AI agents</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://paperclip.ing
+- **Usage**: `nix run github:numtide/llm-agents.nix#paperclip -- --help`
+- **Nix**: [packages/paperclip/package.nix](packages/paperclip/package.nix)
+
+</details>
+<details>
 <summary><strong>picoclaw</strong> - Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity</summary>
 
 - **Source**: source

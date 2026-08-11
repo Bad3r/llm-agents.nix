@@ -1,6 +1,8 @@
 {
   lib,
   stdenv,
+  stdenvNoCC,
+  fetchurl,
   fetchFromGitHub,
   bun2nixLib,
   bun,
@@ -17,6 +19,8 @@
   zig,
   cmake,
   libpulseaudio,
+  unzip,
+  pipewire,
 }:
 
 let
@@ -24,17 +28,26 @@ let
   inherit (versionData) version hash cargoHash;
   platformsBySystem = {
     aarch64-darwin = {
-      bunTarget = "bun-darwin-arm64";
+      bunTemplate = {
+        name = "bun-darwin-aarch64";
+        hash = "sha256-2LliIYKK1vl6x6wKt+lYcjQa92MAHogD6CZ2UsJlJiA=";
+      };
       nativeLib = "libpi_natives.dylib";
       nodeTag = "darwin-arm64";
     };
     aarch64-linux = {
-      bunTarget = "bun-linux-arm64";
+      bunTemplate = {
+        name = "bun-linux-aarch64";
+        hash = "sha256-on/7Y6gxA3WDbg1vZorhf6jY0YuIw3yCHGUzGXOhmjs=";
+      };
       nativeLib = "libpi_natives.so";
       nodeTag = "linux-arm64";
     };
     x86_64-linux = {
-      bunTarget = "bun-linux-x64-modern";
+      bunTemplate = {
+        name = "bun-linux-x64";
+        hash = "sha256-lR7iruhV8IWVruxiJSJqKY0/6oOj3NZGXAnLzN9+hI8=";
+      };
       nativeLib = "libpi_natives.so";
       nodeTag = "linux-x64";
     };
@@ -42,6 +55,32 @@ let
   platform =
     platformsBySystem.${stdenv.hostPlatform.system}
       or (throw "Unsupported platform for omp: ${stdenv.hostPlatform.system}");
+  # Bun 1.3.14's compiler corrupts Nix-patched executable templates
+  # (oven-sh/bun#31023), so Bun 1.3.13 writes OMP into an unmodified 1.3.14
+  # template. Remove once a stable release contains oven-sh/bun#31024.
+  bunRuntimeVersion = "1.3.14";
+  bunRuntimeTemplate = stdenvNoCC.mkDerivation {
+    pname = "omp-bun-runtime-template";
+    version = bunRuntimeVersion;
+
+    src = fetchurl {
+      url = "https://github.com/oven-sh/bun/releases/download/bun-v${bunRuntimeVersion}/${platform.bunTemplate.name}.zip";
+      inherit (platform.bunTemplate) hash;
+    };
+
+    sourceRoot = platform.bunTemplate.name;
+    nativeBuildInputs = [ unzip ];
+    dontConfigure = true;
+    dontBuild = true;
+    # This is build data, not run here. Fixup would alter the PT_LOAD layout.
+    dontFixup = true;
+
+    installPhase = ''
+      runHook preInstall
+      install -Dm755 ./bun $out/libexec/bun
+      runHook postInstall
+    '';
+  };
   rustTarget = stdenv.hostPlatform.rust.rustcTarget;
 
   src = fetchFromGitHub {
@@ -54,6 +93,7 @@ in
 stdenv.mkDerivation {
   pname = "omp";
   inherit version src;
+  patches = [ ./use-bun-executable-template.patch ];
 
   cargoDeps = rustPlatform.fetchCargoVendor {
     name = "omp-${version}-cargo-vendor";
@@ -67,8 +107,7 @@ stdenv.mkDerivation {
     rustc
     cargo
     rustPlatform.cargoSetupHook
-    # bindgen (zlob, maudio-sys) needs libclang plus the correct clang flags
-    # to find libc headers such as pthread.h.
+    # bindgen (zlob, maudio-sys) needs libclang and clang flags for libc headers
     rustPlatform.bindgenHook
     pkg-config
     makeWrapper
@@ -84,15 +123,15 @@ stdenv.mkDerivation {
     zlib
     # audiopus_sys links against opus (found via pkg-config)
     libopus
+    # pi-natives' wayland-pipewire feature links system libpipewire (pkg-config)
+    pipewire
   ];
 
-  # cmake is only needed by the audiopus_sys build script, not for configuring
-  # this derivation itself.
+  # cmake is only for audiopus_sys' build script, not this derivation
   dontUseCmakeConfigure = true;
 
-  # smallvec's `specialization` feature requires nightly Rust.
-  # RUSTC_BOOTSTRAP=1 enables nightly features on stable rustc.
   env = {
+    # smallvec's `specialization` feature needs nightly features on stable rustc
     RUSTC_BOOTSTRAP = 1;
     # audiopus_sys' bundled opus ships a cmake_minimum_required older than
     # what nixpkgs' cmake 4.x still accepts.
@@ -136,12 +175,11 @@ stdenv.mkDerivation {
     "
   '';
 
-  # We handle build and install ourselves
   dontUseBunBuild = true;
   dontUseBunInstall = true;
   dontRunLifecycleScripts = true;
 
-  # bun compile embeds JS in the binary; stripping would break it
+  # bun compile embeds JS in the binary. Stripping would break it.
   dontStrip = true;
 
   postPatch = ''
@@ -154,11 +192,6 @@ stdenv.mkDerivation {
     done
     sed -i 's/: "\^/: "/g; s/: "~/: "/g' bun.lock
 
-    # Relax engines.bun to the bun doing the compile, otherwise omp refuses
-    # to start when the embedded runtime is older than upstream's minimum
-    # (issue #4996).
-    sed -i 's/"bun": ">=[0-9.]*"/"bun": ">='"$(bun --version)"'"/' \
-      packages/utils/package.json
 
     # Placeholder client bundle avoids building the full React dashboard.
     cat > packages/stats/src/embedded-client.generated.txt <<'PLACEHOLDER'
@@ -169,21 +202,19 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
 
-    # Native node modules like @napi-rs/cli need libstdc++ at build time
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       export LD_LIBRARY_PATH="${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}"
     ''}
 
-    # Build the Rust native addon
     echo "Building Rust native addon..."
-    cargo build --release -p pi-natives --target ${rustTarget} --target-dir target
+    cargo build --release -p pi-natives \
+      ${lib.optionalString stdenv.hostPlatform.isLinux "--features wayland-pipewire"} \
+      --target ${rustTarget} --target-dir target
 
-    # Install the native addon where the JS code expects it
     mkdir -p packages/natives/native
     cp target/${rustTarget}/release/${platform.nativeLib} \
        packages/natives/native/pi_natives.${platform.nodeTag}.node
 
-    # Generate the napi type definitions and JS loader
     napiBin="$(pwd)/node_modules/.bin/napi"
     if [ -x "$napiBin" ]; then
       "$napiBin" build \
@@ -197,43 +228,37 @@ stdenv.mkDerivation {
         || echo "napi CLI post-processing failed; using cargo output directly"
     fi
 
-    # Generate runtime enum exports from const enums in the type definitions
     if [ -f packages/natives/scripts/gen-enums.ts ] && \
        [ -f packages/natives/native/index.d.ts ]; then
       bun packages/natives/scripts/gen-enums.ts || true
     fi
 
-    # --generate embeds the omp:// docs index; without it the script is a no-op
+    # --generate embeds the omp:// docs index. Without it the script is a no-op
     # and the binary ships no docs, breaking omp:// reads.
     echo "Generating docs index..."
     bun packages/coding-agent/scripts/generate-docs-index.ts --generate
 
-    # Generate the embedded stats dashboard client bundle. Bun.Archive.write
-    # stamps each tar header with the current time, so normalize the archive
-    # afterwards to keep the compiled binary reproducible (issue #6534).
+    # Bun.Archive.write stamps tar headers with the current time. Normalize
+    # afterwards for reproducibility (issue #6534).
     echo "Generating embedded stats dashboard..."
     bun --cwd packages/stats scripts/generate-client-bundle.ts --generate
     bun ${./normalize-embedded-client.ts} \
       packages/stats/src/embedded-client.generated.txt
 
-    # Generate the embedded HTML-export tool-views bundle (coding-agent prepack
-    # step): export/html/index.ts text-imports ./tool-views.generated.js, which
-    # bun compile cannot resolve unless it is generated first.
+    # export/html/index.ts text-imports ./tool-views.generated.js, which must
+    # exist before bun compile.
     echo "Generating embedded HTML-export tool-views..."
     bun --cwd packages/collab-web scripts/build-tool-views.ts
 
-    # Since v16.4.6 mupdf is bundled into the binary and its wasm blob is
-    # embedded via a generated helper (upstream gen:mupdf); --external mupdf
-    # no longer works because the compiled bunfs cannot resolve it.
+    # Since v16.4.6 mupdf's wasm blob must be embedded via a generated helper.
+    # --external mupdf no longer works in the compiled bunfs.
     echo "Embedding mupdf wasm..."
     bun packages/coding-agent/scripts/embed-mupdf-wasm.ts --generate
 
-    # Compile the standalone binary. Since v16.4.6 the binary needs the
-    # in-memory omp-legacy-pi-modules virtual module, which only the
-    # Bun.build() plugin from upstream's compile-binary.ts can provide, so
-    # drive that helper instead of `bun build --compile`.
+    # compile-standalone.ts drives upstream's compile-binary.ts helper because
+    # `bun build --compile` cannot load the required virtual-module plugin.
     echo "Compiling standalone binary..."
-    (cd packages/coding-agent && bun ${./compile-standalone.ts} "${platform.bunTarget}")
+    (cd packages/coding-agent && bun ${./compile-standalone.ts} "${bunRuntimeTemplate}/libexec/bun")
 
     runHook postBuild
   '';
@@ -253,24 +278,26 @@ stdenv.mkDerivation {
         zlib
         stdenv.cc.cc.lib
         libpulseaudio
+        pipewire
       ]
     }"}
 
     runHook postInstall
   '';
 
-  # Re-sign the bun-compiled binary after fixup. fixDarwinDylibNames may run
-  # install_name_tool, and Bun can produce invalid signatures on newer macOS.
+  # Re-sign after fixup: install_name_tool and Bun can leave invalid signatures
   postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
     ${lib.getExe rcodesign} sign --code-signature-flags linker-signed $out/lib/omp/omp
   '';
 
   # Workers and the stats dashboard only fail at runtime when their bunfs
-  # entrypoints are missing; the smoke test catches that at build time.
+  # entrypoints are missing. The smoke test catches that at build time.
   doInstallCheck = true;
   installCheckPhase = ''
     runHook preInstallCheck
     HOME=$TMPDIR $out/bin/omp --smoke-test | grep -q "smoke-test: ok"
+    BUN_BE_BUN=1 $out/lib/omp/omp -e \
+      'if (Bun.version !== "${bunRuntimeVersion}" || typeof Bun.Image !== "function") process.exit(1)'
     runHook postInstallCheck
   '';
 

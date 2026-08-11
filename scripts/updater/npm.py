@@ -32,12 +32,60 @@ def _can_prefetch_npm_lockfile(lockfile: Path) -> bool:
     return True
 
 
+def _supplement_missing_optional_deps(lockfile: Path) -> None:
+    """Add lock entries for optional dependencies npm omitted.
+
+    npm skips lock entries for optional dependencies of bundled packages
+    (e.g. esbuild, tsx), which later makes ``npm ci`` reject the lockfile.
+    """
+    lock = json.loads(lockfile.read_text())
+    packages = lock["packages"]
+
+    present = {
+        key.rsplit("node_modules/", 1)[-1] for key in packages if "node_modules/" in key
+    }
+    missing = {
+        name: requirement
+        for metadata in packages.values()
+        for name, requirement in metadata.get("optionalDependencies", {}).items()
+        if name not in present
+    }
+    if not missing:
+        return
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        supplement = Path(tmpdir)
+        (supplement / "package.json").write_text(
+            json.dumps(
+                {
+                    "name": "lock-supplement",
+                    "version": "1.0.0",
+                    "optionalDependencies": missing,
+                }
+            )
+        )
+        subprocess.run(
+            ["npm", "install", "--package-lock-only", "--ignore-scripts"],
+            cwd=supplement,
+            check=True,
+        )
+        extra = json.loads((supplement / "package-lock.json").read_text())
+
+    for key, metadata in extra["packages"].items():
+        if key:
+            packages.setdefault(key, metadata)
+
+    lockfile.write_text(json.dumps(lock, indent=2) + "\n")
+    print(f"Added lock entries for {len(missing)} missing optional dependencies")
+
+
 def extract_or_generate_lockfile(
     tarball_url: str,
     output_path: Path,
     *,
     env: dict[str, str] | None = None,
     strip_dev_dependencies: bool = False,
+    supplement_optional_deps: bool = False,
 ) -> bool:
     """Extract an npm lockfile from npm tarball or generate it.
 
@@ -53,6 +101,8 @@ def extract_or_generate_lockfile(
             workspace whose devDependencies use the ``workspace:*`` protocol,
             which npm cannot resolve outside the monorepo. Mirror this with a
             matching ``del(.devDependencies)`` in the package's derivation.
+        supplement_optional_deps: Add lock entries npm omits for optional
+            dependencies of bundled packages.
 
     Returns:
         True if lockfile was successfully extracted or generated, False otherwise
@@ -116,6 +166,8 @@ def extract_or_generate_lockfile(
         new_lock = package_dir / "package-lock.json"
         if new_lock.exists():
             output_path.write_text(new_lock.read_text())
+            if supplement_optional_deps:
+                _supplement_missing_optional_deps(output_path)
             print("Generated package-lock.json")
             return True
 

@@ -48,7 +48,6 @@ def main() -> None:
 
     print(f"Updating omp from {current} to {latest}")
 
-    # Step 1: Calculate new source hash
     print("Calculating source hash...")
     url = f"https://github.com/{OWNER}/{REPO}/archive/refs/tags/v{latest}.tar.gz"
     source_hash = calculate_url_hash(url, unpack=True)
@@ -60,7 +59,6 @@ def main() -> None:
     }
     save_hashes(HASHES_FILE, data)
 
-    # Step 2: Regenerate bun.nix from upstream bun.lock
     clone_and_generate_bun_nix(
         OWNER,
         REPO,
@@ -71,7 +69,6 @@ def main() -> None:
     )
     strip_workspace_entries(BUN_NIX, "@oh-my-pi", FLAKE_ROOT)
 
-    # Step 3: Calculate cargoHash
     update_dependency_hash(".#omp", "cargoHash", HASHES_FILE, data)
 
     print(f"Updated omp to {latest}")

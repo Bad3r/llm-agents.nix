@@ -24,6 +24,7 @@ def update_npm_package(
     strip_dev_dependencies: bool = False,
     require_lockfile: bool = True,
     fetchzip: bool = False,
+    supplement_optional_deps: bool = False,
 ) -> None:
     """Update a package built from an npm registry tarball.
 
@@ -58,6 +59,7 @@ def update_npm_package(
         pkg_dir / "package-lock.json",
         env=lockfile_env,
         strip_dev_dependencies=strip_dev_dependencies,
+        supplement_optional_deps=supplement_optional_deps,
     ):
         if require_lockfile:
             sys.exit(1)
