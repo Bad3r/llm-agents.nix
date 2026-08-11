@@ -20,17 +20,17 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "prime-agent";
-  version = "0.7.1";
+  version = "0.7.2";
 
   src = fetchFromGitHub {
     owner = "PrimeIntellect-ai";
     repo = "prime-agent";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-TaDa5Iflg6eGW9Hzd6alAcwF8PU0SBG2MCLiM313YqY=";
+    hash = "sha256-rOKFkKoV2Mfg2wHioZ+2Eo3Js6C4489hxTxVu38cgbA=";
   };
 
   nodejs = nodejs_22;
-  npmDepsHash = "sha256-pecwSOAcYiBmxJOwuHK7ErXHg0QsXjQ484AAcSvfq8U=";
+  npmDepsHash = "sha256-/pu+a4hlTOCde1qwxTQ4WLVwJEVmojl9B1DBbjoxwRs=";
 
   nativeBuildInputs = [
     makeWrapper

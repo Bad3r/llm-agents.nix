@@ -6,14 +6,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.1.0";
+  version = "0.2.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-JoN3YmBVstzIFF5pxizwrSdSqPO5jlD1Qz0avU3PMgo=";
+    hash = "sha256-alS3ZF8ioOMo6v1hSAV1XV/rePhGVALh4HdgafN91Og=";
   };
 
   build-system = with python3.pkgs; [
