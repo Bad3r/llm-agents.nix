@@ -18,6 +18,7 @@ from .deps import calculate_dependency_hash, update_dependency_hash
 from .flows import (
     update_bun_github,
     update_github_source,
+    update_manifest_binaries,
     update_npm_package,
     update_platform_binaries,
 )
@@ -74,6 +75,7 @@ __all__ = [
     "update_bun_github",
     "update_dependency_hash",
     "update_github_source",
+    "update_manifest_binaries",
     "update_npm_package",
     "update_platform_binaries",
 ]

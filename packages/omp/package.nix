@@ -17,7 +17,6 @@
   libopus,
   python3,
   zig,
-  cmake,
   libpulseaudio,
   unzip,
   pipewire,
@@ -112,30 +111,23 @@ stdenv.mkDerivation {
     pkg-config
     makeWrapper
     zig
-    # audiopus_sys (new dependency in 17.1.3) builds bundled libopus via cmake
-    cmake
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [ rcodesign ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+  buildInputs = [
+    libopus
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
     zlib
-    # audiopus_sys links against opus (found via pkg-config)
-    libopus
     # pi-natives' wayland-pipewire feature links system libpipewire (pkg-config)
     pipewire
   ];
 
-  # cmake is only for audiopus_sys' build script, not this derivation
-  dontUseCmakeConfigure = true;
-
   env = {
     # smallvec's `specialization` feature needs nightly features on stable rustc
     RUSTC_BOOTSTRAP = 1;
-    # audiopus_sys' bundled opus ships a cmake_minimum_required older than
-    # what nixpkgs' cmake 4.x still accepts.
-    CMAKE_POLICY_VERSION_MINIMUM = "3.5";
   };
 
   bunDeps = bun2nixLib.fetchBunDeps {

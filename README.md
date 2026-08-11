@@ -371,6 +371,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>qoder-cli-cn</strong> - Qoder CLI (mainland China edition) - terminal-based AI coding assistant for China-region accounts</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://qoder.cn
+- **Usage**: `nix run github:numtide/llm-agents.nix#qoder-cli-cn -- --help`
+- **Nix**: [packages/qoder-cli-cn/package.nix](packages/qoder-cli-cn/package.nix)
+
+</details>
+<details>
 <summary><strong>qwen-code</strong> - Command-line AI workflow tool for Qwen3-Coder models</summary>
 
 - **Source**: source
@@ -454,16 +464,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>hermes-desktop</strong> - Desktop companion for Hermes Agent</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/fathah/hermes-desktop
-- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-desktop -- --help`
-- **Nix**: [packages/hermes-desktop/package.nix](packages/hermes-desktop/package.nix)
-
-</details>
-<details>
 <summary><strong>hermes-hud</strong> - TUI consciousness monitor for Hermes Agent</summary>
 
 - **Source**: source
@@ -471,6 +471,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/joeynyc/hermes-hud
 - **Usage**: `nix run github:numtide/llm-agents.nix#hermes-hud -- --help`
 - **Nix**: [packages/hermes-hud/package.nix](packages/hermes-hud/package.nix)
+
+</details>
+<details>
+<summary><strong>hermes-one</strong> - Hermes One, community desktop companion for Hermes Agent</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/fathah/hermes-desktop
+- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-one -- --help`
+- **Nix**: [packages/hermes-one/package.nix](packages/hermes-one/package.nix)
 
 </details>
 <details>
@@ -1382,6 +1392,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/openclaw/mcporter
 - **Usage**: `nix run github:numtide/llm-agents.nix#mcporter -- --help`
 - **Nix**: [packages/mcporter/package.nix](packages/mcporter/package.nix)
+
+</details>
+<details>
+<summary><strong>mcptoon</strong> - Token-efficient MCP CLI client that converts tool discovery and results to compact TOON output</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/activeing123/mcptoon
+- **Usage**: `nix run github:numtide/llm-agents.nix#mcptoon -- --help`
+- **Nix**: [packages/mcptoon/package.nix](packages/mcptoon/package.nix)
 
 </details>
 <details>

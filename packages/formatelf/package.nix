@@ -7,15 +7,15 @@
 }:
 
 let
-  version = "0-unstable-2025-06-11";
+  version = "0-unstable-2026-08-11";
 
   # Nix packaging is vendored in-tree; the Rust source and the setup-hook shell
   # script are fetched from upstream as a fixed-output derivation.
   src = fetchFromGitHub {
     owner = "Mic92";
     repo = "formatelf";
-    rev = "6f2d4362339ec0cb432956a05156ff483159f474";
-    hash = "sha256-90d7rLrnIAIAYEyxKBTlGNd/C246wPcZ23m8rCwuahw=";
+    rev = "2b36d819b48c0bfd4a084e6f0ce430633d8ee5f4";
+    hash = "sha256-wWCpCxVogWKo/ivGfmAmD8YE8H4CQfs52lMdKsELK/w=";
   };
 
   formatelf = rustPlatform.buildRustPackage {
