@@ -17,7 +17,7 @@ buildNpmPackage rec {
   src = fetchFromGitHub {
     owner = "kunchenguid";
     repo = "gnhf";
-    rev = "gnhf-v${version}";
+    tag = "gnhf-v${version}";
     hash = "sha256-bNxY0MGkWaHqK5OFcjrqB+WKVR6KdzXR3aV8VuPkEas=";
   };
 

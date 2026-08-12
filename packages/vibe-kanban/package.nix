@@ -31,7 +31,7 @@ let
   src = fetchFromGitHub {
     owner = "BloopAI";
     repo = "vibe-kanban";
-    rev = tag;
+    inherit tag;
     inherit hash;
   };
 

@@ -13,7 +13,7 @@ rustPlatform.buildRustPackage rec {
   src = fetchFromGitHub {
     owner = "dollspace-gay";
     repo = "chainlink";
-    rev = "chainlink-${version}";
+    tag = "chainlink-${version}";
     hash = "sha256-2n+cM1ADmeDrKZKjMY5Ct4mVxl38as4iu1Y4ZSCuBho=";
   };
 

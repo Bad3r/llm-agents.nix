@@ -53,7 +53,8 @@ buildNpmPackage {
   # The package from npm is already built
   dontNpmBuild = true;
 
-  nativeBuildInputs = lib.optional useBun bun
+  nativeBuildInputs =
+    lib.optional useBun bun
     ++ lib.optionals (useBun && stdenv.hostPlatform.isDarwin) [
       rcodesign
     ];

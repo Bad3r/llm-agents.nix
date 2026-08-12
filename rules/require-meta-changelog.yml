@@ -1,0 +1,42 @@
+id: require-meta-changelog
+language: nix
+severity: error
+message: >-
+  Every package `meta` must have a `changelog` attribute. The updater uses it to generate release notes. Use a version-specific URL matching the upstream tag format; fall back to `/releases` when tags are inconsistent.
+note: |
+  meta = {
+    changelog = "https://github.com/owner/repo/releases/tag/v${version}";
+    # ...
+  };
+# Only the top-level package definition; vendored-dependency metas inside
+# other .nix files do not need a changelog.
+files:
+  - 'packages/**/package.nix'
+# In-repo helpers and build hooks have no upstream releases.
+ignores:
+  - 'packages/buildNpmPackage/**'
+  - 'packages/darwinOpenptyHook/**'
+  - 'packages/default/**'
+  - 'packages/dolt/**'
+  - 'packages/formatelf/**'
+  - 'packages/go-bin/**'
+  - 'packages/unpinCargoMsrvHook/**'
+  - 'packages/unpinGoModVersionHook/**'
+  - 'packages/versionCheckHomeHook/**'
+  - 'packages/wrapBuddy/**'
+# Anchor on the whole file: a package.nix that defines a `meta` but never a
+# `changelog` anywhere is missing it. Per-meta matching would flag vendored
+# dependency derivations whose small metas legitimately skip changelog.
+rule:
+  kind: binding
+  has:
+    field: attrpath
+    regex: '^meta$'
+  inside:
+    kind: source_code
+    stopBy: end
+    not:
+      has:
+        stopBy: end
+        kind: attrpath
+        regex: '^changelog$'

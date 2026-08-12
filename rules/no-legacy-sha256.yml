@@ -1,0 +1,10 @@
+id: no-legacy-sha256
+language: nix
+severity: error
+message: >-
+  Use `hash = "sha256-..."` (SRI format) instead of the legacy `sha256`/`cargoSha256`/`vendorSha256` attributes. All fetchers and builders in this repo accept `hash`.
+rule:
+  kind: binding
+  has:
+    field: attrpath
+    regex: '^(sha256|cargoSha256|vendorSha256)$'

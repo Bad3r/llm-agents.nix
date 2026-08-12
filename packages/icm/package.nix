@@ -19,7 +19,7 @@ let
   icm-web-src = fetchFromGitHub {
     owner = "rtk-ai";
     repo = "icm";
-    rev = "icm-v${hashes.version}";
+    tag = "icm-v${hashes.version}";
     hash = hashes.hash;
   };
 
@@ -64,7 +64,7 @@ rustPlatform.buildRustPackage {
   src = fetchFromGitHub {
     owner = "rtk-ai";
     repo = "icm";
-    rev = "icm-v${hashes.version}";
+    tag = "icm-v${hashes.version}";
     hash = hashes.hash;
   };
 
