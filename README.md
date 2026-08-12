@@ -464,6 +464,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>hermes-desktop</strong> - Official native Electron desktop shell for Hermes Agent</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://hermes-agent.nousresearch.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#hermes-desktop -- --help`
+- **Nix**: [packages/hermes-desktop/package.nix](packages/hermes-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-hud</strong> - TUI consciousness monitor for Hermes Agent</summary>
 
 - **Source**: source

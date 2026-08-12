@@ -180,7 +180,11 @@ stdenv.mkDerivation {
 ## Linting with ast-grep
 
 Structural lint rules live in `rules/*.yml` (wired via `sgconfig.yml`). Run
-`ast-grep scan packages`; the `ast-grep` flake check enforces them in CI.
+`ast-grep scan packages`; the `treefmt` flake check (`checks/treefmt.nix`)
+enforces them in CI together with the formatters. Do not duplicate
+`checks/meta-completeness.nix` as ast-grep rules: required `meta`/`passthru`
+attributes are already enforced at eval time, where overrides and
+`hideFromDocs` resolve correctly.
 
 ## Testing Guidelines
 

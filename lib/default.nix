@@ -1,5 +1,5 @@
 { inputs, ... }:
-inputs.nixpkgs.lib.extend (
+inputs."nixpkgs".lib.extend (
   _final: prev: {
     licenses = prev.licenses // {
       # nixpkgs' unfree license, but with `free = true` so evaluating these

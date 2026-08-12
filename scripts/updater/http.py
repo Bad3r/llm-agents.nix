@@ -4,6 +4,17 @@ import json
 import os
 import urllib.request
 from typing import Any
+from urllib.parse import urlparse
+
+# Only these hosts receive the Authorization header. Matched against the
+# parsed hostname, never a substring: "api.github.com" appears inside
+# attacker-shaped hosts like api.github.com.evil.com or evil.com/?api.github.com.
+GITHUB_API_HOSTS = frozenset({"api.github.com"})
+
+
+def _is_github_api(url: str) -> bool:
+    """Return True only when url's host is exactly a GitHub API host."""
+    return urlparse(url).hostname in GITHUB_API_HOSTS
 
 
 def _github_request(url: str) -> urllib.request.Request:
@@ -40,10 +51,7 @@ def fetch_text(
         urllib.error.URLError: If the request fails
 
     """
-    if "api.github.com" in url:
-        req = _github_request(url)
-    else:
-        req = urllib.request.Request(url)
+    req = _github_request(url) if _is_github_api(url) else urllib.request.Request(url)
     req.add_header("User-Agent", user_agent)
     with urllib.request.urlopen(req, timeout=timeout) as response:
         data: bytes = response.read()

@@ -1,0 +1,34 @@
+id: quote-input-name
+language: nix
+severity: error
+message: >-
+  Quote the attribute after `inputs.` — write `inputs."foo"`, not `inputs.foo`. Flake input names are external identifiers, not code; quoting marks them as such and keeps names with dots or dashes uniform.
+note: |
+  inputs."nixpkgs".follows = "nixpkgs";  # not: inputs.nixpkgs.follows
+  flake.inputs."bun2nix".overlays.default
+rule:
+  pattern: $NAME
+  kind: identifier
+  any:
+    # inputs.foo.follows / flake.inputs.foo — second segment of an
+    # attrpath whose first segment is `inputs`
+    - nthChild: 2
+      inside:
+        kind: attrpath
+        has:
+          nthChild: 1
+          kind: identifier
+          regex: '^inputs$'
+    # inputs.foo — first attrpath segment when the receiver
+    # expression is the `inputs` variable
+    - nthChild: 1
+      inside:
+        kind: attrpath
+        inside:
+          kind: select_expression
+          has:
+            field: expression
+            has:
+              kind: identifier
+              regex: '^inputs$'
+fix: '"$NAME"'

@@ -11,18 +11,18 @@
     systems.url = "github:nix-systems/default";
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs."nixpkgs".follows = "nixpkgs";
     };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
+      inputs."nixpkgs-lib".follows = "nixpkgs";
     };
     bun2nix = {
       url = "github:nix-community/bun2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.systems.follows = "systems";
-      inputs.treefmt-nix.follows = "treefmt-nix";
-      inputs.flake-parts.follows = "flake-parts";
+      inputs."nixpkgs".follows = "nixpkgs";
+      inputs."systems".follows = "systems";
+      inputs."treefmt-nix".follows = "treefmt-nix";
+      inputs."flake-parts".follows = "flake-parts";
     };
   };
 
@@ -90,7 +90,7 @@
               bun = pkgsFor.${system}.bun or pkgs.bun;
               # bun2nix builder set (hook, fetchBunDeps, ...); the `bun2nix`
               # scope attribute is the CLI package.
-              bun2nixLib = (pkgs.extend inputs.bun2nix.overlays.default).bun2nix;
+              bun2nixLib = (pkgs.extend inputs."bun2nix".overlays.default).bun2nix;
               # makeScope reserves `packages`, so expose the package set as allPackages.
               allPackages = packages;
             }

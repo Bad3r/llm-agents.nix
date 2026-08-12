@@ -6,15 +6,21 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.2.2";
+  version = "0.3.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-alS3ZF8ioOMo6v1hSAV1XV/rePhGVALh4HdgafN91Og=";
+    hash = "sha256-JgfgEmAnYhOvlrSrAfdyVNaQN9r4YLDpW+2lTC4dYpA=";
   };
+
+  # Upstream tags releases without bumping __version__ (v0.2.2 still
+  # says 0.2.1), and the CLI banner prints it. Align it with the tag.
+  postPatch = ''
+    sed -i -E 's/^__version__ = ".*"/__version__ = "${version}"/' src/mcptoon/__init__.py
+  '';
 
   build-system = with python3.pkgs; [
     setuptools
