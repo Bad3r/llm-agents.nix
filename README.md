@@ -846,6 +846,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>kandev</strong> - Manage tasks, orchestrate agents, review changes, and ship value</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://github.com/kdlbs/kandev
+- **Usage**: `nix run github:numtide/llm-agents.nix#kandev -- --help`
+- **Nix**: [packages/kandev/package.nix](packages/kandev/package.nix)
+
+</details>
+<details>
+<summary><strong>kandev-desktop</strong> - Native desktop application for the Kandev agentic development platform</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://github.com/kdlbs/kandev
+- **Usage**: `nix run github:numtide/llm-agents.nix#kandev-desktop -- --help`
+- **Nix**: [packages/kandev-desktop/package.nix](packages/kandev-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>mardi-gras</strong> - Terminal UI for Beads issue tracking with a parade-inspired workflow view</summary>
 
 - **Source**: source

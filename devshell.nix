@@ -14,6 +14,7 @@ pkgs.mkShellNoCC {
     pkgs.jq
     pkgs.nix-update
     pkgs.nodejs
+    pkgs.nushell
 
     # Formatter
     perSystem.self.formatter

@@ -9,6 +9,39 @@ let
     ];
     text = builtins.readFile ./../../scripts/check.sh;
   };
+
+  # Like writeShellApplication but the body is Nushell: nu shebang, runtimeInputs
+  # on PATH, and a build-time nu-check parse validation (nushell's shellcheck).
+  writeNushellApplication =
+    {
+      name,
+      text,
+      runtimeInputs ? [ ],
+    }:
+    pkgs.writeTextFile {
+      inherit name;
+      executable = true;
+      destination = "/bin/${name}";
+      text = ''
+        #!${lib.getExe pkgs.nushell}
+      ''
+      + lib.optionalString (runtimeInputs != [ ]) ''
+        $env.PATH = ("${lib.makeBinPath runtimeInputs}" | split row (char esep) | append $env.PATH)
+      ''
+      + "\n"
+      + text;
+      checkPhase = ''
+        ${lib.getExe pkgs.nushell} --no-config-file --commands "nu-check --debug $target | ignore"
+      '';
+    };
+
+  # Parse validator; logic in scripts/treefmt-nu-check.nu. Must not be named
+  # "nu-check": a script whose name shadows a builtin makes nushell resolve the
+  # internal `nu-check` call to the external script, breaking `nu-check --debug`.
+  nu-parse-check = writeNushellApplication {
+    name = "nu-parse-check";
+    text = builtins.readFile ./../../scripts/treefmt-nu-check.nu;
+  };
 in
 {
   package = pkgs.treefmt;
@@ -65,5 +98,11 @@ in
     includes = [ "*.py" ];
     pipeline = "python";
     priority = 3;
+  };
+
+  # Nushell scripts: parse-check only (see nu-parse-check above)
+  settings.formatter.nu-check = {
+    command = "${nu-parse-check}/bin/nu-parse-check";
+    includes = [ "*.nu" ];
   };
 }

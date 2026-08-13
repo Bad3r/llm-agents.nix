@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - 'packages/**'
-      - 'scripts/generate-package-docs.py'
+      - 'scripts/generate-package-docs.nu'
       - 'scripts/generate-package-docs.nix'
       - 'README.md'
       - '.github/workflows/check-readme.yml'
@@ -18,5 +18,5 @@ jobs:
         uses: cachix/install-nix-action@v31
       - name: Verify README matches generator output
         run: |
-          ./scripts/generate-package-docs.py
+          ./scripts/generate-package-docs.nu
           git diff --exit-code README.md
