@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.28";
+  version = "0.1.29";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-DlrY7HqZPlgwqOUnz2oAqaxsCLPk9zmtbjQSvFXYx1Y=";
+    hash = "sha256-hEg0ZOXv/CO0PntVgRSGcI1EKPl3K2DQRE1X+66Z3Qc=";
   };
 
-  cargoHash = "sha256-ovNxL4zrTD+yr5FRKIyyDRXqDYJc8MjK3sDMDhrtodc=";
+  cargoHash = "sha256-Bz0SWUhRBX8oElJ044LJboGqzG0UqmEqGDonil8wZ1U=";
 
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
@@ -62,6 +62,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # `aven backup` races its own WAL connection against a `sqlite3 .backup`
     # subprocess and flakes as "database is locked" on loaded runners.
     "--test-threads=1"
+    # New in 0.1.29: these tests spawn absolute system binaries (/usr/bin/tee,
+    # /usr/bin/false) and compile a fixture with `rustc` at run time, none of
+    # which exist in the sandbox, so every invocation fails to start.
+    "--skip=tui::app::tests::custom_commands"
   ];
 
   # Many tests rely on inferring the project from the surrounding git repo;

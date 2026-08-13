@@ -30,6 +30,7 @@ HOISTED = {
     "parse5",
     "turndown",
     "typescript",
+    "uqr",
 }
 
 # Dependencies from workspaces that are not built for this package.  Removing

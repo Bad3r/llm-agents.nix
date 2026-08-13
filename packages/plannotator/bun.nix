@@ -5071,6 +5071,10 @@
     url = "https://registry.npmjs.org/update-browserslist-db/-/update-browserslist-db-1.2.3.tgz";
     hash = "sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w==";
   };
+  "uqr@0.1.3" = fetchurl {
+    url = "https://registry.npmjs.org/uqr/-/uqr-0.1.3.tgz";
+    hash = "sha512-0rjE8iEJe4YmT9TOhwsZtqCMRLc5DXZUI2UEYUUg63ikBkqqE5EYWaI0etFe/5KUcmcYwLih2RND1kq+hrUJXA==";
+  };
   "url-join@4.0.1" = fetchurl {
     url = "https://registry.npmjs.org/url-join/-/url-join-4.0.1.tgz";
     hash = "sha512-jk1+QP6ZJqyOiuEI9AEWQfju/nB2Pw466kbA0LEZljHwKeMgd9WrAEgEGxjPDD2+TNbbb37rTyhEfrCXfuKXnA==";
