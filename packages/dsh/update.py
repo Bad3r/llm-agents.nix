@@ -1,7 +1,7 @@
 #!/usr/bin/env nix
 #! nix shell --inputs-from .# nixpkgs#python3 nixpkgs#nodejs --command python3
 
-"""Update script for iflow-cli package."""
+"""Update script for dsh package."""
 
 import sys
 from pathlib import Path
@@ -12,7 +12,6 @@ from updater import update_npm_package
 
 update_npm_package(
     Path(__file__).parent,
-    "@iflow-ai/iflow-cli",
-    ".#iflow-cli",
-    require_lockfile=False,
+    "@deepseek-ai/dsh",
+    ".#dsh",
 )

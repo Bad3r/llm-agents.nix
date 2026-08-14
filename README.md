@@ -29,6 +29,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>bb-app</strong> - Agentic IDE for orchestrating coding agents</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://getbb.app
+- **Usage**: `nix run github:numtide/llm-agents.nix#bb-app -- --help`
+- **Nix**: [packages/bb-app/package.nix](packages/bb-app/package.nix)
+
+</details>
+<details>
 <summary><strong>claude-code</strong> - Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster</summary>
 
 - **Source**: binary
@@ -130,6 +140,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>dsh</strong> - Open-source agent harness developed by DeepSeek AI</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/deepseek-ai/deepseek-harness
+- **Usage**: `nix run github:numtide/llm-agents.nix#dsh -- --help`
+- **Nix**: [packages/dsh/package.nix](packages/dsh/package.nix)
+
+</details>
+<details>
 <summary><strong>eca</strong> - Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor</summary>
 
 - **Source**: binary
@@ -148,6 +168,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Usage**: `nix run github:numtide/llm-agents.nix#forgecode -- --help`
 - **Nix**: [packages/forgecode/package.nix](packages/forgecode/package.nix)
 - **Documentation**: See [packages/forgecode/README.md](packages/forgecode/README.md) for detailed usage
+
+</details>
+<details>
+<summary><strong>freebuff</strong> - The world's strongest free coding agent</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://freebuff.com
+- **Usage**: `nix run github:numtide/llm-agents.nix#freebuff -- --help`
+- **Nix**: [packages/freebuff/package.nix](packages/freebuff/package.nix)
 
 </details>
 <details>
@@ -188,16 +218,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://x.ai
 - **Usage**: `nix run github:numtide/llm-agents.nix#grok -- --help`
 - **Nix**: [packages/grok/package.nix](packages/grok/package.nix)
-
-</details>
-<details>
-<summary><strong>iflow-cli</strong> - AI coding agent for the terminal with free model access via the iFlow platform</summary>
-
-- **Source**: bytecode
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/iflow-ai/iflow-cli
-- **Usage**: `nix run github:numtide/llm-agents.nix#iflow-cli -- --help`
-- **Nix**: [packages/iflow-cli/package.nix](packages/iflow-cli/package.nix)
 
 </details>
 <details>

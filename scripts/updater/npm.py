@@ -7,7 +7,10 @@ import tarfile
 import tempfile
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 from urllib.request import urlretrieve
+
+from updater.http import fetch_json
 
 
 def _can_prefetch_npm_lockfile(lockfile: Path) -> bool:
@@ -30,6 +33,42 @@ def _can_prefetch_npm_lockfile(lockfile: Path) -> bool:
             return False
 
     return True
+
+
+def _add_missing_registry_metadata(lockfile: Path) -> None:
+    """Fill in resolved/integrity that npm 11 omits for deduplicated entries.
+
+    Without them ``npm ci`` and Nix's npm dependency prefetcher reject the
+    lockfile, so query the registry for the missing dist metadata.
+    """
+    lock: dict[str, Any] = json.loads(lockfile.read_text())
+    packages: dict[str, dict[str, Any]] = lock["packages"]
+
+    count = 0
+    for path, metadata in packages.items():
+        version = metadata.get("version")
+        if (
+            "node_modules/" not in path
+            or not isinstance(version, str)
+            or metadata.get("link")
+            or metadata.get("inBundle")
+            or "integrity" in metadata
+        ):
+            continue
+
+        name = path.rsplit("node_modules/", 1)[1]
+        url = f"https://registry.npmjs.org/{quote(name, safe='')}/{quote(version, safe='')}"
+        registry = fetch_json(url)
+        if not isinstance(registry, dict) or "dist" not in registry:
+            msg = f"Missing npm dist metadata for {name}@{version}"
+            raise TypeError(msg)
+        dist = registry["dist"]
+        metadata.update({"resolved": dist["tarball"], "integrity": dist["integrity"]})
+        count += 1
+
+    if count:
+        lockfile.write_text(json.dumps(lock, indent=2) + "\n")
+        print(f"Added registry metadata to {count} lockfile entries")
 
 
 def _supplement_missing_optional_deps(lockfile: Path) -> None:
@@ -168,6 +207,7 @@ def extract_or_generate_lockfile(
             output_path.write_text(new_lock.read_text())
             if supplement_optional_deps:
                 _supplement_missing_optional_deps(output_path)
+            _add_missing_registry_metadata(output_path)
             print("Generated package-lock.json")
             return True
 
