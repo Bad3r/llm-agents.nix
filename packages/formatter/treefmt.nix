@@ -10,8 +10,8 @@ let
     text = builtins.readFile ./../../scripts/check.sh;
   };
 
-  # Like writeShellApplication but the body is Nushell: nu shebang, runtimeInputs
-  # on PATH, and a build-time nu-check parse validation (nushell's shellcheck).
+  # Like writeShellApplication, but for Nushell: nu shebang, runtimeInputs on
+  # PATH, build-time nu-check parse validation.
   writeNushellApplication =
     {
       name,
@@ -35,9 +35,8 @@ let
       '';
     };
 
-  # Parse validator; logic in scripts/treefmt-nu-check.nu. Must not be named
-  # "nu-check": a script whose name shadows a builtin makes nushell resolve the
-  # internal `nu-check` call to the external script, breaking `nu-check --debug`.
+  # Must not be named "nu-check": that would shadow the nushell builtin the
+  # script itself calls.
   nu-parse-check = writeNushellApplication {
     name = "nu-parse-check";
     text = builtins.readFile ./../../scripts/treefmt-nu-check.nu;
@@ -100,7 +99,7 @@ in
     priority = 3;
   };
 
-  # Nushell scripts: parse-check only (see nu-parse-check above)
+  # Nushell has no mature formatter yet, so parse-check only
   settings.formatter.nu-check = {
     command = "${nu-parse-check}/bin/nu-parse-check";
     includes = [ "*.nu" ];

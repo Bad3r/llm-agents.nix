@@ -21,9 +21,10 @@ def run(
     *,
     check: bool = True,
     capture: bool = False,
+    cwd: str | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run a command, optionally capturing output."""
-    return subprocess.run(cmd, capture_output=capture, text=True, check=check)
+    return subprocess.run(cmd, capture_output=capture, text=True, check=check, cwd=cwd)
 
 
 def write_output(key: str, value: str) -> None:

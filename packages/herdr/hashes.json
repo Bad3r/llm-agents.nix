@@ -1,8 +1,0 @@
-{
-  "version": "0.8.0",
-  "hash": "sha256-empFQ+hrnCh2JhOzQRWSCLV0YoZC3DXW3bY6k8YuJjk=",
-  "cargoHash": "sha256-E1lBgpTFZwNjeALeg/atwbDFL/XQbUnvCdX7ohbAHAc=",
-  "binaryHashes": {
-    "aarch64-darwin": "sha256-1Tqfk/zP38xVYyknv1EAL1rdCqeZC831CP+9hKxlgXg="
-  }
-}

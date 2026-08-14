@@ -15,12 +15,12 @@ let
   };
 in
 base.overrideAttrs (old: rec {
-  version = "2.2.4";
+  version = "2.3.0";
   src = fetchFromGitHub {
     owner = "dolthub";
     repo = "dolt";
     tag = "v${version}";
-    hash = "sha256-XAc584mxGsadxmY1Jf4JgaaBAUg9hXainGkaWIgdp5A=";
+    hash = "sha256-ho0mUdiwYTmczU7791pyD3MpCMje2a/IVt40QIiCJd4=";
   };
   vendorHash = "sha256-k5fpdI1wtZQYpjJEyre3Kh57AC0i3PsU2SIsf8ga1c8=";
   passthru = (old.passthru or { }) // {

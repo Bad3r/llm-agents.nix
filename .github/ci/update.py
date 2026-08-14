@@ -11,6 +11,7 @@ import argparse
 import json
 import logging
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -18,6 +19,62 @@ from pathlib import Path
 from lib import UpdateType, nix_eval_raw, run, write_output
 
 log = logging.getLogger(__name__)
+
+
+def sandbox_works(bwrap: str) -> bool:
+    """Probe whether bubblewrap can create its namespaces here."""
+    probe = [bwrap, "--ro-bind", "/", "/", "--", "true"]
+    if run(probe, check=False, capture=True).returncode == 0:
+        return True
+    # Ubuntu 24.04 runners restrict unprivileged user namespaces via
+    # AppArmor. The runner user has passwordless sudo, so lift the limit.
+    if shutil.which("sudo"):
+        run(
+            ["sudo", "sysctl", "-w", "kernel.apparmor_restrict_unprivileged_userns=0"],
+            check=False,
+            capture=True,
+        )
+    return run(probe, check=False, capture=True).returncode == 0
+
+
+def sandbox_wrap(cmd: list[str], name: str) -> list[str]:
+    """Confine updater code with bubblewrap.
+
+    The filesystem is read-only except the package's own directory, /nix,
+    and a fresh tmpfs HOME and /tmp. Network stays available for upstream
+    APIs. Set UPDATE_SANDBOX=0 to opt out locally.
+    """
+    if sys.platform != "linux" or os.environ.get("UPDATE_SANDBOX") == "0":
+        return cmd
+    bwrap = shutil.which("bwrap")
+    if bwrap is None:
+        log.warning("::warning::bwrap not found; running updater unsandboxed")
+        return cmd
+    if not sandbox_works(bwrap):
+        log.warning(
+            "::warning::bubblewrap cannot create namespaces; "
+            "running updater unsandboxed"
+        )
+        return cmd
+    pkg_dir = str(Path.cwd() / "packages" / name)
+    # Fresh HOME instead of a tmpfs over the real one, which would hide
+    # ~/.nix-profile/bin. Later binds override the read-only root.
+    return [
+        bwrap,
+        *("--ro-bind", "/", "/"),
+        *("--dev", "/dev"),
+        *("--proc", "/proc"),
+        *("--tmpfs", "/tmp"),  # noqa: S108 — sandbox mount, not a host temp path
+        *("--dir", "/tmp/home"),  # noqa: S108
+        *("--setenv", "HOME", "/tmp/home"),  # noqa: S108
+        *("--setenv", "TMPDIR", "/tmp"),  # noqa: S108
+        *("--bind", "/nix", "/nix"),
+        *("--bind", pkg_dir, pkg_dir),
+        *("--chdir", str(Path.cwd())),
+        "--die-with-parent",
+        "--",
+        *cmd,
+    ]
 
 
 def git_has_changes() -> bool:
@@ -66,13 +123,15 @@ def update_package(name: str) -> None:
     if update_script.exists():
         log.info("Running update script for %s...", name)
         run_update_command(
-            [str(update_script)],
+            sandbox_wrap([str(update_script)], name),
             f"Update script failed for package {name}",
         )
     else:
         log.info("No update script found, trying nix-update...")
         run_update_command(
-            ["nix-update", "--flake", name, *load_nix_update_args(name)],
+            sandbox_wrap(
+                ["nix-update", "--flake", name, *load_nix_update_args(name)], name
+            ),
             f"nix-update failed for package {name}",
         )
 

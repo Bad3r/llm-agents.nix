@@ -3,165 +3,107 @@
   stdenv,
   flake,
   fetchFromGitHub,
-  fetchurl,
   rustPlatform,
-  callPackage,
   zig_0_15,
+  xcbuild,
+  cctools,
   installShellFiles,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
-let
-  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData)
-    version
-    hash
-    cargoHash
-    binaryHashes
-    ;
+# build.rs shells out to `zig build` to compile vendored libghostty-vt.
+rustPlatform.buildRustPackage (finalAttrs: {
+  pname = "herdr";
+  version = "0.8.0";
 
-  # build.rs shells out to `zig build` to compile vendored libghostty-vt.
-  # On Linux this works in the sandbox.  On Darwin zig's libc/SDK discovery
-  # relies on xcrun + system libtool, which aren't available; integrating
-  # that with the nixpkgs apple-sdk is a larger project, so use the upstream
-  # release binaries on Darwin until then.
-  fromSource = rustPlatform.buildRustPackage (finalAttrs: {
-    pname = "herdr";
-    inherit version;
-
-    src = fetchFromGitHub {
-      owner = "ogulcancelik";
-      repo = "herdr";
-      tag = "v${version}";
-      inherit hash;
-    };
-
-    inherit cargoHash;
-
-    # Upstream ships ghostty's zon2nix-generated build.zig.zon.nix alongside
-    # the vendored libghostty-vt sources; it pre-fetches the Zig package cache
-    # so zig can build offline.  We vendor a copy in-tree (kept in sync by
-    # update.py) and import that instead of reading it from ${finalAttrs.src},
-    # which would require import-from-derivation (disabled repo-wide).
-    zigDeps = callPackage ./build.zig.zon.nix {
-      name = "herdr-libghostty-vt-zig-deps";
-      inherit zig_0_15;
-    };
-
-    nativeBuildInputs = [
-      zig_0_15
-      installShellFiles
-    ];
-
-    # zig's setup hook overrides buildPhase/installPhase with `zig build`,
-    # but here zig is only invoked indirectly from build.rs.  Keep cargo's
-    # phases.
-    dontUseZigBuild = true;
-    dontUseZigInstall = true;
-    dontUseZigCheck = true;
-    dontUseZigConfigure = true;
-
-    # build.rs passes an explicit -Dtarget that zig treats as a cross target,
-    # so build-time helper executables (uucode_build_tables) get linked against
-    # the FHS dynamic loader path which doesn't exist in the sandbox.  Drop the
-    # flag so zig uses the native target and picks up the wrapped libc paths,
-    # but keep Zig's CPU baseline explicit to avoid build-host CPU features
-    # leaking into the output.
-    postPatch = ''
-      substituteInPlace build.rs \
-        --replace-fail '.arg("build")' '.arg("build")
-            .arg("-Dcpu=baseline")' \
-        --replace-fail '.arg(format!("-Dtarget={zig_target}"))' ""
-    '';
-
-    preBuild = ''
-      export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-global-cache"
-      export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-local-cache"
-      mkdir -p "$ZIG_GLOBAL_CACHE_DIR" "$ZIG_LOCAL_CACHE_DIR"
-      ln -s ${finalAttrs.zigDeps} "$ZIG_GLOBAL_CACHE_DIR/p"
-    '';
-
-    # Tests spawn PTYs / interact with the terminal and don't work in the
-    # sandbox.
-    doCheck = false;
-
-    postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-      installShellCompletion --cmd herdr \
-        --bash <("$out/bin/herdr" completion bash) \
-        --fish <("$out/bin/herdr" completion fish) \
-        --zsh <("$out/bin/herdr" completion zsh)
-    '';
-
-    doInstallCheck = true;
-    nativeInstallCheckInputs = [
-      versionCheckHook
-      versionCheckHomeHook
-    ];
-
-    passthru.category = "Workflow & Project Management";
-
-    meta = commonMeta // {
-      sourceProvenance = [ lib.sourceTypes.fromSource ];
-      platforms = lib.platforms.linux;
-    };
-  });
-
-  binaryAssetMap = {
-    aarch64-darwin = "herdr-macos-aarch64";
+  src = fetchFromGitHub {
+    owner = "ogulcancelik";
+    repo = "herdr";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-Uo1z1YBbzULkHg1oGaZwqmJfYmFdd7frCB+xdgM6vAk=";
   };
 
-  fromBinary = stdenv.mkDerivation {
-    pname = "herdr";
-    inherit version;
+  cargoHash = "sha256-kuHJpe1zr+pfY+PhGhikKjEGJh8rRSlfalXwBPYIxQE=";
 
-    src = fetchurl {
-      url = "https://github.com/ogulcancelik/herdr/releases/download/v${version}/${
-        binaryAssetMap.${stdenv.hostPlatform.system}
-      }";
-      hash = binaryHashes.${stdenv.hostPlatform.system};
-    };
-
-    dontUnpack = true;
-
-    nativeBuildInputs = [
-      installShellFiles
-    ];
-
-    installPhase = ''
-      runHook preInstall
-      install -Dm755 $src $out/bin/herdr
-      runHook postInstall
-    '';
-
-    postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-      installShellCompletion --cmd herdr \
-        --bash <("$out/bin/herdr" completion bash) \
-        --fish <("$out/bin/herdr" completion fish) \
-        --zsh <("$out/bin/herdr" completion zsh)
-    '';
-
-    doInstallCheck = true;
-    nativeInstallCheckInputs = [
-      versionCheckHook
-      versionCheckHomeHook
-    ];
-
-    passthru.category = "Workflow & Project Management";
-
-    meta = commonMeta // {
-      sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
-      platforms = builtins.attrNames binaryAssetMap;
-    };
+  # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
+  # build offline.  fetchDeps is a fixed-output derivation, so this does not
+  # require import-from-derivation (disabled repo-wide).
+  zigDeps = zig_0_15.fetchDeps {
+    inherit (finalAttrs) pname version;
+    src = "${finalAttrs.src}/vendor/libghostty-vt";
+    fetchAll = true;
+    hash = "sha256-PnM+hZIlLyQwK8vJgd/Bhjt1lNIz06T8FahwliRmMrY=";
   };
 
-  commonMeta = {
+  nativeBuildInputs = [
+    zig_0_15
+    installShellFiles
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    # zig's macOS SDK detection shells out to xcode-select/xcrun; xcbuild
+    # provides nix-native shims that answer with the nixpkgs apple-sdk.
+    xcbuild
+    # libghostty-vt's CombineArchivesStep runs `libtool` on Darwin.
+    cctools
+  ];
+
+  # zig's setup hook overrides buildPhase/installPhase with `zig build`,
+  # but here zig is only invoked indirectly from build.rs.  Keep cargo's
+  # phases.
+  dontUseZigBuild = true;
+  dontUseZigInstall = true;
+  dontUseZigCheck = true;
+  dontUseZigConfigure = true;
+
+  # build.rs passes an explicit -Dtarget that zig treats as a cross target,
+  # so build-time helper executables (uucode_build_tables) get linked against
+  # the FHS dynamic loader path which doesn't exist in the sandbox.  Drop the
+  # flag so zig uses the native target and picks up the wrapped libc paths,
+  # but keep Zig's CPU baseline explicit to avoid build-host CPU features
+  # leaking into the output.
+  postPatch = ''
+    substituteInPlace build.rs \
+      --replace-fail '.arg("build")' '.arg("build")
+          .arg("-Dcpu=baseline")' \
+      --replace-fail '.arg(format!("-Dtarget={zig_target}"))' ""
+  '';
+
+  preBuild = ''
+    export ZIG_GLOBAL_CACHE_DIR="$TMPDIR/zig-global-cache"
+    export ZIG_LOCAL_CACHE_DIR="$TMPDIR/zig-local-cache"
+    mkdir -p "$ZIG_GLOBAL_CACHE_DIR" "$ZIG_LOCAL_CACHE_DIR"
+    cp -rL ${finalAttrs.zigDeps} "$ZIG_GLOBAL_CACHE_DIR/p"
+    chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR/p"
+  '';
+
+  # Tests spawn PTYs / interact with the terminal and don't work in the
+  # sandbox.
+  doCheck = false;
+
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    installShellCompletion --cmd herdr \
+      --bash <("$out/bin/herdr" completion bash) \
+      --fish <("$out/bin/herdr" completion fish) \
+      --zsh <("$out/bin/herdr" completion zsh)
+  '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    versionCheckHomeHook
+  ];
+
+  passthru.category = "Workflow & Project Management";
+
+  meta = {
     description = "Terminal workspace manager for AI coding agents";
     homepage = "https://herdr.dev";
-    changelog = "https://github.com/ogulcancelik/herdr/releases/tag/v${version}";
+    changelog = "https://github.com/ogulcancelik/herdr/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.agpl3Plus;
     maintainers = with flake.lib.maintainers; [ murlakatam ];
     mainProgram = "herdr";
+    sourceProvenance = [ lib.sourceTypes.fromSource ];
+    platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
-in
-if stdenv.hostPlatform.isDarwin then fromBinary else fromSource
+})

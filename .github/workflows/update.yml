@@ -26,6 +26,7 @@ jobs:
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+    # Write access comes from the App token, minted inside the called
+    # workflow after updater code has run.
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read

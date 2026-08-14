@@ -5475,9 +5475,9 @@
     url = "https://registry.npmjs.org/node-abi/-/node-abi-4.28.0.tgz";
     hash = "sha512-Qfp5XZL1cJDOabOT8H5gnqMTmM4NjvYzHp4I/Kt/Sl76OVkOBBHRFlPspGV0hYvMoqQsypFjT/Yp7Km0beXW9g==";
   };
-  "node-addon-api@8.9.1" = fetchurl {
-    url = "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.9.1.tgz";
-    hash = "sha512-4eUQWVPCUUUiBjLnHS3cXWeC6ryoPUc0U3rP7IuzapoGbzMqd/r6KKO0clr0b+snQhsrueFEhCZDdK+LK7hxKg==";
+  "node-addon-api@8.9.2" = fetchurl {
+    url = "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.9.2.tgz";
+    hash = "sha512-VijLXbi3UACN69I0JVXJsX4tjACjNoQDgv2gTF6sx2wWEi8tkSg2eX8p5gSIFi8z2+DL3oHmY6OyKce38SDolg==";
   };
   "node-api-version@0.2.1" = fetchurl {
     url = "https://registry.npmjs.org/node-api-version/-/node-api-version-0.2.1.tgz";

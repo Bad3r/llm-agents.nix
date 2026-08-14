@@ -1,12 +1,11 @@
-# treefmt hook: check that each .nu file parses. No autoformat — nufmt is alpha.
-# nu-check runs per file in a `for` loop; it misreports errors inside `each`.
+# treefmt hook: check that each .nu file parses.
+# Uses a `for` loop because nu-check misreports errors inside `each`.
 def main [...files: string] {
   for f in $files {
-    # nu-check resolves a relative path against $env.FILE_PWD (this wrapper's
-    # store dir), so make it absolute against the CWD.
+    # nu-check resolves relative paths against $env.FILE_PWD (this script's
+    # store dir), so make them absolute against the CWD.
     let target = ($f | path expand --no-symlink)
-    # --debug raises on a parse error with a rendered diagnostic; report the
-    # file and stop at the first failure.
+    # --debug raises on parse errors with a rendered diagnostic
     try {
       nu-check --debug $target | ignore
     } catch {|e|

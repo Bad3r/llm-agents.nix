@@ -26,26 +26,26 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "ironclaw";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "nearai";
     repo = "ironclaw";
     tag = "ironclaw-v${version}";
-    hash = "sha256-bKNEYdIegRaj3aj3LoFHiqNTgQY9myYya1O4+4TuvZ0=";
+    hash = "sha256-jPFEZGTofF+W52WudBGnDwKyHw0yKJQ3G56qvr89U84=";
   };
 
-  cargoHash = "sha256-ncI05JaH/xYXaV6U50I+FEAt7QciqnzDuOHkal9UWSA=";
+  cargoHash = "sha256-hiAFQRC9j39Ptt/2/9XN4n5Pzg1w3t1sANRUT/Dw7s0=";
 
   pnpmDeps = fetchPnpmDeps {
     pname = "${pname}-webui";
     inherit version src;
     inherit pnpm;
-    sourceRoot = "source/crates/ironclaw_webui/frontend";
-    hash = "sha256-XL/4zXI2E1igKxmqVPLlea55/sjBXpX4zkbelNC1/ns=";
+    sourceRoot = "source/crates/product/ironclaw_webui/frontend";
+    hash = "sha256-/6Vp3fPnllfba8Jm+cuw9lfSdUB6epUhN6Lz+2HQpc4=";
     fetcherVersion = 4;
   };
-  pnpmRoot = "crates/ironclaw_webui/frontend";
+  pnpmRoot = "crates/product/ironclaw_webui/frontend";
 
   nativeBuildInputs = [
     corepack

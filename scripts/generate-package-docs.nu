@@ -7,7 +7,6 @@
 const BEGIN_MARKER = "<!-- BEGIN GENERATED PACKAGE DOCS -->"
 const END_MARKER = "<!-- END GENERATED PACKAGE DOCS -->"
 
-# Category display order.
 const CATEGORY_ORDER = [
   "AI Coding Agents"
   "AI Assistants"
@@ -24,24 +23,15 @@ const CATEGORY_ORDER = [
   "Uncategorized"
 ]
 
-# All package metadata in one nix eval; drop nulls (filtered out or failed).
+# Drop nulls: packages that were filtered out or failed to evaluate.
 def all-packages-metadata [nix_file: string]: nothing -> table {
-  let result = (^nix eval --json --file $nix_file | complete)
-  if $result.exit_code != 0 {
-    print -e $"Error running nix eval: exit ($result.exit_code)"
-    if ($result.stderr | is-not-empty) {
-      print -e $"stderr: ($result.stderr)"
-    }
-    exit 1
-  }
-  $result.stdout
+  ^nix eval --json --file $nix_file
   | from json
   | transpose package meta
   | where meta != null
   | sort-by package
 }
 
-# Render one package's <details> block.
 def package-doc [package: string, meta: record]: nothing -> string {
   let description = ($meta.description? | default "No description available")
   let source = ($meta.sourceType? | default "unknown")
@@ -61,11 +51,9 @@ def package-doc [package: string, meta: record]: nothing -> string {
   }
 
   $lines = ($lines | append $"- **Usage**: `nix run github:numtide/llm-agents.nix#($package) -- --help`")
-  # Escape the literal ( ) in the link target: in an interpolated string an
-  # unescaped ( opens a subexpression.
+  # \( because an unescaped ( in an interpolated string opens a subexpression
   $lines = ($lines | append $"- **Nix**: [packages/($package)/package.nix]\(packages/($package)/package.nix\)")
 
-  # Optional package-specific README (path relative to CWD).
   if ($"packages/($package)/README.md" | path exists) {
     $lines = ($lines | append $"- **Documentation**: See [packages/($package)/README.md]\(packages/($package)/README.md\) for detailed usage")
   }
@@ -75,48 +63,28 @@ def package-doc [package: string, meta: record]: nothing -> string {
   $lines | str join "\n"
 }
 
-# Emit heading + package blocks + a trailing spacer for one category.
 def category-block [category: string, rows: table]: nothing -> list<string> {
-  mut out = [$"### ($category)\n"]
-  for row in $rows {
-    $out = ($out | append (package-doc $row.package $row.meta))
-  }
-  $out | append ""
+  [$"### ($category)\n"]
+  | append ($rows | each {|r| package-doc $r.package $r.meta })
+  | append ""
 }
 
-# Build the whole generated section, grouped by category.
+# Categories in CATEGORY_ORDER first, then any remaining ones sorted.
 def generate-all-docs [nix_file: string]: nothing -> string {
-  let data = (all-packages-metadata $nix_file)
-
-  mut docs = []
-  mut seen = []
-
-  # Categories in the defined order.
-  for category in $CATEGORY_ORDER {
-    let rows = ($data | where {|r| ($r.meta.category? | default "Uncategorized") == $category })
-    if ($rows | is-empty) { continue }
-    $seen = ($seen | append $category)
-    $docs = ($docs | append (category-block $category $rows))
-  }
-
-  # Any categories not in CATEGORY_ORDER, sorted.
-  let leftover = (
-    $data
-    | get meta.category
-    | uniq
-    | sort
-    | where {|c| $c not-in $seen }
+  let by_category = (
+    all-packages-metadata $nix_file
+    | group-by {|r| $r.meta.category? | default "Uncategorized" }
   )
-  for category in $leftover {
-    let rows = ($data | where {|r| ($r.meta.category? | default "Uncategorized") == $category })
-    $docs = ($docs | append (category-block $category $rows))
-  }
-
-  $docs | str join "\n" | str trim --right --char "\n"
+  let present = ($by_category | columns)
+  ($CATEGORY_ORDER | where {|c| $c in $present })
+  | append ($present | where {|c| $c not-in $CATEGORY_ORDER } | sort)
+  | each {|c| category-block $c ($by_category | get $c) }
+  | flatten
+  | str join "\n"
+  | str trim --right --char "\n"
 }
 
-# Splice the generated section between the markers in README.md.
-# Returns the new content, or null if nothing changed.
+# Returns the new README content, or null if nothing changed.
 def update-readme [readme_path: string, nix_file: string]: nothing -> any {
   let content = (open --raw $readme_path | decode utf-8)
 
@@ -136,8 +104,8 @@ def update-readme [readme_path: string, nix_file: string]: nothing -> any {
 
   let generated = (generate-all-docs $nix_file)
 
-  # Split on the literal markers rather than slice by index, so the result
-  # does not depend on how string indices count code points.
+  # Split on the markers instead of slicing by index: str index-of counts
+  # code points, not bytes.
   let before = ($content | split row $BEGIN_MARKER | first)
   let after = ($content | split row $END_MARKER | last)
   let new_content = $"($before)($BEGIN_MARKER)\n\n($generated)\n($END_MARKER)($after)"
