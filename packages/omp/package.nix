@@ -92,7 +92,6 @@ in
 stdenv.mkDerivation {
   pname = "omp";
   inherit version src;
-  patches = [ ./use-bun-executable-template.patch ];
 
   cargoDeps = rustPlatform.fetchCargoVendor {
     name = "omp-${version}-cargo-vendor";
