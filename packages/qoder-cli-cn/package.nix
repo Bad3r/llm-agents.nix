@@ -2,6 +2,7 @@
   stdenv,
   fetchurl,
   flake,
+  mkUpdater,
   qoder-cli,
 }:
 
@@ -29,6 +30,30 @@ qoder-cli.overrideAttrs (old: {
 
     runHook postInstall
   '';
+
+  passthru = old.passthru // {
+    updater = mkUpdater {
+      kind = "manifest";
+      manifestUrl = "https://static.qoder.com.cn/qoder-cli-cn/channels/manifest.json";
+      platformMap = [
+        {
+          os = "linux";
+          arch = "amd64";
+          platform = "x86_64-linux";
+        }
+        {
+          os = "linux";
+          arch = "arm64";
+          platform = "aarch64-linux";
+        }
+        {
+          os = "darwin";
+          arch = "arm64";
+          platform = "aarch64-darwin";
+        }
+      ];
+    };
+  };
 
   meta = old.meta // {
     description = "Qoder CLI (mainland China edition) - terminal-based AI coding assistant for China-region accounts";

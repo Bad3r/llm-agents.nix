@@ -6,6 +6,7 @@
   go-bin,
   versionCheckHook,
   versionCheckHomeHook,
+  mkUpdater,
 }:
 
 let
@@ -56,6 +57,11 @@ in
   passthru = {
     category = "AI Coding Agents";
     jsonschema = "${placeholder "out"}/share/crush/schema.json";
+    updater = mkUpdater {
+      kind = "github-source";
+      purl = "pkg:github/charmbracelet/crush";
+      depHashKey = "vendorHash";
+    };
   };
 
   meta = with lib; {

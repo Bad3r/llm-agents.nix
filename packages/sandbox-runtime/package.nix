@@ -4,6 +4,7 @@
   buildNpmPackage,
   fetchzip,
   makeWrapper,
+  mkUpdater,
   nodejs_24,
   runCommand,
   # Linux dependencies
@@ -58,6 +59,11 @@ buildNpmPackage {
   doInstallCheck = false;
 
   passthru.category = "Sandboxing & Isolation";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40anthropic-ai/sandbox-runtime";
+    fetchzip = true;
+  };
 
   meta = {
     description = "Lightweight sandboxing tool for enforcing filesystem and network restrictions";

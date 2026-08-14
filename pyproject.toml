@@ -52,6 +52,16 @@ ignore = [
 ".github/ci/lib.py" = [
   "INP001",
 ] # shared module for standalone CI scripts, not a package
+"*_test.py" = [
+  "D101",   # test classes are self-documenting
+  "D102",   # test methods are self-documenting
+  "D103",   # test helper functions are self-documenting
+  "D107",   # test helper __init__ needs no docstring
+  "ANN401", # test doubles legitimately use Any (*args/**kwargs recorders)
+  "PT009",  # we use stdlib unittest assertions on purpose (zero-dep, extractable)
+  "PT027",  # ditto: unittest assertRaises, not pytest.raises
+  "S101",   # asserts are the point in tests
+]
 
 [tool.ruff.lint.pylint]
 max-args = 8     # Allow more arguments for updater classes

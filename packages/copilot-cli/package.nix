@@ -1,6 +1,7 @@
 {
   lib,
   flake,
+  mkUpdater,
   stdenv,
   platformSource,
   makeWrapper,
@@ -21,9 +22,7 @@ let
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
     };
-    url =
-      { version, platform }:
-      "https://registry.npmjs.org/@github/copilot-${platform}/-/copilot-${platform}-${version}.tgz";
+    urlTemplate = "https://registry.npmjs.org/@github/copilot-{platform}/-/copilot-{platform}-{version}.tgz";
   };
 in
 stdenv.mkDerivation (finalAttrs: {
@@ -83,6 +82,15 @@ stdenv.mkDerivation (finalAttrs: {
   versionCheckProgramArg = [ "--version" ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "npm";
+        package = "@github/copilot";
+      };
+    }
+  );
 
   meta = {
     description = "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.";

@@ -1,5 +1,6 @@
 {
   lib,
+  mkUpdater,
   stdenv,
   platformSource,
   makeWrapper,
@@ -16,9 +17,7 @@ let
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
     };
-    url =
-      { version, platform }:
-      "https://registry.npmjs.org/@kilocode/cli-${platform}/-/cli-${platform}-${version}.tgz";
+    urlTemplate = "https://registry.npmjs.org/@kilocode/cli-{platform}/-/cli-{platform}-{version}.tgz";
   };
 in
 stdenv.mkDerivation {
@@ -48,6 +47,15 @@ stdenv.mkDerivation {
   versionCheckProgramArg = "--version";
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "npm";
+        package = "@kilocode/cli";
+      };
+    }
+  );
 
   meta = {
     description = "The open-source AI coding agent. Now available in your terminal.";

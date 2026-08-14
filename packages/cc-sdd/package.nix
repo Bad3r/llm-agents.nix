@@ -5,6 +5,7 @@
   bun,
   versionCheckHook,
   versionCheckHomeHook,
+  mkUpdater,
 }:
 
 let
@@ -60,6 +61,11 @@ buildNpmPackage {
   ];
 
   passthru.category = "Workflow & Project Management";
+  passthru.updater = mkUpdater {
+    kind = "github-source";
+    purl = "pkg:github/gotalab/cc-sdd";
+    depHashKey = "npmDepsHash";
+  };
 
   meta = with lib; {
     description = "Spec-driven development framework for AI coding agents";

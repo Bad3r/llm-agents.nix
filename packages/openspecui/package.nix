@@ -4,6 +4,7 @@
   flake,
   jq,
   lib,
+  mkUpdater,
   runCommand,
 }:
 
@@ -46,6 +47,11 @@ buildNpmPackage {
   dontNpmBuild = true;
 
   passthru.category = "Workflow & Project Management";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/openspecui";
+    stripDevDependencies = true;
+  };
 
   meta = {
     description = "Visual interface for spec-driven development";

@@ -6,6 +6,7 @@
   wrapBuddy,
   gcc-unwrapped,
   versionCheckHook,
+  mkUpdater,
 }:
 
 let
@@ -16,9 +17,7 @@ let
       aarch64-linux = "aarch64-unknown-linux-gnu";
       aarch64-darwin = "aarch64-apple-darwin";
     };
-    url =
-      { version, platform }:
-      "https://github.com/tailcallhq/forgecode/releases/download/v${version}/forge-${platform}";
+    urlTemplate = "https://github.com/tailcallhq/forgecode/releases/download/v{version}/forge-{platform}";
   };
 in
 stdenv.mkDerivation rec {
@@ -61,6 +60,16 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "github";
+        owner = "tailcallhq";
+        repo = "forgecode";
+      };
+    }
+  );
 
   meta = with lib; {
     description = "AI-Enhanced Terminal Development Environment - A comprehensive coding agent that integrates AI capabilities with your development environment";

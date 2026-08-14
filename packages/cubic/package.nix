@@ -1,6 +1,7 @@
 {
   lib,
   flake,
+  mkUpdater,
   stdenv,
   platformSource,
   unzip,
@@ -17,9 +18,7 @@ let
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
     };
-    url =
-      { version, platform }:
-      "https://mcafvrhahbqdwfrtncql.supabase.co/storage/v1/object/public/releases/v${version}/cubic-${platform}.zip";
+    urlTemplate = "https://mcafvrhahbqdwfrtncql.supabase.co/storage/v1/object/public/releases/v{version}/cubic-{platform}.zip";
   };
 in
 stdenv.mkDerivation {
@@ -50,6 +49,15 @@ stdenv.mkDerivation {
   versionCheckProgramArg = "--version";
 
   passthru.category = "Code Review";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "text";
+        url = "https://mcafvrhahbqdwfrtncql.supabase.co/storage/v1/object/public/releases/latest.txt";
+      };
+    }
+  );
 
   meta = with lib; {
     description = "AI code review CLI from cubic.dev - fast pre-flight review before you push";

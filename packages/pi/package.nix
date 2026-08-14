@@ -4,6 +4,7 @@
   bun,
   fetchurl,
   fd,
+  mkUpdater,
   rcodesign,
   ripgrep,
   runCommand,
@@ -154,6 +155,10 @@ buildNpmPackage {
     '';
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40earendil-works/pi-coding-agent";
+  };
 
   meta = {
     description = "A terminal-based coding agent with multi-model support";

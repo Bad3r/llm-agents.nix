@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  mkUpdater,
   bun2nixLib,
   bun,
   makeWrapper,
@@ -144,6 +145,10 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "Memory & Code Intelligence";
+  passthru.updater = mkUpdater {
+    kind = "bun-github";
+    purl = "pkg:github/tobi/qmd";
+  };
 
   meta = with lib; {
     description = "mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local";

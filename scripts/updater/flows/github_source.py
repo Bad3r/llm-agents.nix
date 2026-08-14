@@ -5,9 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from updater.deps import update_dependency_hash
-from updater.hash import DUMMY_SHA256_HASH, calculate_url_hash
+from updater.fetch import PurlFetcher
+from updater.hash import DUMMY_SHA256_HASH
 from updater.hashes_file import load_hashes, save_hashes
-from updater.version import fetch_github_latest_release, should_update
+from updater.purl import Purl
+from updater.version import should_update
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -20,29 +22,26 @@ def update_github_source(
     flake_attr: str,
     dep_hash_key: str,
 ) -> None:
-    """Update a package built from a GitHub release source tarball.
-
-    Bumps version/hash in hashes.json and recalculates the given dependency
-    hash (e.g. vendorHash for Go packages).
-    """
+    """Bump version/src hash and recalc dep_hash_key (e.g. Go vendorHash)."""
     hashes_file = pkg_dir / "hashes.json"
     data = load_hashes(hashes_file)
     current = data["version"]
-    latest = fetch_github_latest_release(owner, repo)
 
-    print(f"Current: {current}, Latest: {latest}")
+    fetcher = PurlFetcher.default()
+    purl = Purl("github", owner, repo)
+    resolved = fetcher.resolve(purl)
 
-    if not should_update(current, latest):
+    print(f"Current: {current}, Latest: {resolved.version}")
+
+    if not should_update(current, resolved.version):
         print("Already up to date")
         return
 
-    url = f"https://github.com/{owner}/{repo}/archive/refs/tags/v{latest}.tar.gz"
-
     print("Calculating source hash...")
-    source_hash = calculate_url_hash(url, unpack=True)
+    source_hash = fetcher.hashes(purl, resolved)["src"]
 
     data = {
-        "version": latest,
+        "version": resolved.version,
         "hash": source_hash,
         dep_hash_key: DUMMY_SHA256_HASH,
     }
@@ -50,4 +49,4 @@ def update_github_source(
 
     update_dependency_hash(flake_attr, dep_hash_key, hashes_file, data)
 
-    print(f"Updated to {latest}")
+    print(f"Updated to {resolved.version}")

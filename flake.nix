@@ -69,13 +69,39 @@
         let
           system = pkgs.stdenv.hostPlatform.system;
 
+          # Generic {name}-template interpolation (Nix mirror of str.format) and
+          # a templated fetchurl built on it — the single templated-URL primitive
+          # shared between a package's build and its declarative updater.
+          interpolate = import ./lib/interpolate.nix;
+          fetchurlTemplate = import ./lib/fetchurl-template.nix {
+            inherit (pkgs) fetchurl;
+            inherit interpolate;
+          };
+
+          # Route bun2nix's per-dep fetches through naked-fetchurl: ~3.4s (~15%)
+          # off eval, all in the bun packages. Output paths unchanged (FODs),
+          # only bun-cache .drv inputs differ, so it is a one-time cache rebuild.
+          pkgsBun = pkgs // {
+            fetchurl = import ./lib/naked-fetchurl.nix;
+          };
+
           scope = lib.makeScope pkgs.newScope (
             self:
             {
-              inherit flake inputs system;
+              inherit
+                flake
+                inputs
+                system
+                interpolate
+                fetchurlTemplate
+                ;
               platformSource = import ./lib/platform-source.nix {
-                inherit (pkgs) stdenv fetchurl;
+                inherit (pkgs) stdenv;
+                inherit fetchurlTemplate;
               };
+              # Validate a declarative passthru.updater config (see
+              # scripts/updater/run.py); packages opt out of update.py with it.
+              mkUpdater = import ./lib/mk-updater.nix { inherit (pkgs) lib; };
               # `bun build --compile` copies the running bun binary into the
               # executable it produces, so bun ends up inside our outputs
               # rather than being a build tool we can leave to the consumer.
@@ -89,16 +115,49 @@
               # every store path in the set.
               bun = pkgsFor.${system}.bun or pkgs.bun;
               # bun2nix builder set (hook, fetchBunDeps, ...); the `bun2nix`
-              # scope attribute is the CLI package.
-              bun2nixLib = (pkgs.extend inputs."bun2nix".overlays.default).bun2nix;
+              # scope attribute is the CLI package. Apply the overlay directly
+              # (final=prev=pkgs) instead of pkgs.extend, which would re-run the
+              # whole nixpkgs fixpoint just to add this one leaf (~5s of eval).
+              bun2nixLib = (inputs."bun2nix".overlays.default pkgsBun pkgsBun).bun2nix;
               # makeScope reserves `packages`, so expose the package set as allPackages.
               allPackages = packages;
             }
             // lib.genAttrs packageNames (name: self.callPackage (./packages + "/${name}/package.nix") { })
           );
 
+          # Generate a standard passthru.updateScript from a package's
+          # declarative passthru.updater config (see lib/mk-update-script.nix).
+          mkUpdateScript = import ./lib/mk-update-script.nix {
+            inherit (pkgs)
+              lib
+              writeShellApplication
+              nix
+              git
+              cacert
+              bun
+              nodejs
+              ;
+            python3 = pkgs.python3;
+          };
+
+          # Attach passthru.updateScript to any package carrying passthru.updater,
+          # so one `nix run .#<pkg>.updateScript` drives every declarative updater.
+          withUpdateScript =
+            name: pkg:
+            if pkg ? updater then
+              pkg.overrideAttrs (old: {
+                passthru = (old.passthru or { }) // {
+                  updateScript = mkUpdateScript {
+                    inherit name;
+                    config = pkg.updater;
+                  };
+                };
+              })
+            else
+              pkg;
+
           # Only the packages, without the scope plumbing and helpers.
-          packages = lib.genAttrs packageNames (name: scope.${name});
+          packages = lib.mapAttrs withUpdateScript (lib.genAttrs packageNames (name: scope.${name}));
         in
         packages;
 

@@ -102,6 +102,26 @@ def run_update_command(cmd: list[str], error_label: str) -> None:
         sys.exit(1)
 
 
+def has_declarative_updater(name: str) -> bool:
+    """Whether the package carries a declarative passthru.updater config.
+
+    Such packages expose a standard passthru.updateScript (attached in
+    flake.nix from the config), so the update is one ``nix run`` away.
+    """
+    result = run(
+        [
+            "nix",
+            "eval",
+            f".#packages.x86_64-linux.{name}.updater",
+            "--apply",
+            "_: true",
+        ],
+        check=False,
+        capture=True,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "true"
+
+
 def load_nix_update_args(name: str) -> list[str]:
     """Load extra nix-update arguments from the package's nix-update-args file."""
     args_file = Path(f"packages/{name}/nix-update-args")
@@ -125,6 +145,12 @@ def update_package(name: str) -> None:
         run_update_command(
             sandbox_wrap([str(update_script)], name),
             f"Update script failed for package {name}",
+        )
+    elif has_declarative_updater(name):
+        log.info("Running updateScript for %s...", name)
+        run_update_command(
+            ["nix", "run", f".#packages.x86_64-linux.{name}.updateScript"],
+            f"updateScript failed for package {name}",
         )
     else:
         log.info("No update script found, trying nix-update...")

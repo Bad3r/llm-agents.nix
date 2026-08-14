@@ -7,6 +7,7 @@
   makeWrapper,
   versionCheckHook,
   versionCheckHomeHook,
+  mkUpdater,
 }:
 
 let
@@ -65,6 +66,10 @@ stdenvNoCC.mkDerivation {
   ];
 
   passthru.category = "Utilities";
+  passthru.updater = mkUpdater {
+    kind = "bun-github";
+    purl = "pkg:github/yusukebe/ax";
+  };
 
   meta = with lib; {
     description = "The AI-era curl: fetch, discover, extract. One command";

@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchzip,
+  mkUpdater,
   nodejs_24,
   postgresql_18,
   runCommand,
@@ -75,6 +76,12 @@ buildNpmPackage {
   versionCheckProgramArg = "--version";
 
   passthru.category = "AI Assistants";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/paperclipai";
+    fetchzip = true;
+    supplementOptionalDeps = true;
+  };
 
   meta = {
     description = "Open-source control plane for managing teams of AI agents";

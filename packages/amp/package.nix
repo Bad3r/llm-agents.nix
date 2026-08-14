@@ -11,12 +11,13 @@
   rcodesign,
   versionCheckHook,
   versionCheckHomeHook,
+  mkUpdater,
 }:
 
 let
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version;
-  hashes = versionData.binaryHashes;
+  hashes = versionData.hashes;
 
   platformMap = {
     x86_64-linux = "linux-x64";
@@ -84,6 +85,19 @@ stdenv.mkDerivation {
   ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "platform";
+    versionSource = {
+      type = "text";
+      url = "https://static.ampcode.com/cli/cli-version.txt";
+    };
+    urlTemplate = "https://static.ampcode.com/cli/{version}/amp-{platform}";
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+      aarch64-darwin = "darwin-arm64";
+    };
+  };
 
   meta = with lib; {
     description = "CLI for Amp, an agentic coding tool in research preview from Sourcegraph";

@@ -12,7 +12,17 @@ from .bun import (
 )
 
 # Dependency hash calculation
-from .deps import calculate_dependency_hash, update_dependency_hash
+from .deps import DepHasher, update_dependency_hash
+
+# Purl fetcher (source-identity layer)
+from .fetch import (
+    Deps,
+    Location,
+    PurlFetcher,
+    Resolved,
+    VersionPolicy,
+    default_deps,
+)
 
 # High-level update flows
 from .flows import (
@@ -45,6 +55,12 @@ from .npm import extract_or_generate_lockfile
 # Platform utilities
 from .platforms import calculate_platform_hashes
 
+# Purl parsing
+from .purl import Purl
+
+# State stores
+from .store import HashesJsonStore, StateStore
+
 # Version fetching
 from .version import (
     fetch_github_latest_release,
@@ -54,11 +70,20 @@ from .version import (
 )
 
 __all__ = [
+    "DepHasher",
+    "Deps",
+    "HashesJsonStore",
+    "Location",
     "NixCommandError",
-    "calculate_dependency_hash",
+    "Purl",
+    "PurlFetcher",
+    "Resolved",
+    "StateStore",
+    "VersionPolicy",
     "calculate_platform_hashes",
     "calculate_url_hash",
     "clone_and_generate_bun_nix",
+    "default_deps",
     "extract_or_generate_lockfile",
     "fetch_github_latest_release",
     "fetch_json",

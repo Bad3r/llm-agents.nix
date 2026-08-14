@@ -1,6 +1,7 @@
 {
   lib,
   flake,
+  mkUpdater,
   stdenv,
   fetchurl,
   wrapBuddy,
@@ -45,6 +46,27 @@ stdenv.mkDerivation {
   ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "manifest";
+    manifestUrl = "https://qoder-ide.oss-ap-southeast-1.aliyuncs.com/qodercli/channels/manifest.json";
+    platformMap = [
+      {
+        os = "linux";
+        arch = "amd64";
+        platform = "x86_64-linux";
+      }
+      {
+        os = "linux";
+        arch = "arm64";
+        platform = "aarch64-linux";
+      }
+      {
+        os = "darwin";
+        arch = "arm64";
+        platform = "aarch64-darwin";
+      }
+    ];
+  };
 
   meta = with lib; {
     description = "Qoder AI CLI tool - Terminal-based AI assistant for code development";

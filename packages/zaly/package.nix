@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
+  mkUpdater,
   runCommand,
   versionCheckHook,
   versionCheckHomeHook,
@@ -45,6 +46,13 @@ buildNpmPackage {
   ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40zaly/cli";
+    lockfileEnv = {
+      NPM_CONFIG_OMIT = "dev";
+    };
+  };
 
   meta = with lib; {
     description = "Hackable terminal coding agent";

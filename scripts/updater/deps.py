@@ -1,66 +1,61 @@
-"""Dependency hash calculation utilities for Nix package updaters.
+"""Dependency hash calculation (cargoHash, vendorHash, npmDepsHash, ...).
 
-This module provides utilities for calculating dependency hashes
-(cargoHash, vendorHash, npmDepsHash, outputHash) using the
-dummy-hash-and-build pattern.
+Computed with the dummy-hash-and-build pattern: stage a placeholder, build,
+and read the correct hash out of the resulting mismatch error.
 """
 
-from pathlib import Path
-from typing import Any
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from .hash import DUMMY_SHA256_HASH, extract_hash_from_build_error
-from .hashes_file import save_hashes
 from .nix import NixCommandError, nix_build
+from .store import HashesJsonStore
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    from .store import StateStore
 
 
-def calculate_dependency_hash(
-    package_attr: str,
-    hash_key: str,
-    hashes_file: Path,
-    data: dict[str, Any],
-) -> str:
-    """Calculate dependency hash by building with dummy hash and extracting from error.
+class DepHasher:
+    """Compute a dependency hash via the dummy-build error, over a StateStore."""
 
-    This function:
-    1. Saves the current hash value
-    2. Writes a dummy hash to hashes.json
-    3. Triggers a nix build (which will fail)
-    4. Extracts the correct hash from the build error
-    5. Restores original hash on failure
+    def __init__(
+        self,
+        store: StateStore,
+        package_attr: str,
+        *,
+        build: Callable[..., Any] = nix_build,
+    ) -> None:
+        """Bind the hasher to a store, package attr, and build command."""
+        self._store = store
+        self._attr = package_attr
+        self._build = build
 
-    Args:
-        package_attr: Nix package attribute (e.g., ".#codex", ".#claude-code")
-        hash_key: Key in data dict for the hash (e.g., "cargoHash", "vendorHash")
-        hashes_file: Path to hashes.json file
-        data: Dictionary containing package data
+    def hash(self, hash_key: str) -> str:
+        """Stage a dummy hash, build, and return the real hash from the error.
 
-    Returns:
-        Calculated hash in SRI format
-
-    Raises:
-        ValueError: If hash cannot be extracted from build error
-
-    """
-    print(f"Calculating {hash_key}...")
-    original_hash = data[hash_key]
-
-    # Write dummy hash
-    data[hash_key] = DUMMY_SHA256_HASH
-    save_hashes(hashes_file, data)
-
-    try:
-        nix_build(package_attr, check=True)
+        Any failure rolls the store back, so a broken run never leaves a
+        placeholder behind.
+        """
+        original = self._store.get(hash_key)
+        self._store.stage_dummy(hash_key, DUMMY_SHA256_HASH)
+        try:
+            self._build(self._attr, check=True)
+        except NixCommandError as exc:
+            found = extract_hash_from_build_error(exc.args[0])
+            if not found:
+                self._store.rollback(hash_key, original)
+                msg = f"Could not extract hash from build error:\n{exc.args[0]}"
+                raise ValueError(msg) from exc
+            self._store.commit(hash_key, found)
+            return found
+        # A build with the dummy hash must fail; success means something is off.
+        self._store.rollback(hash_key, original)
         msg = "Build succeeded with dummy hash - unexpected"
         raise ValueError(msg)
-    except NixCommandError as e:
-        dep_hash = extract_hash_from_build_error(e.args[0])
-        if not dep_hash:
-            # Restore original hash
-            data[hash_key] = original_hash
-            save_hashes(hashes_file, data)
-            msg = f"Could not extract hash from build error:\n{e.args[0]}"
-            raise ValueError(msg) from e
-        return dep_hash
 
 
 def update_dependency_hash(
@@ -71,22 +66,11 @@ def update_dependency_hash(
 ) -> None:
     """Calculate a dependency hash and persist it to the hashes file.
 
-    Wraps calculate_dependency_hash so every updater fails the same way:
-    on error the process exits non-zero, which stops CI from committing a
-    placeholder hash and opening a broken update PR.
-
-    Args:
-        package_attr: Nix package attribute (e.g., ".#codex")
-        hash_key: Key in data dict for the hash (e.g., "cargoHash")
-        hashes_file: Path to hashes.json file
-        data: Dictionary containing package data (updated in place)
-
+    On error exits non-zero, so CI never commits a placeholder hash.
     """
+    store = HashesJsonStore(hashes_file, data=data)
     try:
-        data[hash_key] = calculate_dependency_hash(
-            package_attr, hash_key, hashes_file, data
-        )
-        save_hashes(hashes_file, data)
-    except (ValueError, NixCommandError) as e:
-        msg = f"Error calculating {hash_key} for {package_attr}: {e}"
-        raise SystemExit(msg) from e
+        DepHasher(store, package_attr).hash(hash_key)
+    except (ValueError, NixCommandError) as exc:
+        msg = f"Error calculating {hash_key} for {package_attr}: {exc}"
+        raise SystemExit(msg) from exc

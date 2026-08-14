@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchzip,
+  mkUpdater,
   versionCheckHook,
   nodejs_24,
   runCommand,
@@ -53,6 +54,11 @@ buildNpmPackage {
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Utilities";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40github/copilot-language-server";
+    fetchzip = true;
+  };
 
   meta = with lib; {
     description = "GitHub Copilot Language Server - AI pair programmer LSP";

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from updater.hash import hex_to_sri
+from updater.fetch import Location, default_deps
+from updater.handlers import GenericHandler
 from updater.hashes_file import load_hashes, save_hashes
 from updater.http import fetch_json
 from updater.version import should_update
@@ -21,10 +22,11 @@ def update_manifest_binaries(
 ) -> None:
     """Update a package from a manifest listing per-platform urls and sha256.
 
-    The manifest must contain ``latest`` and a ``files`` list with ``os``,
-    ``arch``, ``url`` and ``sha256`` (hex) entries. ``platform_map`` maps
-    ``(os, arch)`` pairs to Nix platform names. Upstream has changed file
-    naming before, so the exact URL is recorded rather than reconstructed.
+    The manifest needs ``latest`` and a ``files`` list of ``os``/``arch``/
+    ``url``/``sha256`` (hex). ``platform_map`` maps ``(os, arch)`` to Nix
+    platform names. The exact URL is recorded, not reconstructed: upstream has
+    changed file naming before. Each file goes through ``Location`` so the
+    hex-to-SRI conversion reuses the shared ``source_hash`` path.
     """
     hashes_file = pkg_dir / "hashes.json"
     data = load_hashes(hashes_file)
@@ -42,13 +44,17 @@ def update_manifest_binaries(
         print("Already up to date")
         return
 
+    hasher = GenericHandler(default_deps())
     platforms: dict[str, dict[str, str]] = {}
     for file_entry in manifest["files"]:
         nix_platform = platform_map.get((file_entry["os"], file_entry["arch"]))
         if nix_platform is not None:
+            location = Location(
+                nix_platform, file_entry["url"], upstream_sha=file_entry["sha256"]
+            )
             platforms[nix_platform] = {
-                "url": file_entry["url"],
-                "hash": hex_to_sri(file_entry["sha256"]),
+                "url": location.url,
+                "hash": hasher.source_hash(location),
             }
 
     missing = set(platform_map.values()) - set(platforms)

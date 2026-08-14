@@ -6,19 +6,23 @@
   fetchFromGitHub,
   makeWrapper,
   typescript,
+  mkUpdater,
 }:
 
+let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+in
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   forceGitDeps = true;
   pname = "gitnexus";
-  version = "1.6.9";
+  inherit (versionData) version;
 
   src = fetchFromGitHub {
     owner = "abhigyanpatwari";
     repo = "GitNexus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-lLO5+b/LqVDtOuJwqc4d6SmAtmKVfoHe7tXsYHRWrOw=";
+    inherit (versionData) hash;
   };
 
   sourceRoot = "source/gitnexus";
@@ -41,7 +45,7 @@ buildNpmPackage (finalAttrs: {
       --replace-fail "path.join('node_modules', '.bin', 'tsc')" "'tsc'"
   '';
 
-  npmDepsHash = "sha256-kVRy2o6r/2C3HR8Mdcb7WJXqJBsjmYdnePPRRQ6zhIU=";
+  inherit (versionData) npmDepsHash;
   makeCacheWritable = true;
 
   npmFlags = [ "--ignore-scripts" ];
@@ -94,6 +98,11 @@ buildNpmPackage (finalAttrs: {
     '';
 
   passthru.category = "Memory & Code Intelligence";
+  passthru.updater = mkUpdater {
+    kind = "github-source";
+    purl = "pkg:github/abhigyanpatwari/GitNexus";
+    depHashKey = "npmDepsHash";
+  };
 
   meta = with lib; {
     description = "Graph-powered code intelligence for AI agents";

@@ -6,6 +6,7 @@
   unpinGoModVersionHook,
   versionCheckHook,
   flake,
+  mkUpdater,
 }:
 
 let
@@ -43,6 +44,11 @@ buildGoModule.override { go = go_1_26; } {
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Utilities";
+  passthru.updater = mkUpdater {
+    kind = "github-source";
+    purl = "pkg:github/router-for-me/CLIProxyAPI";
+    depHashKey = "vendorHash";
+  };
 
   meta = with lib; {
     description = "Unified proxy providing OpenAI/Gemini/Claude/Codex compatible APIs for AI coding CLI tools";

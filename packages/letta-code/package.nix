@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
+  mkUpdater,
   nodejs,
   runCommand,
   versionCheckHook,
@@ -53,6 +54,13 @@ buildNpmPackage rec {
   ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40letta-ai/letta-code";
+    lockfileEnv = {
+      NPM_CONFIG_LEGACY_PEER_DEPS = "true";
+    };
+  };
 
   meta = with lib; {
     description = "Memory-first coding agent that learns and evolves across sessions";

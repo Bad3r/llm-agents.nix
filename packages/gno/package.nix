@@ -3,6 +3,7 @@
   stdenv,
   fetchFromGitHub,
   fetchurl,
+  mkUpdater,
   bun,
   bun2nixLib,
   makeWrapper,
@@ -191,6 +192,10 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "Memory & Code Intelligence";
+  passthru.updater = mkUpdater {
+    kind = "bun-github";
+    purl = "pkg:github/gmickel/gno";
+  };
 
   meta = with lib; {
     description = "Local-first knowledge engine with hybrid search, RAG Q&A, and MCP server integration";

@@ -10,6 +10,7 @@
   versionCheckHook,
   versionCheckHomeHook,
   writeShellScriptBin,
+  mkUpdater,
 }:
 
 let
@@ -122,6 +123,20 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "platform";
+    versionSource = {
+      type = "github";
+      owner = "anomalyco";
+      repo = "opencode";
+    };
+    urlTemplate = "https://github.com/anomalyco/opencode/releases/download/v{version}/{platform}";
+    platforms = {
+      x86_64-linux = "opencode-linux-x64.tar.gz";
+      aarch64-linux = "opencode-linux-arm64.tar.gz";
+      aarch64-darwin = "opencode-darwin-arm64.zip";
+    };
+  };
 
   meta = {
     description = "AI coding agent built for the terminal";

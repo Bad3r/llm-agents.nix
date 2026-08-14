@@ -17,3 +17,6 @@ packages/wrapBuddy/.cache/clangd
 
 # Rust build artifacts
 target/
+.claude/
+scripts/updater/*-DESIGN.md
+scripts/updater/*-MIGRATION.md

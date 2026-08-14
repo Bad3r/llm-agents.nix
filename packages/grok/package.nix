@@ -1,6 +1,7 @@
 {
   lib,
   flake,
+  mkUpdater,
   stdenv,
   platformSource,
   makeWrapper,
@@ -18,9 +19,7 @@ let
       aarch64-linux = "linux-aarch64";
       aarch64-darwin = "macos-aarch64";
     };
-    url =
-      { version, platform }:
-      "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-${version}-${platform}";
+    urlTemplate = "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-{version}-{platform}";
   };
   inherit (source) version;
 in
@@ -73,6 +72,15 @@ stdenv.mkDerivation {
   ];
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "text";
+        url = "https://storage.googleapis.com/grok-build-public-artifacts/cli/stable";
+      };
+    }
+  );
 
   meta = with lib; {
     description = "Grok Build, xAI's agentic coding tool";

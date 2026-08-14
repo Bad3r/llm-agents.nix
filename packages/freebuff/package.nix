@@ -17,9 +17,7 @@ let
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
     };
-    url =
-      { version, platform }:
-      "https://github.com/CodebuffAI/codebuff-community/releases/download/freebuff-v${version}/freebuff-${platform}.tar.gz";
+    urlTemplate = "https://github.com/CodebuffAI/codebuff-community/releases/download/freebuff-v{version}/freebuff-{platform}.tar.gz";
   };
 in
 stdenv.mkDerivation {

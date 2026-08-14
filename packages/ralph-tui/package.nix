@@ -6,6 +6,7 @@
   bun,
   fetchFromGitHub,
   makeWrapper,
+  mkUpdater,
 }:
 
 let
@@ -55,6 +56,10 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "Workflow & Project Management";
+  passthru.updater = mkUpdater {
+    kind = "bun-github";
+    purl = "pkg:github/subsy/ralph-tui";
+  };
 
   meta = with lib; {
     description = "AI Agent Loop Orchestrator TUI";

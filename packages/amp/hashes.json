@@ -1,6 +1,6 @@
 {
   "version": "0.0.1786666234-gf5184d",
-  "binaryHashes": {
+  "hashes": {
     "x86_64-linux": "sha256-LdSwh4x6B1oQHKWqwrmTJjoOFjXQNZga4rcSRYh3V5I=",
     "aarch64-linux": "sha256-CeISKxZ4fdp0px+WW60DFFndsiP+yV2TBCLaBC+ANgU=",
     "aarch64-darwin": "sha256-hSjI+t3MDs9gxckCZObUMHY2g6lmC4zlMT6QVzR7xaU="

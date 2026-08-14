@@ -5,6 +5,7 @@
   bun,
   fetchFromGitHub,
   jq,
+  mkUpdater,
 }:
 
 let
@@ -83,6 +84,10 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "Workflow & Project Management";
+  passthru.updater = mkUpdater {
+    kind = "bun-github";
+    purl = "pkg:github/MrLesk/Backlog.md";
+  };
 
   meta = with lib; {
     description = "Backlog.md - A tool for managing project collaboration between humans and AI Agents in a git ecosystem";

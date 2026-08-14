@@ -2,6 +2,7 @@
   buildNpmPackage,
   fetchurl,
   lib,
+  mkUpdater,
   runCommand,
 }:
 
@@ -42,6 +43,10 @@ buildNpmPackage {
   '';
 
   passthru.category = "Workflow & Project Management";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40fission-ai/openspec";
+  };
 
   meta = {
     description = "Spec-driven development for AI coding assistants";

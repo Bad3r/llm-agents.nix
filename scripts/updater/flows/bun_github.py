@@ -5,9 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from updater.bun import clone_and_generate_bun_nix
+from updater.fetch import PurlFetcher
 from updater.hashes_file import load_hashes, save_hashes
-from updater.nix import nix_prefetch_url
-from updater.version import fetch_github_latest_release, should_update
+from updater.purl import Purl
+from updater.version import should_update
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -20,39 +21,40 @@ def update_bun_github(
     *,
     ref_prefix: str = "v",
 ) -> None:
-    """Update a bun2nix package built from a GitHub release source tarball.
+    """Bump version/hash and regenerate bun.nix from the upstream bun.lock.
 
-    Bumps version/hash in hashes.json and regenerates bun.nix from the
-    upstream bun.lock.
+    A non-default ref_prefix becomes an x_tag_template qualifier so the
+    fetcher builds the same archive URL as before.
     """
     flake_root = pkg_dir.parent.parent
     hashes_file = pkg_dir / "hashes.json"
     data = load_hashes(hashes_file)
     current = data["version"]
-    latest = fetch_github_latest_release(owner, repo)
 
-    print(f"Current: {current}, Latest: {latest}")
+    fetcher = PurlFetcher.default()
+    purl = Purl("github", owner, repo)
+    if ref_prefix != "v":
+        purl = purl.with_qualifiers(x_tag_template=f"{ref_prefix}{{v}}")
+    resolved = fetcher.resolve(purl)
 
-    if not should_update(current, latest):
+    print(f"Current: {current}, Latest: {resolved.version}")
+
+    if not should_update(current, resolved.version):
         print("Already up to date")
         return
 
     print("Calculating source hash...")
-    url = (
-        f"https://github.com/{owner}/{repo}/archive/refs/tags/"
-        f"{ref_prefix}{latest}.tar.gz"
-    )
-    src_hash = nix_prefetch_url(url, unpack=True)
+    src_hash = fetcher.hashes(purl, resolved)["src"]
 
-    save_hashes(hashes_file, {"version": latest, "hash": src_hash})
+    save_hashes(hashes_file, {"version": resolved.version, "hash": src_hash})
 
     clone_and_generate_bun_nix(
         owner,
         repo,
-        latest,
+        resolved.version,
         pkg_dir / "bun.nix",
         flake_root,
         ref_prefix=ref_prefix,
     )
 
-    print(f"Updated to {latest}")
+    print(f"Updated to {resolved.version}")

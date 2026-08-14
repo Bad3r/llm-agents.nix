@@ -19,9 +19,7 @@ let
       aarch64-linux = "linux-aarch64";
       aarch64-darwin = "macos-aarch64";
     };
-    url =
-      { version, platform }:
-      "https://github.com/JetBrains/junie/releases/download/${version}/junie-release-${version}-${platform}.zip";
+    urlTemplate = "https://github.com/JetBrains/junie/releases/download/{version}/junie-release-{version}-{platform}.zip";
   };
   inherit (source) version;
 in

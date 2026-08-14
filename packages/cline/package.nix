@@ -21,9 +21,7 @@ let
       aarch64-linux = "linux-arm64";
       aarch64-darwin = "darwin-arm64";
     };
-    url =
-      { version, platform }:
-      "https://registry.npmjs.org/@cline/cli-${platform}/-/cli-${platform}-${version}.tgz";
+    urlTemplate = "https://registry.npmjs.org/@cline/cli-{platform}/-/cli-{platform}-{version}.tgz";
   };
   launcher = fetchurl {
     url = "https://registry.npmjs.org/cline/-/cline-${source.version}.tgz";

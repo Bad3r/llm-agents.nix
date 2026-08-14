@@ -2,6 +2,7 @@
   buildNpmPackage,
   fetchurl,
   lib,
+  mkUpdater,
   runCommand,
   versionCheckHook,
   flake,
@@ -44,6 +45,10 @@ buildNpmPackage {
   nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Skills & Plugins";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/skills";
+  };
 
   meta = with lib; {
     description = "The open agent skills tool for installing and managing skills across AI coding agents";

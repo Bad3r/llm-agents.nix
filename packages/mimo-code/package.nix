@@ -11,6 +11,7 @@
   versionCheckHomeHook,
   writeShellScriptBin,
   flake,
+  mkUpdater,
 }:
 
 let
@@ -107,6 +108,20 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "platform";
+    versionSource = {
+      type = "github";
+      owner = "XiaomiMiMo";
+      repo = "MiMo-Code";
+    };
+    urlTemplate = "https://github.com/XiaomiMiMo/MiMo-Code/releases/download/v{version}/{platform}";
+    platforms = {
+      x86_64-linux = "mimocode-linux-x64.tar.gz";
+      aarch64-linux = "mimocode-linux-arm64.tar.gz";
+      aarch64-darwin = "mimocode-darwin-arm64.zip";
+    };
+  };
 
   meta = {
     description = "Open-source AI coding agent with cross-session memory";
