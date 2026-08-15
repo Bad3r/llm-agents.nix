@@ -18,13 +18,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
   version = "0.8.0";
 
   src = fetchFromGitHub {
-    owner = "ogulcancelik";
+    owner = "herdrdev";
     repo = "herdr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Uo1z1YBbzULkHg1oGaZwqmJfYmFdd7frCB+xdgM6vAk=";
+    hash = "sha256-empFQ+hrnCh2JhOzQRWSCLV0YoZC3DXW3bY6k8YuJjk=";
   };
 
-  cargoHash = "sha256-kuHJpe1zr+pfY+PhGhikKjEGJh8rRSlfalXwBPYIxQE=";
+  cargoHash = "sha256-E1lBgpTFZwNjeALeg/atwbDFL/XQbUnvCdX7ohbAHAc=";
 
   # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
   # build offline.  fetchDeps is a fixed-output derivation, so this does not
@@ -99,7 +99,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Terminal workspace manager for AI coding agents";
     homepage = "https://herdr.dev";
-    changelog = "https://github.com/ogulcancelik/herdr/releases/tag/v${finalAttrs.version}";
+    changelog = "https://github.com/herdrdev/herdr/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.agpl3Plus;
     maintainers = with flake.lib.maintainers; [ murlakatam ];
     mainProgram = "herdr";
