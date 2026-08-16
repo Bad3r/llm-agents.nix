@@ -16,26 +16,26 @@ let
   # build.rs resolves that URL from nodes.litellm.locked in the tagged tree's
   # flake.lock, so the pin must match it exactly or we embed different prices
   # than upstream ships. update.py re-reads it from the tag on every bump.
-  litellmRev = "34561482ed092d78c296cab7999486022af5a938";
+  litellmRev = "1a183efaa1a2108aed7e1bed8d445d93bd1aa60d";
   litellm-pricing = fetchurl {
     url = "https://raw.githubusercontent.com/BerriAI/litellm/${litellmRev}/model_prices_and_context_window.json";
-    hash = "sha256-jV/bRDNx+DNMKMsP9kvw82rRNexvdm7sdnzGLTt/gJI=";
+    hash = "sha256-p0U40u3BPh609nhw+8LuBQNTJubq7Q3FvOEdNyz/bmA=";
   };
 in
 rustPlatform.buildRustPackage rec {
   pname = "ccusage";
-  version = "20.0.19";
+  version = "20.0.20";
 
   src = fetchFromGitHub {
     owner = "ccusage";
     repo = "ccusage";
     tag = "v${version}";
-    hash = "sha256-/x/RsJ8JLrGm8UXBewF/kbFLTdE51P+tPb3LwBT+LT8=";
+    hash = "sha256-fMEun+cbIUWBJgH26FsY0xh9uq86ySZsiRpRgBqEUCk=";
   };
 
   sourceRoot = "${src.name}/rust";
 
-  cargoHash = "sha256-VJBLhQrVmeZSJ0EVpZaDiQ0eMpk5fgcaipgRd2GN9gw=";
+  cargoHash = "sha256-uKJlz37i/y2sCBHA12yY4pkjT6HOV9Nbw1ATyUsG+uY=";
 
   cargoBuildFlags = [
     "-p"
