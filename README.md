@@ -470,6 +470,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/zaly/package.nix](packages/zaly/package.nix)
 
 </details>
+<details>
+<summary><strong>zcode</strong> - Agentic development environment (ADE) by Z.ai</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://zcode.z.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#zcode -- --help`
+- **Nix**: [packages/zcode/package.nix](packages/zcode/package.nix)
+
+</details>
 
 ### AI Assistants
 

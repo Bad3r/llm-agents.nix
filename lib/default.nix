@@ -219,6 +219,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 184182;
         name = "Nanne";
       };
+      imxyy1soope1 = {
+        github = "imxyy1soope1";
+        githubId = 103114856;
+        name = "imxyy_soope_";
+      };
     };
   }
 )

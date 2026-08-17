@@ -12,16 +12,16 @@
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "vessel-browser";
-  version = "0.1.189";
+  version = "0.1.191";
 
   src = fetchFromGitHub {
     owner = "unmodeled-tyler";
     repo = "vessel-browser";
     tag = "v${version}";
-    hash = "sha256-dIBfF2f0jfIB1VzpVL4OGRlBTZ0t5nBojdcWSifawRs=";
+    hash = "sha256-3TphMhmNa8XbJbRWqA9lYhlSsI1YonsPS/oGngsZCTs=";
   };
 
-  npmDepsHash = "sha256-bfXEZVD7CV6jeiu3kXHoVv+tpGwYg7WHSNZMtiF6vcw=";
+  npmDepsHash = "sha256-c3u18DsIG0umDiSatfCCoW4QQB03YWAVTTX2rRCm0e8=";
 
   nativeBuildInputs = [
     copyDesktopItems

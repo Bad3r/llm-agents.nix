@@ -46,6 +46,7 @@
   libxfixes,
   libxrandr,
   libxcb,
+  commandLineArgs ? "",
 }:
 
 let
@@ -162,7 +163,9 @@ stdenv.mkDerivation {
           coreutils
           xdg-utils
         ]
-      }
+      } \
+      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}" \
+      --add-flags ${lib.escapeShellArg commandLineArgs}
 
     runHook postInstall
   '';
