@@ -100,7 +100,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     description = "Terminal workspace manager for AI coding agents";
     homepage = "https://herdr.dev";
     changelog = "https://github.com/herdrdev/herdr/releases/tag/v${finalAttrs.version}";
-    license = lib.licenses.agpl3Plus;
+    license = lib.licenses.asl20;
     maintainers = with flake.lib.maintainers; [ murlakatam ];
     mainProgram = "herdr";
     sourceProvenance = [ lib.sourceTypes.fromSource ];

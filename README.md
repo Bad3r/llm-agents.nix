@@ -879,7 +879,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <summary><strong>herdr</strong> - Terminal workspace manager for AI coding agents</summary>
 
 - **Source**: source
-- **License**: AGPL-3.0-or-later
+- **License**: Apache-2.0
 - **Homepage**: https://herdr.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#herdr -- --help`
 - **Nix**: [packages/herdr/package.nix](packages/herdr/package.nix)

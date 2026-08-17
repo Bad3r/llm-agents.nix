@@ -1,8 +1,8 @@
 {
-  "version": "0.40.1",
-  "hash": "sha256-L4qWANdl7v/ttaQLfqrNzIRg68Qxe9JLRSh7FTkA8pQ=",
-  "npmDepsHash": "sha256-YTNVoyQuZZX5n81NbAI+VG6CLNb6sMiTDxtYzzaZa50=",
-  "vendorHash": "sha256-/iGBvl5xGSkfszcQyrT3vrSnVZOb+RRISlkeJpx8LUs=",
+  "version": "0.41.0",
+  "hash": "sha256-+cXpfGf7+SD60pNjby8JkeAe2KrFBBItpgmmy2Pn4xQ=",
+  "npmDepsHash": "sha256-PCrBQ1/1O/0L2FdctUE9yVv4PxfnfXdrYowJiJjX3M0=",
+  "vendorHash": "sha256-tkDQ8haOP15IvMYC4+FRvGGFEhejfGHM6Oh6PxLNSyE=",
   "litellmSnapshot": {
     "url": "https://raw.githubusercontent.com/kenn-io/agentsview/db257992fb8e3048af8c1cec9da738c28b4fe603/litellm_snapshot.json.gz",
     "hash": "sha256-Dom2Nsz4WO2/laP2GIR2tuq2zyH2bRamXCGEIp74HL4="
