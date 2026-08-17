@@ -44,13 +44,15 @@ stdenv.mkDerivation {
 
     install -Dm755 $src $out/libexec/grok/grok
 
+    # Disable self-updates without injecting --no-auto-update into argv. Callers
+    # such as Kandev already pass that documented flag themselves.
     makeWrapper $out/libexec/grok/grok $out/libexec/grok/grok-launcher \
       --argv0 grok \
-      --add-flags --no-auto-update
+      --set GROK_DISABLE_AUTOUPDATER 1
 
     makeWrapper $out/libexec/grok/grok $out/libexec/grok/agent-launcher \
       --argv0 agent \
-      --add-flags --no-auto-update
+      --set GROK_DISABLE_AUTOUPDATER 1
 
     # bin → launcher on all platforms. A former Linux-only bubblewrap shim
     # faked /bin/{bash,zsh} for older Grok builds that hardcoded those paths
@@ -70,6 +72,12 @@ stdenv.mkDerivation {
     versionCheckHook
     versionCheckHomeHook
   ];
+  postInstallCheck = ''
+    grep -q GROK_DISABLE_AUTOUPDATER $out/libexec/grok/grok-launcher
+    grep -q GROK_DISABLE_AUTOUPDATER $out/libexec/grok/agent-launcher
+    $out/bin/grok --no-auto-update --version
+    $out/bin/agent --no-auto-update --version
+  '';
 
   passthru.category = "AI Coding Agents";
   passthru.updater = mkUpdater (

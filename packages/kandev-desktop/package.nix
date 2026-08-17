@@ -9,9 +9,6 @@
   pnpm_10,
   fetchurl,
   nodejs_24,
-  codex,
-  codex-acp,
-  gemini-cli,
   cargo-tauri,
   pkg-config,
   wrapGAppsHook3,
@@ -21,9 +18,7 @@
   openssl,
   webkitgtk_4_1,
   kandev,
-  git,
-  bash,
-  openssh,
+  kandevRuntime ? kandev,
 }:
 
 let
@@ -98,15 +93,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
   '';
 
   preBuild = ''
-    if [[ ${kandev.version} != ${finalAttrs.version} ]]; then
-      echo "Kandev Desktop ${finalAttrs.version} requires the matching Kandev runtime; got ${kandev.version}." >&2
+    if [[ ${kandevRuntime.version} != ${finalAttrs.version} ]]; then
+      echo "Kandev Desktop ${finalAttrs.version} requires the matching Kandev runtime; got ${kandevRuntime.version}." >&2
       exit 1
     fi
 
     runtime=apps/desktop/src-tauri/resources/kandev
     rm -rf "$runtime"
     mkdir -p "$runtime/bin"
-    cp -L ${kandev}/libexec/kandev/bin/* "$runtime/bin/"
+    cp -L ${kandevRuntime}/libexec/kandev/bin/* "$runtime/bin/"
     chmod +x "$runtime/bin/"*
   '';
 
@@ -115,17 +110,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   preFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
     gappsWrapperArgs+=(
-      --prefix PATH : ${
-        lib.makeBinPath [
-          nodejs_24
-          codex
-          codex-acp
-          gemini-cli
-          git
-          bash
-          openssh
-        ]
-      }
+      ${lib.escapeShellArgs kandevRuntime.agentRuntimeWrapperArgs}
+      --prefix PATH : ${kandevRuntime.agentPath}
     )
   '';
 
@@ -136,17 +122,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     makeBinaryWrapper \
       "$launcher-unwrapped" \
       "$launcher" \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          nodejs_24
-          codex
-          codex-acp
-          gemini-cli
-          git
-          bash
-          openssh
-        ]
-      }
+      ${lib.escapeShellArgs kandevRuntime.agentRuntimeWrapperArgs} \
+      --prefix PATH : ${kandevRuntime.agentPath}
     mkdir -p "$out/bin"
     ln -s "$launcher" "$out/bin/kandev-desktop"
   '';
@@ -168,7 +145,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
     runHook preInstallCheck
 
     test -x "$out/bin/kandev-desktop"
-    grep -aF '${nodejs_24}/bin' "$out/bin/kandev-desktop" >/dev/null
+    ${lib.concatMapStringsSep "\n" (
+      package: ''grep -aF '${lib.getBin package}/bin' "$out/bin/kandev-desktop" >/dev/null''
+    ) kandevRuntime.agentRuntimePackages}
+    ${lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (name: value: ''
+        grep -aF '${name}' "$out/bin/kandev-desktop" >/dev/null
+        grep -aF '${value}' "$out/bin/kandev-desktop" >/dev/null
+      '') kandevRuntime.agentRuntimeEnvironment
+    )}
     runtime=$out/${
       if stdenv.hostPlatform.isDarwin then "Applications/Kandev.app/Contents/Resources" else "lib/Kandev"
     }/kandev
@@ -186,7 +171,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     runHook postInstallCheck
   '';
 
-  passthru.category = "Workflow & Project Management";
+  passthru = {
+    category = "Workflow & Project Management";
+    inherit kandevRuntime;
+  };
 
   meta = {
     description = "Native desktop application for the Kandev agentic development platform";

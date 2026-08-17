@@ -893,6 +893,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/kdlbs/kandev
 - **Usage**: `nix run github:numtide/llm-agents.nix#kandev -- --help`
 - **Nix**: [packages/kandev/package.nix](packages/kandev/package.nix)
+- **Documentation**: See [packages/kandev/README.md](packages/kandev/README.md) for detailed usage
 
 </details>
 <details>

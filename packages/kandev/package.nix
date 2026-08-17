@@ -10,9 +10,39 @@
   pnpm_10,
   fetchurl,
   nodejs_24,
+  claude-code,
   codex,
-  codex-acp,
   gemini-cli,
+  pi,
+  omp,
+  opencode,
+  copilot-cli,
+  hermes-agent,
+  amp,
+  cursor-agent,
+  droid,
+  grok,
+  kilocode-cli,
+  kimi-code,
+  qoder-cli,
+  qwen-code,
+  claudeSupport ? false,
+  codexSupport ? false,
+  geminiSupport ? false,
+  piSupport ? false,
+  ompSupport ? false,
+  opencodeSupport ? false,
+  copilotSupport ? false,
+  hermesSupport ? false,
+  ampSupport ? false,
+  cursorSupport ? false,
+  droidSupport ? false,
+  grokSupport ? false,
+  kilocodeSupport ? false,
+  kimiSupport ? false,
+  qoderSupport ? false,
+  qwenSupport ? false,
+  extraPackages ? [ ],
   makeWrapper,
   rcodesign,
   git,
@@ -32,6 +62,71 @@ let
     tag = "v${version}";
     hash = "sha256-YLJ6shH/CCh7I8412Fw6tVuma4bCiBFheH9BDM49T1k=";
   };
+
+  runtimeTools = [
+    nodejs_24
+    git
+    bash
+    openssh
+  ];
+  agentRuntimePackages =
+    runtimeTools
+    ++ lib.optional claudeSupport claude-code
+    ++ lib.optional codexSupport codex
+    ++ lib.optional geminiSupport gemini-cli
+    ++ lib.optional piSupport pi
+    ++ lib.optional ompSupport omp
+    ++ lib.optional opencodeSupport opencode
+    ++ lib.optional copilotSupport copilot-cli
+    ++ lib.optional hermesSupport hermes-agent
+    ++ lib.optional ampSupport amp
+    ++ lib.optional cursorSupport cursor-agent
+    ++ lib.optional droidSupport droid
+    ++ lib.optional grokSupport grok
+    ++ lib.optional kilocodeSupport kilocode-cli
+    ++ lib.optional kimiSupport kimi-code
+    ++ lib.optional qoderSupport qoder-cli
+    ++ lib.optional qwenSupport qwen-code
+    ++ extraPackages;
+  agentRuntimeCommands = [
+    "node"
+    "git"
+    "bash"
+    "ssh"
+  ]
+  ++ lib.optional claudeSupport "claude"
+  ++ lib.optional codexSupport "codex"
+  ++ lib.optional geminiSupport "gemini"
+  ++ lib.optional piSupport "pi"
+  ++ lib.optional ompSupport "omp"
+  ++ lib.optional opencodeSupport "opencode"
+  ++ lib.optional copilotSupport "copilot"
+  ++ lib.optional hermesSupport "hermes"
+  ++ lib.optional ampSupport "amp"
+  ++ lib.optional cursorSupport "cursor-agent"
+  ++ lib.optional droidSupport "droid"
+  ++ lib.optional grokSupport "grok"
+  ++ lib.optional kilocodeSupport "kilocode"
+  ++ lib.optional kimiSupport "kimi"
+  ++ lib.optional qoderSupport "qodercli"
+  ++ lib.optional qwenSupport "qwen";
+  agentPath = lib.makeBinPath agentRuntimePackages;
+  # The npm ACP adapters bundle native CLI binaries whose FHS interpreters are
+  # unavailable on NixOS. Both adapters honor these overrides and ignore PATH.
+  agentRuntimeEnvironment =
+    lib.optionalAttrs claudeSupport {
+      CLAUDE_CODE_EXECUTABLE = lib.getExe claude-code;
+    }
+    // lib.optionalAttrs codexSupport {
+      CODEX_PATH = lib.getExe codex;
+    };
+  agentRuntimeWrapperArgs = lib.concatLists (
+    lib.mapAttrsToList (name: value: [
+      "--set"
+      name
+      value
+    ]) agentRuntimeEnvironment
+  );
 
   pnpm = pnpm_10.overrideAttrs (_: {
     version = "9.15.9";
@@ -98,17 +193,18 @@ buildGoModule (_finalAttrs: {
     "-X main.Version=v${version}"
   ];
 
+  patches = [
+    ./prefer-native-acp-runtimes.patch
+    ./use-pi-cli-passthrough.patch
+  ];
+
   postPatch = ''
-    substituteInPlace apps/backend/internal/agent/agents/codex_acp.go \
-      --replace-fail 'a.ManagedNPMRuntime().CachedACPCommand()' 'NewCommand("codex-acp")' \
-      --replace-fail 'NewCommand("npx", "-y", "@openai/codex")' 'NewCommand("codex")'
-    substituteInPlace apps/backend/internal/agent/agents/gemini.go \
-      --replace-fail 'a.ManagedNPMRuntime().CachedACPCommand()' 'NewCommand("gemini", "--acp")' \
-      --replace-fail 'NewCommand("npx", "--yes", "--prefer-offline", geminiPackage)' 'NewCommand("gemini")'
-    old_probe_command='"npx":           "npx",'
-    new_probe_commands=$'"codex-acp":     "codex-acp",\n\t"gemini":        "gemini",\n\t"npx":           "npx",'
-    substituteInPlace apps/backend/internal/agentctl/server/utility/acp_executor.go \
-      --replace-fail "$old_probe_command" "$new_probe_commands"
+    # Nix sandboxes do not populate FHS bin directories. Preserve the fake curl
+    # precedence while letting this upstream test find mktemp and shell tools.
+    old_path='"PATH=" + binDir + ":/usr/bin:/bin",'
+    sandbox_path='"PATH=" + binDir + ":" + os.Getenv("PATH"),'
+    substituteInPlace apps/backend/internal/agent/agents/devin_acp_test.go \
+      --replace-fail "$old_path" "$sandbox_path"
   '';
 
   preBuild = ''
@@ -145,17 +241,8 @@ buildGoModule (_finalAttrs: {
     makeWrapper $out/libexec/kandev/bin/kandev $out/bin/kandev \
       --set KANDEV_BUNDLE_DIR $out/libexec/kandev \
       --set KANDEV_VERSION ${version} \
-      --prefix PATH : ${
-        lib.makeBinPath [
-          nodejs_24
-          codex
-          codex-acp
-          gemini-cli
-          git
-          bash
-          openssh
-        ]
-      }
+      ${lib.escapeShellArgs agentRuntimeWrapperArgs} \
+      --prefix PATH : ${agentPath}
   '';
 
   # Do not let fixup mutate the cross-platform helpers. Re-sign every Darwin
@@ -175,7 +262,12 @@ buildGoModule (_finalAttrs: {
       $out/libexec/kandev/bin/agentctl
   '';
 
-  doCheck = false;
+  doCheck = true;
+  checkPhase = ''
+    runHook preCheck
+    go test ./internal/agent/agents ./internal/agentctl/server/utility
+    runHook postCheck
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
@@ -185,9 +277,22 @@ buildGoModule (_finalAttrs: {
   ];
   versionCheckProgramArg = "--version";
 
-  postInstallCheck = ''
+  installCheckPhase = ''
+    runHook preInstallCheck
+
     $out/bin/kandev --help >/dev/null
-    grep -aF '${nodejs_24}/bin' $out/bin/kandev >/dev/null
+    ${lib.concatMapStringsSep "\n" (
+      package: "grep -aF '${lib.getBin package}/bin' $out/bin/kandev >/dev/null"
+    ) agentRuntimePackages}
+    for command in ${lib.escapeShellArgs agentRuntimeCommands}; do
+      PATH=${agentPath} command -v "$command" >/dev/null
+    done
+    ${lib.concatStringsSep "\n" (
+      lib.mapAttrsToList (name: value: ''
+        grep -aF '${name}' $out/bin/kandev >/dev/null
+        grep -aF '${value}' $out/bin/kandev >/dev/null
+      '') agentRuntimeEnvironment
+    )}
 
     set +e
     output="$($out/libexec/kandev/bin/agentctl kandev 2>&1)"
@@ -203,11 +308,40 @@ buildGoModule (_finalAttrs: {
 
     node ${src}/scripts/release/validate-darwin-arm64-helper.mjs \
       $out/libexec/kandev/bin/agentctl-darwin-arm64
+
+    runHook postInstallCheck
   '';
 
   passthru = {
     category = "Workflow & Project Management";
-    inherit frontend;
+    inherit
+      agentPath
+      agentRuntimePackages
+      agentRuntimeCommands
+      agentRuntimeEnvironment
+      agentRuntimeWrapperArgs
+      frontend
+      ;
+    agentSupport = {
+      inherit
+        claudeSupport
+        codexSupport
+        geminiSupport
+        piSupport
+        ompSupport
+        opencodeSupport
+        copilotSupport
+        hermesSupport
+        ampSupport
+        cursorSupport
+        droidSupport
+        grokSupport
+        kilocodeSupport
+        kimiSupport
+        qoderSupport
+        qwenSupport
+        ;
+    };
   };
 
   meta = {
