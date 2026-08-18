@@ -9,13 +9,13 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "terminal-use";
-  version = "1.3.0";
+  version = "1.4.0";
 
   src = fetchFromGitHub {
     owner = "flipbit03";
     repo = "terminal-use";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-EB8mB8YZOje7Sy9l9QjT+I463+LbKh1p08000F5UEqA=";
+    hash = "sha256-1oAuC8c9CrASJMvlpIH3OmXTOU+qZLAXivpR9RyAdPU=";
   };
 
   cargoHash = "sha256-KapRznQ67o8H0aIMGvCMojwF/qSZ3rSlx6SEKbi12ig=";
