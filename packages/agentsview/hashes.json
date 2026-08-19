@@ -1,6 +1,6 @@
 {
-  "version": "0.41.0",
-  "hash": "sha256-+cXpfGf7+SD60pNjby8JkeAe2KrFBBItpgmmy2Pn4xQ=",
+  "version": "0.41.1",
+  "hash": "sha256-zSzJqu0FG5D4XcFu+MYVsqAU5sGpOUcHy/agDUz/cnA=",
   "npmDepsHash": "sha256-PCrBQ1/1O/0L2FdctUE9yVv4PxfnfXdrYowJiJjX3M0=",
   "vendorHash": "sha256-tkDQ8haOP15IvMYC4+FRvGGFEhejfGHM6Oh6PxLNSyE=",
   "litellmSnapshot": {
