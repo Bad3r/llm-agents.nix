@@ -191,6 +191,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>fx</strong> - Tiny, open, embeddable, native coding agent</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/vercel-labs/fx
+- **Usage**: `nix run github:numtide/llm-agents.nix#fx -- --help`
+- **Nix**: [packages/fx/package.nix](packages/fx/package.nix)
+
+</details>
+<details>
 <summary><strong>gemini-cli</strong> - AI agent that brings the power of Gemini directly into your terminal</summary>
 
 - **Source**: source
@@ -368,6 +378,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/RightNow-AI/openfang
 - **Usage**: `nix run github:numtide/llm-agents.nix#openfang -- --help`
 - **Nix**: [packages/openfang/package.nix](packages/openfang/package.nix)
+
+</details>
+<details>
+<summary><strong>orca</strong> - ADE for working with a fleet of parallel coding agents</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://onorca.dev
+- **Usage**: `nix run github:numtide/llm-agents.nix#orca -- --help`
+- **Nix**: [packages/orca/package.nix](packages/orca/package.nix)
 
 </details>
 <details>
@@ -907,6 +927,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>luvus</strong> - Mission control for your AI coding agents</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-or-later
+- **Homepage**: https://luvus.dev
+- **Usage**: `nix run github:numtide/llm-agents.nix#luvus -- --help`
+- **Nix**: [packages/luvus/package.nix](packages/luvus/package.nix)
+
+</details>
+<details>
 <summary><strong>mardi-gras</strong> - Terminal UI for Beads issue tracking with a parade-inspired workflow view</summary>
 
 - **Source**: source
@@ -1433,6 +1463,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/ctxrs/ctx
 - **Usage**: `nix run github:numtide/llm-agents.nix#ctx -- --help`
 - **Nix**: [packages/ctx/package.nix](packages/ctx/package.nix)
+
+</details>
+<details>
+<summary><strong>git-ai</strong> - Git extension for tracking AI-generated code in repositories</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/git-ai-project/git-ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#git-ai -- --help`
+- **Nix**: [packages/git-ai/package.nix](packages/git-ai/package.nix)
 
 </details>
 <details>

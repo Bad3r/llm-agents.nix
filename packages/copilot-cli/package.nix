@@ -6,7 +6,6 @@
   platformSource,
   makeWrapper,
   patchelf,
-  cacert,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -65,7 +64,6 @@ stdenv.mkDerivation (finalAttrs: {
     ''
     + ''
       makeWrapper "$bin" $out/bin/copilot \
-        --set SSL_CERT_DIR "${cacert}/etc/ssl/certs" \
         --set-default COPILOT_AUTO_UPDATE false \
         ${lib.optionalString stdenv.hostPlatform.isLinux ''--prefix LD_LIBRARY_PATH : "${libPath}"''}
 

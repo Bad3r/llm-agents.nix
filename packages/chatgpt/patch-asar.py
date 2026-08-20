@@ -20,8 +20,8 @@ SKIP_PROCESS_REPORT = (
 # manifests there. Node's fs.cp preserves the Nix store's read-only modes,
 # so copy with coreutils and make only the user-owned destination writable.
 COPY_PLUGINS_WRITABLE = (
-    b'async function Mne(e,t){if(S.default.platform===`darwin`){await lne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(S.default.platform!==`win32`){await y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0});return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
-    b'async function Mne(e,t){let r=S.default.platform;if(r===`darwin`){await lne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(r!==`win32`){await lne(`cp`,[`-r`,e+`/.`,t]);await lne(`chmod`,[`-R`,`u+w`,t]);return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
+    b'async function Kne(e,t){if(S.default.platform===`darwin`){await Cne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(S.default.platform!==`win32`){await y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0});return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
+    b'async function Kne(e,t){let r=S.default.platform;if(r===`darwin`){await Cne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(r!==`win32`){await Cne(`cp`,[`-r`,e+`/.`,t]);await Cne(`chmod`,[`-R`,`u+w`,t]);return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
 )
 
 
