@@ -1,5 +1,6 @@
 {
   lib,
+  bashInteractive,
   buildNpmPackage,
   fetchurl,
   flake,
@@ -38,6 +39,11 @@ buildNpmPackage {
   nativeBuildInputs = [ makeWrapper ];
 
   postInstall = ''
+    # /bin/bash does not exist on NixOS (issue #8086)
+    substituteInPlace \
+      $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-terminal-bash/lib/index.js \
+      --replace-fail '"/bin/bash"' '"${lib.getExe bashInteractive}"'
+
     rm $out/bin/dsh
     makeWrapper ${lib.getExe nodejs} $out/bin/dsh \
       --argv0 dsh \

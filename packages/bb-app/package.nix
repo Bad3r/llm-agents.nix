@@ -6,7 +6,7 @@
   jq,
   lib,
   makeWrapper,
-  nodejs,
+  nodejs_22,
   python3,
   runCommand,
   stdenv,
@@ -32,6 +32,11 @@ let
   '';
 in
 buildNpmPackage {
+  # better-sqlite3's Statement destructor trips Node 24's
+  # RemoveEnvironmentCleanupHook assertion when the host daemon's worker
+  # thread shuts down, crashing `bb-app start`. Node 22 is unaffected and
+  # within upstream's supported engine range.
+  nodejs = nodejs_22;
   npmDepsFetcherVersion = 2;
   pname = "bb-app";
   inherit version;
@@ -90,7 +95,7 @@ buildNpmPackage {
 
     # The native modules rebuilt in preBuild must load with Nix's Node.js.
     export NODE_PATH=$out/lib/node_modules/bb-app/node_modules
-    ${lib.getExe nodejs} -e \
+    ${lib.getExe nodejs_22} -e \
       "require('@parcel/watcher'); require('better-sqlite3'); require('node-pty')"
 
     runHook postInstallCheck
