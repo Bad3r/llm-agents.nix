@@ -26,16 +26,16 @@ let
 in
 rustPlatform.buildRustPackage rec {
   pname = "ironclaw";
-  version = "1.2.0";
+  version = "1.3.0";
 
   src = fetchFromGitHub {
     owner = "nearai";
     repo = "ironclaw";
     tag = "ironclaw-v${version}";
-    hash = "sha256-jPFEZGTofF+W52WudBGnDwKyHw0yKJQ3G56qvr89U84=";
+    hash = "sha256-0hPl0RFM2mth7YWB1EnJCqyDMNw6/EBf4tHIxA3oioQ=";
   };
 
-  cargoHash = "sha256-hiAFQRC9j39Ptt/2/9XN4n5Pzg1w3t1sANRUT/Dw7s0=";
+  cargoHash = "sha256-zUZ+U1SQ58rPpjk9CUS82pDQYgbSyuL+1LbsYMV6riQ=";
 
   pnpmDeps = fetchPnpmDeps {
     pname = "${pname}-webui";
