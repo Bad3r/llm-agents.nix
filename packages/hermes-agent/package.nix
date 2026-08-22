@@ -133,13 +133,13 @@ let
     };
   };
 
-  version = "2026.8.18";
+  version = "2026.8.19";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-LyI50ipeOVOcQ7tpoh+ofiEhxW3qW9pTJNUK7deJkYE=";
+    hash = "sha256-oeFJlEoFybqKkbuWT4mW8PRauusjt3y44ZJXAcA7TPY=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -150,7 +150,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-s5gdscyuI2FzUrRLlcw5ADgsTYmLdaO+oCCyoSZcUIU=";
+    npmDepsHash = "sha256-YTLmdnmjCsBH2okE0UqTT8Sl4Dlf+4o1huzBdkJP9aY=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
