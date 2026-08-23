@@ -2079,9 +2079,9 @@
     url = "https://registry.npmjs.org/vite-plugin-solid/-/vite-plugin-solid-2.11.14.tgz";
     hash = "sha512-7ZVBt8rpoyqmlwin2kRIUveaHoF6/kulY7gsnD+qFh4nS29V4OPAnw+ojoAspXIjObiL9o1xh9a/nTuYHm02Rw==";
   };
-  "vite@8.2.1" = fetchurl {
-    url = "https://registry.npmjs.org/vite/-/vite-8.2.1.tgz";
-    hash = "sha512-EU/eS7BH3XROHh2YnBefjM6DBKA6ZeMZEYQbj7NLWg5wHYlhB8B/Mayd5XsgWq+NFYccDOTemRpdETWR6Ka/lw==";
+  "vite@8.2.2" = fetchurl {
+    url = "https://registry.npmjs.org/vite/-/vite-8.2.2.tgz";
+    hash = "sha512-cFKLV/PRgAUlIRm5WjMjJ86jrftzpqcgH+Us+DS8mI3CDNiH30Whrz8uHL3+MOLPAgqbMBAqWdAHAphOAM+z/Q==";
   };
   "vitefu@1.1.3" = fetchurl {
     url = "https://registry.npmjs.org/vitefu/-/vitefu-1.1.3.tgz";
