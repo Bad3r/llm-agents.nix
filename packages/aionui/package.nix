@@ -6,7 +6,8 @@
   bun,
   nodejs,
   python3,
-  electron,
+  # better-sqlite3 12.x does not build against electron >= 43 headers
+  electron_41,
   fetchFromGitHub,
   runCommand,
   makeWrapper,
@@ -15,6 +16,7 @@
 }:
 
 let
+  electron = electron_41;
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash;
 

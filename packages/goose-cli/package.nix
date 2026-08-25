@@ -73,8 +73,11 @@ rustPlatform.buildRustPackage rec {
 
     # Run tests for goose-cli package only.
     # test_verify_provenance_warns_on_missing_attestation needs network access.
+    # untracked_enumeration_stays_in_opened_root_after_swap shells out to git,
+    # which is not available in the sandbox.
     cargo test --package goose-cli --release -- \
-      --skip commands::update::tests::test_verify_provenance_warns_on_missing_attestation
+      --skip commands::update::tests::test_verify_provenance_warns_on_missing_attestation \
+      --skip commands::review::handler::tests::untracked_enumeration_stays_in_opened_root_after_swap
   '';
 
   doInstallCheck = true;

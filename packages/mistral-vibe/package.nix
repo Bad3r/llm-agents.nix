@@ -158,14 +158,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.24.2";
+  version = "2.24.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     tag = "v${version}";
-    hash = "sha256-tGshFCD/RmFL7+eCV4BkwZI04OGsYdRfk/SzGAeBOPE=";
+    hash = "sha256-gDQl5UjSOyXg3l9yD1CXhfrSbUWUDYoquVvc2K4nv14=";
   };
 
   build-system = with python.pkgs; [
@@ -211,6 +211,7 @@ python.pkgs.buildPythonApplication rec {
     requests
     rich
     sentry-sdk
+    setproctitle
     sounddevice
     textual
     textual-speedups

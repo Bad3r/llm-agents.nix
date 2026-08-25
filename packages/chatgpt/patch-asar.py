@@ -3,38 +3,74 @@
 
 The asar header records file offsets, so every replacement is padded with
 spaces to the original's exact byte length instead of re-packing the archive.
+Minified identifiers change between releases, so patterns are regexes that
+capture the identifiers they need instead of hard-coding them.
 """
 
+import re
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 # @parcel/watcher uses detect-libc in a named worker. Its process.report
 # fallback trips a CFI guard in the bundled Owl/Electron runtime on NixOS.
 # detect-libc falls back to its ELF/filesystem/ldd probes instead.
 SKIP_PROCESS_REPORT = (
-    b"isLinux() && process.report",
-    b"false /* nix:skip report */",
+    re.compile(rb"isLinux\(\) && process\.report"),
+    lambda _m: b"false /* nix:skip report */",
 )
 
 # The app materializes bundled plugins in ~/.codex and rewrites selected
 # manifests there. Node's fs.cp preserves the Nix store's read-only modes,
 # so copy with coreutils and make only the user-owned destination writable.
+# `exec` is the promisified execFile helper already used for the darwin
+# `ditto` branch. Hoisting `platform` into a local buys the bytes needed.
 COPY_PLUGINS_WRITABLE = (
-    b'async function Kne(e,t){if(S.default.platform===`darwin`){await Cne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(S.default.platform!==`win32`){await y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0});return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
-    b'async function Kne(e,t){let r=S.default.platform;if(r===`darwin`){await Cne(`/usr/bin/ditto`,[`--noqtn`,e,t]);return}if(r!==`win32`){await Cne(`cp`,[`-r`,e+`/.`,t]);await Cne(`chmod`,[`-R`,`u+w`,t]);return}let{copyDirectoryAllowDecryptedDestinationOnEncryptionFailure:n}=await Promise.resolve().then(()=>require("./windows-file-copy-Bw9CB6bJ.js"));await n({copy:()=>y.default.cp(e,t,{recursive:!0,verbatimSymlinks:!0}),destination:t,source:e})}',
+    re.compile(
+        rb"(?P<fn>async function [\w$]+\(e,t\)\{)"
+        rb"if\((?P<plat>[\w$]+\.default\.platform)===`darwin`\)"
+        rb"(?P<ditto>\{await (?P<exec>[\w$]+)\(`/usr/bin/ditto`,\[`--noqtn`,e,t\]\);return\})"
+        rb"if\((?P=plat)!==`win32`\)\{"
+        rb"await [\w$]+\.default\.cp\(e,t,\{recursive:!0,verbatimSymlinks:!0\}\);return\}"
+    ),
+    lambda m: (
+        m["fn"]
+        + b"let r="
+        + m["plat"]
+        + b";if(r===`darwin`)"
+        + m["ditto"]
+        + b"if(r!==`win32`){await "
+        + m["exec"]
+        + b"(`cp`,[`-r`,e+`/.`,t]);await "
+        + m["exec"]
+        + b"(`chmod`,[`-R`,`u+w`,t]);return}"
+    ),
 )
+
+PATCHES: list[tuple[re.Pattern[bytes], Callable[[re.Match[bytes]], bytes]]] = [
+    SKIP_PROCESS_REPORT,
+    COPY_PLUGINS_WRITABLE,
+]
 
 
 def main() -> None:
     """Patch the asar archive given as the only argument."""
     asar = Path(sys.argv[1])
     data = asar.read_bytes()
-    for original, replacement in (SKIP_PROCESS_REPORT, COPY_PLUGINS_WRITABLE):
+    for pattern, build in PATCHES:
+        matches = list(pattern.finditer(data))
+        if len(matches) != 1:
+            sys.exit(
+                f"expected 1 match for {pattern.pattern[:60]!r} in {asar}, got {len(matches)}"
+            )
+        m = matches[0]
+        original = m.group(0)
+        replacement = build(m)
         if len(replacement) > len(original):
             sys.exit(f"replacement longer than original: {replacement[:60]!r}...")
-        if original not in data:
-            sys.exit(f"pattern not found in {asar}: {original[:60]!r}...")
-        data = data.replace(original, replacement.ljust(len(original), b" "))
+        data = (
+            data[: m.start()] + replacement.ljust(len(original), b" ") + data[m.end() :]
+        )
     asar.write_bytes(data)
 
 

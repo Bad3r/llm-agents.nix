@@ -31,16 +31,16 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "luvus";
-  version = "0.11.0";
+  version = "0.12.0";
 
   src = fetchFromGitHub {
     owner = "RizRiyz";
     repo = "luvus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-aKL/5N0E91IVIG7drMwKozNQy/bzy/78VdNCl67Dunc=";
+    hash = "sha256-0qUkQvt/bZq5JkoRY0MaYHrlggywqCYYZXuezIK3f50=";
   };
 
-  cargoHash = "sha256-CqRDKuHC5kwIdGXLdpehBRoV1kE+Vj2Mj7xix3anz9k=";
+  cargoHash = "sha256-poJMbEPnQa3j4YbklPzx1LeQN9ru0IaD/+ZVeYyxBXg=";
 
   nativeBuildInputs = [ makeWrapper ];
 
@@ -57,6 +57,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=app::tests::resize_yields_to_pane_title_and_zoom_but_still_grabs_the_seam"
     "--skip=app::tests::resume_session_opens_pane"
     "--skip=platform::tests::process_tree_finds_this_process_and_its_children"
+    "--skip=app::settings::tests::enter_routes_an_installed_theme_through_removal"
+    # opens the git dashboard on the build dir, which is not a repository
+    "--skip=app::diff::tests::dashboard_diff_click_opens_a_tab_then_reuses_it"
+    # navigates the folder picker to $HOME, which does not exist in the sandbox;
+    # providing one makes tests that persist config under it race each other
+    "--skip=app::picker::tests::home_row_and_go_to_footer_are_interactive"
   ];
 
   postFixup = ''

@@ -8,6 +8,7 @@
   xcbuild,
   cctools,
   installShellFiles,
+  libnotify,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -67,6 +68,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '.arg("build")' '.arg("build")
           .arg("-Dcpu=baseline")' \
       --replace-fail '.arg(format!("-Dtarget={zig_target}"))' ""
+  ''
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    substituteInPlace src/platform/linux.rs \
+      --replace-fail 'let mut cmd = command("notify-send");' \
+        'let mut cmd = command("${libnotify}/bin/notify-send");'
   '';
 
   preBuild = ''
@@ -81,12 +87,20 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # sandbox.
   doCheck = false;
 
-  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-    installShellCompletion --cmd herdr \
-      --bash <("$out/bin/herdr" completion bash) \
-      --fish <("$out/bin/herdr" completion fish) \
-      --zsh <("$out/bin/herdr" completion zsh)
-  '';
+  postInstall =
+    lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd herdr \
+        --bash <("$out/bin/herdr" completion bash) \
+        --fish <("$out/bin/herdr" completion fish) \
+        --zsh <("$out/bin/herdr" completion zsh)
+    ''
+    # Ship the per-agent hook/plugin sources so users can wire them up
+    # declaratively (e.g. home-manager) instead of running `herdr integrate`.
+    + ''
+      install -d "$out/share/herdr"
+      cp -r src/integration/assets "$out/share/herdr/integrations"
+      find "$out/share/herdr/integrations" -name '*.test.ts' -delete
+    '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [

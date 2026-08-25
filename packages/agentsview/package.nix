@@ -1,5 +1,6 @@
 {
   lib,
+  stdenv,
   flake,
   buildGoModule,
   buildNpmPackage,
@@ -116,6 +117,35 @@ buildGoModule {
   postInstall = ''
     wrapProgram $out/bin/agentsview \
       --set AGENTSVIEW_TELEMETRY_ENABLED 0
+  ''
+  + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    # The source tree has the skill only as a Go template. `agentsview skills
+    # install` renders it per harness and adds a header recording a hash of
+    # the body, which `agentsview skills list` compares against a fresh render
+    # to detect a stale or edited file. A copy taken from the source tree
+    # would have neither the harness-specific text nor that header, so only
+    # the binary can produce a usable file. The installer writes under $HOME
+    # and accepts no other destination, hence the staging home.
+    #
+    # `skills list` reports one row per harness, with the columns HARNESS,
+    # LEVEL, STATE and PATH, so a harness added upstream needs no change here.
+    (
+      export HOME="$NIX_BUILD_TOP/agentsview-skills-home"
+
+      "$out/bin/agentsview" skills install
+
+      "$out/bin/agentsview" skills list \
+        | awk 'NR > 1 { print $1, $4 }' \
+        | while read -r harness path; do
+            mkdir -p "$out/share/agentsview/skills/$harness"
+            cp -r "$(dirname "$path")" "$out/share/agentsview/skills/$harness/"
+          done
+
+      if [ ! -d "$out/share/agentsview/skills" ]; then
+        echo "agentsview: no skills were installed; has 'skills list' changed?" >&2
+        exit 1
+      fi
+    )
   '';
 
   passthru.category = "Usage Analytics";

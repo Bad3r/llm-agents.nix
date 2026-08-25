@@ -117,7 +117,7 @@ def nix_build(
         CompletedProcess with build results
 
     """
-    args = ["build", "--log-format", "bar-with-logs", attr]
+    args = ["build", "--no-link", "--log-format", "bar-with-logs", attr]
     return nix_command(args, check=check)
 
 
