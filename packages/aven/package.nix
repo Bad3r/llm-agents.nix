@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.31";
+  version = "0.1.32";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-jpUEhjmGp7IxMs8saSvknWL4K//wrbhe/J2fZ8u6N9s=";
+    hash = "sha256-Q76yCAguCH0NTagxpRSbHccUiDGvWLR8/RXT5ZWLcj4=";
   };
 
-  cargoHash = "sha256-XrcVo5AlwJzFC2S02IYiydoGeXa7IOpN/GI6eq/LmiA=";
+  cargoHash = "sha256-06wV7ArQ1xBZuCfsciYYlPtA5X7bI088ofQYn7V4lRA=";
 
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
