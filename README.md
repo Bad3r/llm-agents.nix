@@ -1186,6 +1186,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### Memory & Code Intelligence
 
 <details>
+<summary><strong>ai-memory</strong> - Long-term memory for AI coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/akitaonrails/ai-memory
+- **Usage**: `nix run github:numtide/llm-agents.nix#ai-memory -- --help`
+- **Nix**: [packages/ai-memory/package.nix](packages/ai-memory/package.nix)
+
+</details>
+<details>
 <summary><strong>ck</strong> - Local first semantic and hybrid BM25 grep / search tool for use by AI and humans!</summary>
 
 - **Source**: source

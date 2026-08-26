@@ -54,13 +54,13 @@
 
 let
   pname = "kandev";
-  version = "0.88.0";
+  version = "0.91.0";
 
   src = fetchFromGitHub {
     owner = "kdlbs";
     repo = "kandev";
     tag = "v${version}";
-    hash = "sha256-YLJ6shH/CCh7I8412Fw6tVuma4bCiBFheH9BDM49T1k=";
+    hash = "sha256-N6TxVX+CKf+vfq3F91GQllO/JZcNfBWuek35YwliipQ=";
   };
 
   runtimeTools = [
@@ -178,7 +178,7 @@ buildGoModule (_finalAttrs: {
   inherit pname version src;
 
   modRoot = "apps/backend";
-  vendorHash = "sha256-68fOqzojvBNAFL6MDw7G8NpLf1PBgAjwJipQcWdple8=";
+  vendorHash = "sha256-x6tHHmA4jZr8iUddi0q7VzCb9qgsATkT5StvYEfwugA=";
 
   subPackages = [
     "cmd/kandev"
@@ -193,10 +193,7 @@ buildGoModule (_finalAttrs: {
     "-X main.Version=v${version}"
   ];
 
-  patches = [
-    ./prefer-native-acp-runtimes.patch
-    ./use-pi-cli-passthrough.patch
-  ];
+  patches = [ ./prefer-native-acp-runtimes.patch ];
 
   postPatch = ''
     # Nix sandboxes do not populate FHS bin directories. Preserve the fake curl

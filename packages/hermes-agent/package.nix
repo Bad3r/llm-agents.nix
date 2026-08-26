@@ -315,6 +315,8 @@ let
       boto3
       # [modal]
       modal
+      # web_search backend hermes would otherwise try to pip-install (#8259)
+      ddgs
     ];
   };
 
