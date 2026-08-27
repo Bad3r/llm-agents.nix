@@ -514,6 +514,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>autolith</strong> - Live, self-modifying Common Lisp AI agent</summary>
+
+- **Source**: source
+- **License**: ISC
+- **Homepage**: https://github.com/lambda-symbolics/autolith
+- **Usage**: `nix run github:numtide/llm-agents.nix#autolith -- --help`
+- **Nix**: [packages/autolith/package.nix](packages/autolith/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
 
 - **Source**: source

@@ -11,16 +11,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "git-ai";
-  version = "1.6.24";
+  version = "1.7.0";
 
   src = fetchFromGitHub {
     owner = "git-ai-project";
     repo = "git-ai";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-5g98zwfg2GLqKtPdWuNxv1FJgS/GvHV1CYe/3Bq5H7k=";
+    hash = "sha256-kj1qfjRBII6aRWPYRz2bFcLURvDXsiqC+kiEfa0SUzQ=";
   };
 
-  cargoHash = "sha256-GYDFOSxl1Kkol1XOcpkqNWcSTTsJWiRhpZGMrVA+H8c=";
+  cargoHash = "sha256-02VFSJKbK7GdaDZOlaV4qRXGsOhPmUrVdzR8BLGWW2I=";
 
   nativeBuildInputs = [ perl ];
 
