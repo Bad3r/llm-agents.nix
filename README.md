@@ -1596,6 +1596,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>tgrab</strong> - Fetch text content from YouTube, Twitter/X, and Bluesky</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/ryoppippi/tgrab
+- **Usage**: `nix run github:numtide/llm-agents.nix#tgrab -- --help`
+- **Nix**: [packages/tgrab/package.nix](packages/tgrab/package.nix)
+
+</details>
+<details>
 <summary><strong>toon</strong> - Rust implementation of TOON - Token-Oriented Object Notation for LLM prompts</summary>
 
 - **Source**: source
