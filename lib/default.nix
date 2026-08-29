@@ -249,6 +249,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 8622519;
         name = "Shuo Zheng";
       };
+      vidhanio = {
+        github = "vidhanio";
+        githubId = 41439633;
+        name = "Vidhan Bhatt";
+      };
     };
   }
 )

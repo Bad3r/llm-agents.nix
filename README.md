@@ -241,6 +241,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>hax</strong> - Minimalist, terminal-native coding agent written in C</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://usehax.dev
+- **Usage**: `nix run github:numtide/llm-agents.nix#hax -- --help`
+- **Nix**: [packages/hax/package.nix](packages/hax/package.nix)
+
+</details>
+<details>
 <summary><strong>jules</strong> - Jules, the asynchronous coding agent from Google, in the terminal</summary>
 
 - **Source**: binary

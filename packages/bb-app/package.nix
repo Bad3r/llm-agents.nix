@@ -98,6 +98,13 @@ buildNpmPackage {
     ${lib.getExe nodejs_22} -e \
       "require('@parcel/watcher'); require('better-sqlite3'); require('node-pty')"
 
+    # bb refuses plugins whose host.js digest drifted (e.g. via patchShebangs, #8436)
+    for meta in $out/lib/node_modules/bb-app/server/dist/builtin-plugins/*/dist/host.meta.json; do
+      want=$(${lib.getExe jq} -r .artifactDigest "$meta")
+      got=$(sha256sum "$(dirname "$meta")/host.js" | cut -d' ' -f1)
+      [ "$want" = "$got" ] || { echo "digest mismatch for $meta"; exit 1; }
+    done
+
     runHook postInstallCheck
   '';
 
