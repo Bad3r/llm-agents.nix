@@ -9,16 +9,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ctx";
-  version = "1.2.0";
+  version = "1.2.2";
 
   src = fetchFromGitHub {
     owner = "ctxrs";
     repo = "ctx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Uj+Tzz4TVcA1y9Vq1hE0cwpbZeDV2wAtHKccJhxwXxY=";
+    hash = "sha256-YmFjWenc/RBI7sQFAQOX00/f0qVZ1lp8e9GUfOCqn3M=";
   };
 
-  cargoHash = "sha256-J47yCPAk3hOYnsMqbPzpRBwLmIu0bX+J81aSZDukMCY=";
+  cargoHash = "sha256-eVbFozuwI+IjftBuknamXUA4JzOGoJa6fAww57gQ/rY=";
 
   cargoBuildFlags = [
     "--package"

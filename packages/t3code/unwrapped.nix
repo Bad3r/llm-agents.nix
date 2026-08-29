@@ -26,14 +26,14 @@
 
 let
   pname = "t3code";
-  version = "0.0.35";
+  version = "0.0.36";
   pnpm = pnpm_11;
 
   src = fetchFromGitHub {
     owner = "pingdotgg";
     repo = "t3code";
     tag = "v${version}";
-    hash = "sha256-flmYfoChsezoOYNXzX/ysPALlM8HKYBV27u90X1fF0w=";
+    hash = "sha256-Usiwzy3ITTc8c3NGk898p0PqaI887n6sW0a77YY5ngw=";
   };
 
   resourceMonitor = rustPlatform.buildRustPackage {
