@@ -35,7 +35,10 @@ stdenv.mkDerivation {
   inherit (stdenv.hostPlatform.go) GOOS GOARCH;
   CGO_ENABLED = 1;
 
-  passthru.hideFromDocs = true;
+  passthru = {
+    hideFromDocs = true;
+    updateEvenIfHidden = true;
+  };
 
   meta = {
     description = "Latest Go toolchain (prebuilt binary) for building packages that need a newer patch release than nixpkgs ships";

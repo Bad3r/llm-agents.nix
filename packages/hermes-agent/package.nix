@@ -133,13 +133,13 @@ let
     };
   };
 
-  version = "2026.8.19";
+  version = "2026.8.27";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-oeFJlEoFybqKkbuWT4mW8PRauusjt3y44ZJXAcA7TPY=";
+    hash = "sha256-4EQ3GD5S3UHItPD/R/0WzSamkmtgDXM3AUq/MWZ7qMo=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -150,7 +150,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-YTLmdnmjCsBH2okE0UqTT8Sl4Dlf+4o1huzBdkJP9aY=";
+    npmDepsHash = "sha256-sBmdqqRxDJy7S7x0M7QzjxoybsjTS2Ktp/cpSwpgN1A=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -187,6 +187,7 @@ let
       # Core
       openai
       anthropic
+      snowballstemmer
       python-dotenv
       fire
       httpx

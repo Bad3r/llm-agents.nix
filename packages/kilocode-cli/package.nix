@@ -36,6 +36,9 @@ stdenv.mkDerivation {
 
     install -Dm755 bin/kilo $out/bin/kilocode
 
+    mkdir -p $out/bin/tree-sitter
+    cp -r bin/tree-sitter/. $out/bin/tree-sitter/
+
     runHook postInstall
   '';
 

@@ -111,6 +111,7 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     tomlkit
     truststore
     watchdog
+    websockets
   ];
 
   pythonImportsCheck = [ "apm_cli" ];

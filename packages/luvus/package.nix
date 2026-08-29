@@ -31,16 +31,16 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "luvus";
-  version = "0.12.0";
+  version = "0.13.1";
 
   src = fetchFromGitHub {
     owner = "RizRiyz";
     repo = "luvus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-0qUkQvt/bZq5JkoRY0MaYHrlggywqCYYZXuezIK3f50=";
+    hash = "sha256-/Nx1bJdoI7eUzJ6Co8UUp3cBuf6ZG8i6sKsXNYEclE0=";
   };
 
-  cargoHash = "sha256-poJMbEPnQa3j4YbklPzx1LeQN9ru0IaD/+ZVeYyxBXg=";
+  cargoHash = "sha256-1YBp3S69f3/CbeckCho5Wc2ipCi0hMfuJ4oEq1cf9lA=";
 
   nativeBuildInputs = [ makeWrapper ];
 
@@ -60,9 +60,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=app::settings::tests::enter_routes_an_installed_theme_through_removal"
     # opens the git dashboard on the build dir, which is not a repository
     "--skip=app::diff::tests::dashboard_diff_click_opens_a_tab_then_reuses_it"
-    # navigates the folder picker to $HOME, which does not exist in the sandbox;
+    # expect $HOME to exist, which it does not in the sandbox;
     # providing one makes tests that persist config under it race each other
     "--skip=app::picker::tests::home_row_and_go_to_footer_are_interactive"
+    "--skip=app::tests::spawn_cwds_skips_missing_dirs_and_anchors_on_home"
   ];
 
   postFixup = ''

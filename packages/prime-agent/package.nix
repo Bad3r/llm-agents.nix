@@ -20,17 +20,17 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "prime-agent";
-  version = "0.7.2";
+  version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "PrimeIntellect-ai";
     repo = "prime-agent";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-rOKFkKoV2Mfg2wHioZ+2Eo3Js6C4489hxTxVu38cgbA=";
+    hash = "sha256-PdgkayPQ0Bmmr5ojnaXM6drbmB/p47cNvkwOmj93FGc=";
   };
 
   nodejs = nodejs_22;
-  npmDepsHash = "sha256-/pu+a4hlTOCde1qwxTQ4WLVwJEVmojl9B1DBbjoxwRs=";
+  npmDepsHash = "sha256-kv4pZ6HS+2MZThcEcZce8o+I2ceTKAMYt4abhyRTnVs=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -111,9 +111,12 @@ buildNpmPackage (finalAttrs: {
       build-system = [ python3.pkgs.hatchling ];
       dependencies = with python3.pkgs; [
         ipykernel
+        mcp
         nest-asyncio
         tyro
       ];
+      # Pins mcp>=2 but rlm/mcp_base.py explicitly supports the 1.x client API.
+      pythonRelaxDeps = [ "mcp" ];
     };
 
     pythonSkills =

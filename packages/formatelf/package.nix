@@ -52,6 +52,8 @@ let
       stdenv.cc.bintools
     ];
     passthru.hideFromDocs = true;
+    # Standalone binary for patching ELFs outside a build (e.g. at runtime).
+    passthru.bin = formatelf;
     meta = {
       description = "Setup hook that patches ELF binaries via formatelf";
       license = lib.licenses.mit;

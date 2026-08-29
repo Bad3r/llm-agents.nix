@@ -391,6 +391,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ori</strong> - OpenRouter CLI for managing agent environments across coding tools</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://openrouter.ai/labs/ori
+- **Usage**: `nix run github:numtide/llm-agents.nix#ori -- --help`
+- **Nix**: [packages/ori/package.nix](packages/ori/package.nix)
+
+</details>
+<details>
 <summary><strong>pi</strong> - A terminal-based coding agent with multi-model support</summary>
 
 - **Source**: bytecode

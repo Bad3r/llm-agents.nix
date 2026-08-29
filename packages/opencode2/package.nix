@@ -12,7 +12,7 @@
 }:
 
 let
-  # OpenCode 2 ships as platform-specific Bun executables on npm's next channel
+  # OpenCode 2 ships as platform-specific Bun executables on npm's beta channel
   # (@opencode-ai/cli-<platform>).
   source = platformSource {
     hashesFile = ./hashes.json;
@@ -66,7 +66,7 @@ stdenv.mkDerivation {
       versionSource = {
         type = "npm";
         package = "@opencode-ai/cli";
-        tag = "next";
+        tag = "beta";
       };
     }
   );
