@@ -16,11 +16,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788009232,
-        "narHash": "sha256-dfplzVDTiDLIDbnT082KqC20G7nGhvr/i/2i1YODebA=",
+        "lastModified": 1788011267,
+        "narHash": "sha256-mEq2kU+ljompTToZ44Afvm7d/rHJ5iMBl0tjZuyShJs=",
         "owner": "Mic92",
         "repo": "bun2nix",
-        "rev": "338cc54b9e88325b6675fbaf00fca7bbcdc11649",
+        "rev": "5765b0614591f75ee8ba5596e81ae85c167d1071",
         "type": "github"
       },
       "original": {
