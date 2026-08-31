@@ -56,6 +56,10 @@
   libcap_ng,
   libseccomp,
 
+  buildFHSEnv,
+  mesa,
+  vulkan-loader,
+
   # Needed for XDG_ICON_DIRS and GSETTINGS_SCHEMAS_PATH.
   adwaita-icon-theme,
   gsettings-desktop-schemas,
@@ -127,100 +131,125 @@ let
     ];
     mainProgram = "claude-desktop";
   };
-in
-stdenvNoCC.mkDerivation {
-  inherit
-    pname
-    version
-    meta
-    passthru
-    ;
 
-  src = fetchurl {
-    url = urls.${platform} or (throw "Unsupported system: ${platform}");
-    hash = hashes.${platform} or (throw "Unsupported system: ${platform}");
+  unwrapped = stdenvNoCC.mkDerivation {
+    inherit
+      pname
+      version
+      meta
+      passthru
+      ;
+
+    src = fetchurl {
+      url = urls.${platform} or (throw "Unsupported system: ${platform}");
+      hash = hashes.${platform} or (throw "Unsupported system: ${platform}");
+    };
+
+    nativeBuildInputs = [
+      formatelf
+      copyDesktopItems
+      makeWrapper
+    ];
+
+    buildInputs = [
+      adwaita-icon-theme
+      alsa-lib
+      at-spi2-atk
+      at-spi2-core
+      atk
+      cairo
+      cups
+      dbus
+      expat
+      gcc-unwrapped.lib
+      glib
+      gsettings-desktop-schemas
+      gtk3
+      libcap_ng
+      libdrm
+      libgbm
+      libseccomp
+      libX11
+      libxcb
+      libXcomposite
+      libXcursor
+      libXdamage
+      libXext
+      libXfixes
+      libXrandr
+      libxkbcommon
+      nspr
+      nss
+      pango
+      systemdLibs
+    ];
+
+    # dlopen()ed at runtime, so autoPatchelfHook cannot discover them from
+    # DT_NEEDED; list them here to force them onto every payload's RUNPATH.
+    runtimeDependencies = [
+      libayatana-appindicator
+      libglvnd
+      libnotify
+      libpulseaudio
+      libsecret
+      pipewire
+      wayland
+    ];
+
+    desktopItems = [ desktopItem ];
+
+    unpackPhase = ''
+      runHook preUnpack
+      ${lib.getExe' bintools "ar"} x $src
+      tar xf data.tar.xz
+      runHook postUnpack
+    '';
+
+    installPhase = ''
+      runHook preInstall
+
+      # Keep the upstream usr/lib layout so bundled libs (e.g. libffmpeg.so)
+      # resolve next to the main binary.
+      mkdir -p $out/lib $out/bin $out/share
+      cp -a usr/lib/claude-desktop $out/lib/claude-desktop
+      cp -a usr/share/icons $out/share/icons
+      cp -a usr/share/doc $out/share/doc
+
+      # autoPatchelfHook sets the interpreter and RUNPATHs. The wrapper only adds
+      # the app dir (so the bundled GL/Vulkan libs find each other), xdg-utils on
+      # PATH, and the icon/schema data dirs.
+      makeWrapper "$out/lib/claude-desktop/claude-desktop" "$out/bin/claude-desktop" \
+        --prefix LD_LIBRARY_PATH : "$out/lib/claude-desktop" \
+        --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
+        --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
+        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
+        --add-flags ${lib.escapeShellArg commandLineArgs}
+
+      runHook postInstall
+    '';
+  };
+in
+# The app downloads and execs generic-linux binaries (claude-code CLI, uv) at
+# runtime, which need an FHS loader path.
+buildFHSEnv {
+  inherit pname version meta;
+  passthru = passthru // {
+    inherit unwrapped;
   };
 
-  nativeBuildInputs = [
-    formatelf
-    copyDesktopItems
-    makeWrapper
-  ];
-
-  buildInputs = [
-    adwaita-icon-theme
-    alsa-lib
-    at-spi2-atk
-    at-spi2-core
-    atk
-    cairo
-    cups
-    dbus
-    expat
+  targetPkgs = _: [
+    unwrapped
     gcc-unwrapped.lib
-    glib
-    gsettings-desktop-schemas
-    gtk3
-    libcap_ng
-    libdrm
-    libgbm
-    libseccomp
-    libX11
-    libxcb
-    libXcomposite
-    libXcursor
-    libXdamage
-    libXext
-    libXfixes
-    libXrandr
-    libxkbcommon
-    nspr
-    nss
-    pango
-    systemdLibs
-  ];
-
-  # dlopen()ed at runtime, so autoPatchelfHook cannot discover them from
-  # DT_NEEDED; list them here to force them onto every payload's RUNPATH.
-  runtimeDependencies = [
-    libayatana-appindicator
+    # GPU acceleration
     libglvnd
-    libnotify
-    libpulseaudio
-    libsecret
-    pipewire
-    wayland
+    mesa
+    libgbm
+    vulkan-loader
   ];
 
-  desktopItems = [ desktopItem ];
+  runScript = "claude-desktop";
 
-  unpackPhase = ''
-    runHook preUnpack
-    ${lib.getExe' bintools "ar"} x $src
-    tar xf data.tar.xz
-    runHook postUnpack
-  '';
-
-  installPhase = ''
-    runHook preInstall
-
-    # Keep the upstream usr/lib layout so bundled libs (e.g. libffmpeg.so)
-    # resolve next to the main binary.
-    mkdir -p $out/lib $out/bin $out/share
-    cp -a usr/lib/claude-desktop $out/lib/claude-desktop
-    cp -a usr/share/icons $out/share/icons
-    cp -a usr/share/doc $out/share/doc
-
-    # autoPatchelfHook sets the interpreter and RUNPATHs. The wrapper only adds
-    # the app dir (so the bundled GL/Vulkan libs find each other), xdg-utils on
-    # PATH, and the icon/schema data dirs.
-    makeWrapper "$out/lib/claude-desktop/claude-desktop" "$out/bin/claude-desktop" \
-      --prefix LD_LIBRARY_PATH : "$out/lib/claude-desktop" \
-      --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
-      --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
-      --add-flags ${lib.escapeShellArg commandLineArgs}
-
-    runHook postInstall
+  extraInstallCommands = ''
+    ln -s ${unwrapped}/share $out/share
   '';
 }
