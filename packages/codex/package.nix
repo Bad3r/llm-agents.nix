@@ -6,6 +6,7 @@
   makeWrapper,
   rustPlatform,
   pkg-config,
+  lld,
   openssl,
   bubblewrap,
   libcap,
@@ -23,12 +24,12 @@
     cargoHash = versionData.cargoHash;
   },
   preBuild ? ''
-    # Upstream's low codegen-units (4 since 0.140.0) makes late-stage rustc
-    # hold large IR modules, peaking at ~12 GiB and OOMing our 16 GiB aarch64
-    # builder. Raise to 16 to bound memory; __TEXT still stays below the
-    # 128 MiB ARM64 branch range the Mach-O linker hit on aarch64-darwin (#4417).
+    # Upstream's ThinLTO + codegen-units=4 make late-stage rustc peak at
+    # ~12 GiB and the whole build crawl; fall back to cargo defaults like
+    # nixpkgs does.
     substituteInPlace Cargo.toml \
-      --replace-fail 'codegen-units = 4' 'codegen-units = 16'
+      --replace-fail 'lto = "thin"' "" \
+      --replace-fail 'codegen-units = 4' ""
   '',
   doInstallCheck ? true,
   librusty_v8 ? mkRustyV8Archive versionData.librusty_v8,
@@ -80,15 +81,10 @@ rustPlatform.buildRustPackage (
       # rusty_v8 >= 150 include!s this instead of running bindgen.
       RUSTY_V8_SRC_BINDING_PATH = librusty_v8.srcBinding;
     }
-    // {
-      # Cap concurrent rustc jobs to keep peak RSS bounded with ThinLTO on the
-      # 16 GiB aarch64 builder.
-      CARGO_BUILD_JOBS = "2";
-      # Drop debuginfo from the shipped binary; combined with ThinLTO this
-      # keeps the codex __TEXT segment well below the 128 MiB ARM64 branch
-      # limit on aarch64-darwin.
-      CARGO_PROFILE_RELEASE_DEBUG = "false";
-      CARGO_PROFILE_RELEASE_STRIP = "symbols";
+    // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+      # nixpkgs' ld64 fails to insert ARM64 branch thunks for this binary
+      # (`b(l) ARM64 branch out of range`, #4417); lld handles it.
+      NIX_CFLAGS_LINK = "-fuse-ld=${lib.getExe' lld "ld64.lld"}";
     };
 
     inherit preBuild;
