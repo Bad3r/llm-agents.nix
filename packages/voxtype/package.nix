@@ -27,16 +27,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "voxtype";
-  version = "1.0.0";
+  version = "1.0.1";
 
   src = fetchFromGitHub {
     owner = "peteonrails";
     repo = "voxtype";
     tag = "v${version}";
-    hash = "sha256-kd6QThm6+i64ez9KMZFhARV5BxB0aqfiyIfuklwgMKo=";
+    hash = "sha256-OT0tVSi9x3U7NwgZU00mojXk3RRWxuFoezpdSknLmmU=";
   };
 
-  cargoHash = "sha256-SSWrw26rgMLn3gZ/8xZfMdYUKOq2qrpD1+/txkm2jE0=";
+  cargoHash = "sha256-kJFI9sSMzaaYHuc7ze5Lkwt3ZVskM9rB9bvTon0XguU=";
 
   nativeBuildInputs = [
     cmake
