@@ -83,6 +83,13 @@ stdenv.mkDerivation {
     "libvulkan.so.1"
   ];
 
+  # avoid bun's shared /private/tmp/bun-node-* shim on darwin
+  preBunLifecycleScriptsPhase = ''
+    mkdir -p $TMPDIR/node-shim
+    ln -s ${lib.getExe bun} $TMPDIR/node-shim/node
+    export PATH=$TMPDIR/node-shim:$PATH
+  '';
+
   # No build step needed - we'll run directly with bun
   dontUseBunBuild = true;
   dontUseBunInstall = true;

@@ -247,11 +247,18 @@ let
 
   # pyramid dropped its pkg_resources shim on python 3.14, so slack-bolt's
   # pyramid adapter tests fail at collection with ModuleNotFoundError.
-  slack-bolt' = python3.pkgs.slack-bolt.overridePythonAttrs (old: {
-    disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
-      "tests/adapter_tests/pyramid/"
-    ];
-  });
+  # pkg-resources-backport tests need jaraco-path, broken on darwin
+  slack-bolt' =
+    (python3.pkgs.slack-bolt.override {
+      pkg-resources-backport = python3.pkgs.pkg-resources-backport.overridePythonAttrs {
+        doCheck = !stdenv.hostPlatform.isDarwin;
+      };
+    }).overridePythonAttrs
+      (old: {
+        disabledTestPaths = (old.disabledTestPaths or [ ]) ++ [
+          "tests/adapter_tests/pyramid/"
+        ];
+      });
 
   # Upstream pins agent-client-protocol==0.9.0; nixpkgs' 0.11.x regenerated the
   # ACP schema and dropped ModelInfo/SetSessionModelResponse/SessionModelState,

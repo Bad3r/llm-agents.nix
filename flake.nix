@@ -18,7 +18,8 @@
       inputs."nixpkgs-lib".follows = "nixpkgs";
     };
     bun2nix = {
-      url = "github:nix-community/bun2nix";
+      # https://github.com/nix-community/bun2nix/pull/106
+      url = "github:Mic92/bun2nix/fix-structured-attrs-hook";
       inputs."nixpkgs".follows = "nixpkgs";
       inputs."systems".follows = "systems";
       inputs."treefmt-nix".follows = "treefmt-nix";
@@ -114,18 +115,6 @@
               # shared-nixpkgs consumers, whose bun would otherwise change
               # every store path in the set.
               bun = pkgsFor.${system}.bun or pkgs.bun;
-              # tmux 3.7c requires an explicit jemalloc choice on darwin; drop
-              # once NixOS/nixpkgs#555604 reaches nixpkgs-unstable.
-              tmux =
-                if
-                  pkgs.stdenv.hostPlatform.isDarwin && !(lib.elem "--enable-jemalloc" pkgs.tmux.configureFlags)
-                then
-                  pkgs.tmux.overrideAttrs (old: {
-                    buildInputs = old.buildInputs ++ [ pkgs.jemalloc ];
-                    configureFlags = old.configureFlags ++ [ "--enable-jemalloc" ];
-                  })
-                else
-                  pkgs.tmux;
               # bun2nix builder set (hook, fetchBunDeps, ...); the `bun2nix`
               # scope attribute is the CLI package. Apply the overlay directly
               # (final=prev=pkgs) instead of pkgs.extend, which would re-run the
