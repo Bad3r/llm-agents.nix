@@ -836,7 +836,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>bernstein</strong> - Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents</summary>
+<summary><strong>bernstein</strong> - Governance layer for AI agents — deterministic scheduling, isolated git worktrees, signed audit trail</summary>
 
 - **Source**: source
 - **License**: Apache-2.0

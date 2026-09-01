@@ -135,7 +135,7 @@ python3.pkgs.buildPythonApplication rec {
   passthru.category = "Workflow & Project Management";
 
   meta = with lib; {
-    description = "Multi-agent orchestrator for CLI coding agents — spawn, coordinate, and manage parallel AI agents";
+    description = "Governance layer for AI agents — deterministic scheduling, isolated git worktrees, signed audit trail";
     homepage = "https://github.com/sipyourdrink-ltd/bernstein";
     changelog = "https://github.com/sipyourdrink-ltd/bernstein/releases/tag/v${version}";
     license = licenses.asl20;
