@@ -59,6 +59,46 @@ let
     };
   };
 
+  # Native (PyO3) document-to-markdown converter; PyPI ships wheels only.
+  firecrawl-anydoc = python3.pkgs.buildPythonPackage rec {
+    pname = "firecrawl-anydoc";
+    version = "0.2.4";
+    pyproject = true;
+
+    src = fetchFromGitHub {
+      owner = "firecrawl";
+      repo = "anydoc";
+      tag = "v${version}";
+      hash = "sha256-rGv3Bh+zmF9xFUgf8RaSmfyB/gfuQ13iC389i6VZIlM=";
+    };
+
+    cargoDeps = rustPlatform.fetchCargoVendor {
+      inherit src;
+      name = "anydoc-${version}";
+      hash = "sha256-yhW5HSzVrZCms4x36J2NGIn1e5YLIgjuNKXM9EJ9J8c=";
+    };
+
+    buildAndTestSubdir = "python";
+
+    nativeBuildInputs = with rustPlatform; [
+      cargoSetupHook
+      maturinBuildHook
+    ];
+
+    pythonImportsCheck = [
+      "anydoc"
+      "anydoc._anydoc"
+    ];
+
+    meta = with lib; {
+      description = "Convert documents to GitHub-Flavored Markdown";
+      homepage = "https://github.com/firecrawl/anydoc";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.unix;
+    };
+  };
+
   fal-client = python3.pkgs.buildPythonPackage rec {
     pname = "fal-client";
     version = "0.13.1";
@@ -133,13 +173,13 @@ let
     };
   };
 
-  version = "2026.8.27";
+  version = "2026.8.31";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-4EQ3GD5S3UHItPD/R/0WzSamkmtgDXM3AUq/MWZ7qMo=";
+    hash = "sha256-Ii9xP2fKUpvCcwWZuxJ0g3CZ+IL2UZH14pUNvBfdclc=";
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
@@ -150,7 +190,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-sBmdqqRxDJy7S7x0M7QzjxoybsjTS2Ktp/cpSwpgN1A=";
+    npmDepsHash = "sha256-Ej35hMbJGzixgwp5kFEw8Np/XDiYzTvLwxRigMP4a+U=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -200,6 +240,7 @@ let
       requests
       jinja2
       pydantic
+      firecrawl-anydoc
       # Interactive CLI
       prompt-toolkit
       # Cron scheduler
