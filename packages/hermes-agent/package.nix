@@ -59,6 +59,46 @@ let
     };
   };
 
+  # Native (PyO3) document-to-markdown converter; PyPI ships wheels only.
+  firecrawl-anydoc = python3.pkgs.buildPythonPackage rec {
+    pname = "firecrawl-anydoc";
+    version = "0.2.4";
+    pyproject = true;
+
+    src = fetchFromGitHub {
+      owner = "firecrawl";
+      repo = "anydoc";
+      tag = "v${version}";
+      hash = "sha256-rGv3Bh+zmF9xFUgf8RaSmfyB/gfuQ13iC389i6VZIlM=";
+    };
+
+    cargoDeps = rustPlatform.fetchCargoVendor {
+      inherit src;
+      name = "anydoc-${version}";
+      hash = "sha256-yhW5HSzVrZCms4x36J2NGIn1e5YLIgjuNKXM9EJ9J8c=";
+    };
+
+    buildAndTestSubdir = "python";
+
+    nativeBuildInputs = with rustPlatform; [
+      cargoSetupHook
+      maturinBuildHook
+    ];
+
+    pythonImportsCheck = [
+      "anydoc"
+      "anydoc._anydoc"
+    ];
+
+    meta = with lib; {
+      description = "Convert documents to GitHub-Flavored Markdown";
+      homepage = "https://github.com/firecrawl/anydoc";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.unix;
+    };
+  };
+
   fal-client = python3.pkgs.buildPythonPackage rec {
     pname = "fal-client";
     version = "0.13.1";
@@ -200,6 +240,7 @@ let
       requests
       jinja2
       pydantic
+      firecrawl-anydoc
       # Interactive CLI
       prompt-toolkit
       # Cron scheduler
