@@ -116,6 +116,7 @@ stdenv.mkDerivation {
     libGL
     libgbm
     libsecret
+    libpulseaudio
     pipewire
     wayland
   ];
