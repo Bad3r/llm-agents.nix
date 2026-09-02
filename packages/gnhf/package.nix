@@ -12,13 +12,13 @@
 
 buildNpmPackage rec {
   pname = "gnhf";
-  version = "0.1.47";
+  version = "0.1.48";
 
   src = fetchFromGitHub {
     owner = "kunchenguid";
     repo = "gnhf";
     tag = "gnhf-v${version}";
-    hash = "sha256-6XTluVmG7JVU8wOv3N+nc8/G1uwfPD5A3BmgjKLjGXg=";
+    hash = "sha256-Ji5tn8+RlMNmAATI0PZyCtndOf4AeaFxStLL04fZFWo=";
   };
 
   npmDeps = null;
