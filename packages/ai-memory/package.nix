@@ -4,6 +4,7 @@
   fetchFromGitHub,
   rustPlatform,
   installShellFiles,
+  cacert,
   makeBinaryWrapper,
   coreutils,
   curl,
@@ -65,6 +66,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
     installShellFiles
     makeBinaryWrapper
   ];
+
+  # reqwest loads native roots in the mcp_bridge test
+  nativeCheckInputs = [ cacert ];
 
   postInstall = ''
     mkdir -p $out/share/ai-memory
