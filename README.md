@@ -1506,6 +1506,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>executor</strong> - MCP gateway that gives coding agents one interface to many tools</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://executor.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#executor -- --help`
+- **Nix**: [packages/executor/package.nix](packages/executor/package.nix)
+
+</details>
+<details>
 <summary><strong>git-ai</strong> - Git extension for tracking AI-generated code in repositories</summary>
 
 - **Source**: source
