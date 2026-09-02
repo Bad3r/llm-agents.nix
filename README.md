@@ -1606,6 +1606,17 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>sub2api</strong> - AI API gateway platform for distributing and managing AI subscription API quotas</summary>
+
+- **Source**: source
+- **License**: LGPL-3.0-or-later
+- **Homepage**: https://github.com/Wei-Shaw/sub2api
+- **Usage**: `nix run github:numtide/llm-agents.nix#sub2api -- --help`
+- **Nix**: [packages/sub2api/package.nix](packages/sub2api/package.nix)
+- **Documentation**: See [packages/sub2api/README.md](packages/sub2api/README.md) for detailed usage
+
+</details>
+<details>
 <summary><strong>terminal-use</strong> - Headless virtual terminal for AI agents</summary>
 
 - **Source**: source
