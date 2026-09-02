@@ -251,6 +251,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>jcode</strong> - RAM-efficient coding agent TUI with multi-model support and swarm coordination</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/1jehuang/jcode
+- **Usage**: `nix run github:numtide/llm-agents.nix#jcode -- --help`
+- **Nix**: [packages/jcode/package.nix](packages/jcode/package.nix)
+
+</details>
+<details>
 <summary><strong>jules</strong> - Jules, the asynchronous coding agent from Google, in the terminal</summary>
 
 - **Source**: binary
