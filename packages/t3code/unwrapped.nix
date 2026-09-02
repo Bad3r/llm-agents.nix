@@ -11,7 +11,7 @@
   node-gyp,
   python3,
   cacert,
-  electron_41,
+  electron_43,
   makeBinaryWrapper,
   installShellFiles,
   makeDesktopItem,
@@ -130,9 +130,9 @@ stdenv.mkDerivation {
     upstream_electron=$(node -p "require('./apps/desktop/package.json').dependencies.electron")
     upstream_major=''${upstream_electron#^}
     upstream_major=''${upstream_major%%.*}
-    nix_major=${lib.versions.major electron_41.version}
+    nix_major=${lib.versions.major electron_43.version}
     if (( upstream_major > nix_major )); then
-      echo "error: upstream expects Electron $upstream_electron but nixpkgs provides ${electron_41.version}" >&2
+      echo "error: upstream expects Electron $upstream_electron but nixpkgs provides ${electron_43.version}" >&2
       exit 1
     fi
 
@@ -183,7 +183,7 @@ stdenv.mkDerivation {
     find "$out/libexec/t3code" "$desktop/libexec/t3code" -xtype l -delete
 
     mkdir -p "$desktop/bin"
-    makeWrapper ${lib.getExe electron_41} "$desktop/bin/t3code-desktop" \
+    makeWrapper ${lib.getExe electron_43} "$desktop/bin/t3code-desktop" \
       --add-flags "$desktop/libexec/t3code/apps/desktop" \
       --inherit-argv0
 
