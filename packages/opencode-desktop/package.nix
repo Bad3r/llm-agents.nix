@@ -20,6 +20,7 @@ let
   electron = electron_42;
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash nodeModulesHash;
+  nodePlatform = "${stdenvNoCC.hostPlatform.node.platform}-${stdenvNoCC.hostPlatform.node.arch}";
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "opencode-desktop";
@@ -100,10 +101,6 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     (lib.getLib stdenv.cc.cc)
   ];
 
-  # The musl prebuilts ship libc.musl-*.so.1 SONAMEs that formatelf can't
-  # resolve on glibc systems. They aren't loaded at runtime on the host libc anyway.
-  autoPatchelfIgnoreMissingDeps = [ "libc.musl-*.so.*" ];
-
   strictDeps = true;
 
   env = {
@@ -133,6 +130,23 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook preConfigure
 
     cp -R ${finalAttrs.node_modules}/. .
+    chmod -R u+w node_modules packages/*/node_modules
+
+    # node_modules is fetched with --os/--cpu="*" so the FOD hash is platform
+    # independent; drop foreign native prebuilds here so electron-builder
+    # doesn't copy them into app.asar.
+    shopt -s nullglob
+    for p in node_modules/.bun/* {.,packages/*}/node_modules/{,@*/}*; do
+      name=''${p##*node_modules/}
+      case "''${name#.bun/}" in
+        *musl*) rm -rf "$p" ;;
+        *${nodePlatform}*) ;;
+        *darwin*|*linux*|*win32*|*android*|*freebsd*|*aix*) rm -rf "$p" ;;
+      esac
+    done
+    shopt -u nullglob
+    find node_modules packages/*/node_modules -xtype l -delete
+
     patchShebangs node_modules
     patchShebangs packages/*/node_modules
 
@@ -215,11 +229,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
             packages/desktop/resources/icons/''${size}x''${size}.png \
             $out/share/icons/hicolor/''${size}x''${size}/apps/opencode-desktop.png
         done
-        for size in 30 44 71 89 107 142 150 284 310; do
-          install -Dm644 \
-            packages/desktop/resources/icons/Square''${size}x''${size}Logo.png \
-            $out/share/icons/hicolor/''${size}x''${size}/apps/opencode-desktop.png
-        done
+        install -Dm644 packages/desktop/resources/icons/128x128@2x.png \
+          $out/share/icons/hicolor/256x256/apps/opencode-desktop.png
 
         makeWrapper ${lib.getExe electron} $out/bin/opencode-desktop \
           --inherit-argv0 \
