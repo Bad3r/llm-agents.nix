@@ -50,6 +50,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "ai-memory"
   ];
 
+  # Expect "ai-memory" in current_exe(), the test binary is ai_memory-<hash>.
+  checkFlags = map (t: "--skip=commands::install_hooks::tests::${t}") [
+    "antigravity_apply_is_idempotent"
+    "cursor_apply_is_idempotent"
+    "kimi_code_apply_is_idempotent"
+    "kimi_code_apply_preserves_providers_and_third_party_hooks"
+  ];
+
   # build.rs would otherwise try to download the tailwind CLI for the web UI.
   env.TAILWIND_SKIP = "1";
 
