@@ -8,13 +8,13 @@
 
 buildGoModule (finalAttrs: {
   pname = "multica";
-  version = "0.4.38";
+  version = "0.4.39";
 
   src = fetchFromGitHub {
     owner = "multica-ai";
     repo = "multica";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-dtHAlV0uLO6ZJH5lfFc91yEbF8ICr/MBYBmEqrGNNYQ=";
+    hash = "sha256-xcj0Jl/+7eiVIVLhEM2lH88SH6PTYniwep4mXa4nhk4=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/server";
