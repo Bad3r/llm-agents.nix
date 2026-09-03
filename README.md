@@ -697,6 +697,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>clauth</strong> - Claude Code multi-account manager and usage monitor (CLI, TUI and MCP cross-account delegation)</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/uwuclxdy/clauth
+- **Usage**: `nix run github:numtide/llm-agents.nix#clauth -- --help`
+- **Nix**: [packages/clauth/package.nix](packages/clauth/package.nix)
+
+</details>
+<details>
 <summary><strong>oh-my-claudecode</strong> - Multi-agent orchestration system for Claude Code</summary>
 
 - **Source**: source
@@ -1503,6 +1513,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/ctxrs/ctx
 - **Usage**: `nix run github:numtide/llm-agents.nix#ctx -- --help`
 - **Nix**: [packages/ctx/package.nix](packages/ctx/package.nix)
+
+</details>
+<details>
+<summary><strong>executor</strong> - MCP gateway that gives coding agents one interface to many tools</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://executor.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#executor -- --help`
+- **Nix**: [packages/executor/package.nix](packages/executor/package.nix)
 
 </details>
 <details>
