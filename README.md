@@ -371,6 +371,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>opencode-desktop</strong> - AI coding agent desktop client</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://opencode.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#opencode-desktop -- --help`
+- **Nix**: [packages/opencode-desktop/package.nix](packages/opencode-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>opencode2</strong> - OpenCode 2 preview CLI</summary>
 
 - **Source**: binary
