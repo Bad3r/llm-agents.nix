@@ -9,6 +9,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 ### AI Coding Agents
 
 <details>
+<summary><strong>agentty</strong> - Terminal AI pair programmer written in C++</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/1ay1/agentty
+- **Usage**: `nix run github:numtide/llm-agents.nix#agentty -- --help`
+- **Nix**: [packages/agentty/package.nix](packages/agentty/package.nix)
+
+</details>
+<details>
 <summary><strong>amp</strong> - CLI for Amp, an agentic coding tool in research preview from Sourcegraph</summary>
 
 - **Source**: binary
@@ -107,6 +117,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/openai/codex
 - **Usage**: `nix run github:numtide/llm-agents.nix#codex -- --help`
 - **Nix**: [packages/codex/package.nix](packages/codex/package.nix)
+
+</details>
+<details>
+<summary><strong>command-code</strong> - Coding agent that learns your coding taste, for open models</summary>
+
+- **Source**: bytecode
+- **License**: unfree
+- **Homepage**: https://commandcode.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#command-code -- --help`
+- **Nix**: [packages/command-code/package.nix](packages/command-code/package.nix)
 
 </details>
 <details>
@@ -248,6 +268,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://usehax.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#hax -- --help`
 - **Nix**: [packages/hax/package.nix](packages/hax/package.nix)
+
+</details>
+<details>
+<summary><strong>jcode</strong> - RAM-efficient coding agent TUI with multi-model support and swarm coordination</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/1jehuang/jcode
+- **Usage**: `nix run github:numtide/llm-agents.nix#jcode -- --help`
+- **Nix**: [packages/jcode/package.nix](packages/jcode/package.nix)
 
 </details>
 <details>
@@ -614,6 +644,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>multica</strong> - Command-line interface for the Multica platform</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/multica-ai/multica
+- **Usage**: `nix run github:numtide/llm-agents.nix#multica -- --help`
+- **Nix**: [packages/multica/package.nix](packages/multica/package.nix)
+
+</details>
+<details>
+<summary><strong>multica-desktop</strong> - Desktop client for the Multica platform</summary>
+
+- **Source**: source
+- **License**: unfree
+- **Homepage**: https://github.com/multica-ai/multica
+- **Usage**: `nix run github:numtide/llm-agents.nix#multica-desktop -- --help`
+- **Nix**: [packages/multica-desktop/package.nix](packages/multica-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>openclaw</strong> - Your own personal AI assistant. Any OS. Any Platform. The lobster way</summary>
 
 - **Source**: source
@@ -790,6 +840,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/cosmtrek/mindwalk
 - **Usage**: `nix run github:numtide/llm-agents.nix#mindwalk -- --help`
 - **Nix**: [packages/mindwalk/package.nix](packages/mindwalk/package.nix)
+
+</details>
+<details>
+<summary><strong>tokscale</strong> - CLI and TUI for AI token usage analytics</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/junhoyeo/tokscale
+- **Usage**: `nix run github:numtide/llm-agents.nix#tokscale -- --help`
+- **Nix**: [packages/tokscale/package.nix](packages/tokscale/package.nix)
 
 </details>
 

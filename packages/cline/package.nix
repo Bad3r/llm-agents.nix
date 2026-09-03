@@ -4,6 +4,7 @@
   stdenv,
   fetchurl,
   platformSource,
+  bash,
   cacert,
   makeWrapper,
   nodejs,
@@ -48,6 +49,14 @@ stdenv.mkDerivation {
 
     mkdir -p $out/lib/cline-platform $out/lib/cline-launcher
     cp -r . $out/lib/cline-platform
+  ''
+  # NixOS has no /bin/bash. Same-length patch so the Bun SEA stays valid.
+  # Not on darwin: editing the Mach-O breaks its code signature.
+  + lib.optionalString stdenv.hostPlatform.isLinux ''
+    grep -qF '"/bin/bash"' $out/lib/cline-platform/bin/cline
+    sed -i 's|"/bin/bash"|"bash"     |g' $out/lib/cline-platform/bin/cline
+  ''
+  + ''
     tar -xzf ${launcher} --strip-components=1 -C $out/lib/cline-launcher package/bin
 
     # Use the official npm launcher so Cline retains its OS trust-store
@@ -57,6 +66,7 @@ stdenv.mkDerivation {
     patchShebangs $out/lib/cline-launcher/bin/cline
 
     makeWrapper $out/lib/cline-launcher/bin/cline $out/bin/cline \
+      --suffix PATH : ${lib.makeBinPath [ bash ]} \
       --set-default SSL_CERT_FILE ${cacert}/etc/ssl/certs/ca-bundle.crt \
       --set-default SSL_CERT_DIR ${cacert}/etc/ssl/certs
 

@@ -179,7 +179,14 @@ let
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-Ii9xP2fKUpvCcwWZuxJ0g3CZ+IL2UZH14pUNvBfdclc=";
+    hash = "sha256-vT5ZhN2NUd0Iv5YplUQfwdHEOVM8yoy94MqJjLvXOJ8=";
+    # contributors/emails/ holds paths differing only in case; they collapse
+    # on case-insensitive stores (APFS) so the NAR hash diverges between
+    # Linux and darwin. Unused at build/runtime. Upstream:
+    # NousResearch/hermes-agent#88257
+    postFetch = ''
+      rm -rf "$out/contributors"
+    '';
   };
 
   # Upstream moved ui-tui/ and web/ into npm workspaces with a single root
