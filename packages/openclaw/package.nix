@@ -25,19 +25,19 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  version = "2026.7.1-2";
+  version = "2026.8.2";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "openclaw";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-kpiKCTjXX4l525IJDNsnI7j2IT6ZYdqvFTyRlKGgomg=";
+    hash = "sha256-lSYGSyD3rt1YDyZ7d99V1080rMcLSu67skP54XuW1Cw=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
-    hash = "sha256-mflaRDsSlYTpHc6irUjoStTFMd/TuA9ozqjf9cxy+ck=";
+    hash = "sha256-XbU5w/X/qsOFZtk0lnB+XJZwhk0f6Ihawk0VEnDqNAk=";
     fetcherVersion = 3;
     prePnpmInstall = stripPatchedDeps;
   };
@@ -61,6 +61,10 @@ stdenv.mkDerivation (finalAttrs: {
   # both so peak RSS stays within the builder's limit.
   env = {
     NODE_OPTIONS = "--max-old-space-size=4096";
+    # the sandbox hides the cgroup limit tsdown-build wants to derive this from
+    OPENCLAW_TSDOWN_MAX_OLD_SPACE_MB = "4096";
+    # fs-safe's native openat2 path returns ENOSYS on some builders
+    FS_SAFE_NATIVE_MODE = "off";
     RAYON_NUM_THREADS = "4";
   };
 
