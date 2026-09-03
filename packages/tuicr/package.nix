@@ -4,8 +4,7 @@
   rustPlatform,
   pkg-config,
   libgit2,
-  git,
-  python3Packages,
+  versionCheckHook,
   flake,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -32,16 +31,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   doCheck = false;
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [
-    git
-    python3Packages.pexpect
-  ];
-  installCheckPhase = ''
-    runHook preInstallCheck
-    # tuicr has no --version flag; verify the binary runs and produces expected output
-    python3 ${./check-tuicr.py} $out/bin/tuicr
-    runHook postInstallCheck
-  '';
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Code Review";
 
