@@ -4,22 +4,21 @@
   rustPlatform,
   pkg-config,
   libgit2,
-  git,
-  python3Packages,
+  versionCheckHook,
   flake,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "tuicr";
-  version = "0.24.0";
+  version = "0.25.0";
 
   src = fetchFromGitHub {
     owner = "agavra";
     repo = "tuicr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-AnLLEOI3QaWZLMy339nJeyfCXt4NZpnzsYhZXTEagkU=";
+    hash = "sha256-nbjvSRrbJ4LQrn8l0FJ8R5PNpq7gcQR8m78agL59zqs=";
   };
 
-  cargoHash = "sha256-LyBCtZ93HZ5GvceqD27zhKzXbAgJ0aLOgGcFNoq/WdE=";
+  cargoHash = "sha256-9L1G0O5kE9EOFAQ092R/C9/SC48K0YcD5D2WjEvkeK0=";
 
   nativeBuildInputs = [
     pkg-config
@@ -32,16 +31,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   doCheck = false;
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [
-    git
-    python3Packages.pexpect
-  ];
-  installCheckPhase = ''
-    runHook preInstallCheck
-    # tuicr has no --version flag; verify the binary runs and produces expected output
-    python3 ${./check-tuicr.py} $out/bin/tuicr
-    runHook postInstallCheck
-  '';
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Code Review";
 
