@@ -120,6 +120,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>command-code</strong> - Coding agent that learns your coding taste, for open models</summary>
+
+- **Source**: bytecode
+- **License**: unfree
+- **Homepage**: https://commandcode.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#command-code -- --help`
+- **Nix**: [packages/command-code/package.nix](packages/command-code/package.nix)
+
+</details>
+<details>
 <summary><strong>copilot-cli</strong> - GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal.</summary>
 
 - **Source**: binary
