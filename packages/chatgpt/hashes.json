@@ -1,14 +1,14 @@
 {
   "sources": {
     "aarch64-linux": {
-      "version": "26.901.31953",
-      "url": "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.901.31953_arm64.deb",
-      "hash": "sha256-DNwkbud4lgaPBTdUwpXKE4JdAhAGj3Rq/ZZcL4THSXQ="
+      "version": "26.901.41123",
+      "url": "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.901.41123_arm64.deb",
+      "hash": "sha256-5TCI+yxqc5xUiwDAtVv8MEz2XDNr1kgLAKeFdQvfqxI="
     },
     "x86_64-linux": {
-      "version": "26.901.31953",
-      "url": "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.901.31953_amd64.deb",
-      "hash": "sha256-K7RSK+h33mwX5fTAcbBuxkiCsd0JqPC9IErwI6t1bZw="
+      "version": "26.901.41123",
+      "url": "https://persistent.oaistatic.com/codex-app-prod/linux/deb/pool/main/c/chatgpt/chatgpt_26.901.41123_amd64.deb",
+      "hash": "sha256-C/eEeNVLDNDgsEy5yMabKyMbvAwm7Cgrylg2Qw2a1fY="
     }
   }
 }
