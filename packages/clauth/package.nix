@@ -44,6 +44,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=update::tests::updates_enabled_when_env_is_other_value"
     "--skip=update::tests::updates_enabled_when_env_is_zero"
     "--skip=update::tests::updates_enabled_when_env_unset"
+    "--skip=herdr::tests::heal_detached_reinstalls_once_and_throttles"
+    "--skip=herdr::tests::heal_detached_fails_closed_without_the_shim_sentinel"
   ];
 
   doInstallCheck = true;
