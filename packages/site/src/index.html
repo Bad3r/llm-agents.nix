@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>llm-agents.nix - package search</title>
+    <meta name="description" content="Nix packages for AI coding agents and development tools." />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="numtide.svg" />
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <div class="brand">
+          <a href="https://numtide.com"><img src="numtide.svg" alt="Numtide" /></a>
+          <a href="https://numtide.com">Numtide</a>
+          <span class="sep">/</span>
+          <a href="https://github.com/numtide/llm-agents.nix">llm-agents.nix</a>
+        </div>
+        <h1>AI coding agents <span class="accent">packaged with Nix.</span></h1>
+        <p class="tagline muted">Auto-updated daily. Prebuilt from the Numtide binary cache for Linux and macOS.</p>
+        <input id="q" type="search" placeholder="Search packages…" autofocus autocomplete="off" spellcheck="false" />
+        <div class="filters">
+          <div id="categories" class="chips" role="group" aria-label="Category"></div>
+          <div class="row">
+            <select id="platform" aria-label="Platform">
+              <option value="">All platforms</option>
+              <option value="x86_64-linux">x86_64-linux</option>
+              <option value="aarch64-linux">aarch64-linux</option>
+              <option value="aarch64-darwin">aarch64-darwin</option>
+            </select>
+            <select id="source" aria-label="Source type">
+              <option value="">Any build</option>
+              <option value="source">Built from source</option>
+              <option value="binary">Prebuilt binary</option>
+            </select>
+            <span id="count" class="muted"></span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="wrap">
+        <ul id="results"></ul>
+        <p id="empty" hidden>No packages match.</p>
+      </div>
+    </main>
+    <footer class="wrap muted">
+      <p>
+        <code>nix run github:numtide/llm-agents.nix#&lt;name&gt;</code> ·
+        <a href="https://github.com/numtide/llm-agents.nix#installation">Installation</a> ·
+        <a href="packages.json">packages.json</a> ·
+        by <a href="https://numtide.com">Numtide</a>
+      </p>
+    </footer>
+    <template id="card">
+      <li class="card">
+        <div class="head">
+          <a class="name"></a>
+          <span class="version muted"></span>
+          <span class="badges"></span>
+        </div>
+        <p class="desc"></p>
+        <div class="cmd">
+          <code></code>
+          <button type="button" class="copy" title="Copy">Copy</button>
+        </div>
+        <div class="links muted"></div>
+      </li>
+    </template>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

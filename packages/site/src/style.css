@@ -1,0 +1,108 @@
+/* Palette and type follow numtide.com: charcoal, #f58220 orange, GT Pressura. */
+:root {
+  --black: #1c1c1c;
+  --ink: #232323;
+  --white: #fff;
+  --lightgray: #fafafa;
+  --gray: #9a9a9a;
+  --border: #333;
+  --primary: #f58220;
+  --primary-dark: #ea510c;
+  --radius: 6px;
+  font-family: "GT Pressura Standard", "GT Pressura", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--black); color: var(--white); }
+a { color: var(--primary); text-decoration: none; }
+a:hover { color: var(--primary-dark); text-decoration: underline; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.88em; }
+.wrap { max-width: 1000px; margin: 0 auto; padding: 0 1.25rem; }
+.muted { color: var(--gray); }
+
+header { padding: 1.5rem 0 1.25rem; border-bottom: 1px solid var(--border); }
+.brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; }
+.brand img { height: 34px; width: 34px; }
+.brand a { color: var(--white); font-size: 1.35rem; font-weight: 500; letter-spacing: 0.01em; }
+.brand .sep { color: var(--gray); }
+header h1 { margin: 0; font-size: 2.6rem; line-height: 1.1; font-weight: 500; }
+header h1 .accent { color: var(--primary); display: block; }
+.tagline { margin: 0.75rem 0 1.5rem; max-width: 42rem; }
+#q {
+  width: 100%; font: inherit; font-size: 1.1rem; padding: 0.8rem 1rem;
+  border: 2px solid var(--white); border-radius: 999px;
+  background: transparent; color: var(--white);
+}
+#q::placeholder { color: var(--gray); }
+#q:focus { outline: none; border-color: var(--primary); }
+.filters { margin-top: 1rem; display: grid; gap: 0.6rem; }
+.row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.row #count { margin-left: auto; font-size: 0.9rem; }
+select {
+  font: inherit; font-size: 0.85rem; padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--ink); color: var(--white);
+}
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip {
+  font: inherit; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.25rem 0.7rem; border: 1px solid var(--border); border-radius: 999px;
+  background: transparent; color: var(--white); cursor: pointer;
+}
+.chip:hover { border-color: var(--primary); }
+.chip .n { color: var(--gray); }
+.chip[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--black); }
+.chip[aria-pressed="true"] .n { color: #0009; }
+
+main { background: var(--lightgray); color: var(--black); padding: 1.5rem 0 2rem; }
+#results {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 1rem;
+}
+.card {
+  background: var(--black); color: var(--white); min-width: 0;
+  border-radius: var(--radius); padding: 1rem 1.1rem 0.9rem;
+  border-bottom: 4px solid var(--primary);
+  display: flex; flex-direction: column;
+}
+.card .head { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.card .name { font-weight: 500; font-size: 1.15rem; color: var(--primary); }
+.card .version { font-size: 0.8rem; font-family: ui-monospace, monospace; }
+.card .badges { margin-left: auto; display: flex; gap: 0.3rem; }
+.badge {
+  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.05rem 0.4rem; border-radius: 3px; border: 1px solid var(--border); color: var(--gray);
+}
+.badge.unfree { color: var(--primary); border-color: var(--primary-dark); }
+.card .desc { margin: 0.4rem 0 0.8rem; font-size: 0.92rem; flex: 1; }
+.cmd {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: var(--ink); border-radius: 4px; padding: 0.35rem 0.4rem 0.35rem 0.7rem;
+}
+.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font-size: 0.78rem; }
+.copy {
+  font: inherit; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.15rem 0.5rem; cursor: pointer;
+  border: 1px solid var(--white); border-radius: 999px; background: transparent; color: var(--white);
+}
+.copy:hover { border-color: var(--primary); color: var(--primary); }
+.links { font-size: 0.8rem; margin-top: 0.6rem; color: var(--gray); }
+#empty { color: var(--black); }
+footer { padding: 1.25rem; font-size: 0.85rem; text-align: center; }
+footer code { color: var(--white); }
+
+@media (max-width: 600px) {
+  /* Keep the first result above the fold on phones. */
+  header { padding: 1rem 0; }
+  .brand { margin-bottom: 0.75rem; }
+  header h1 { font-size: 1.6rem; }
+  header h1 .accent { display: inline; }
+  .tagline { display: none; }
+  #results { grid-template-columns: 1fr; }
+  /* Category chips would push results below the fold; scroll them sideways instead. */
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .chip { white-space: nowrap; }
+  .card .badges { margin-left: 0; }
+}

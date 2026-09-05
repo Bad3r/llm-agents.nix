@@ -193,6 +193,12 @@
 
       formatter = eachSystem (system: allPackages.${system}.formatter);
 
+      # Publishes the package search site to gh-pages via nixbot effects.
+      herculesCI = import ./lib/hercules-ci.nix {
+        pkgs = pkgsFor.x86_64-linux;
+        site = packages.x86_64-linux.site;
+      };
+
       checks = eachSystem (
         system:
         lib.mapAttrs' (name: pkg: lib.nameValuePair "pkgs-${name}" pkg) packages.${system}
