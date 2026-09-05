@@ -4,31 +4,30 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
-  electron_41,
+  electron_43,
   makeWrapper,
   copyDesktopItems,
   makeDesktopItem,
   python3,
+  node-gyp,
 }:
 
 let
-  # Upstream pins electron ^39, but electron_39 and _40 are EOL/insecure in
-  # nixpkgs. Electron majors are backwards compatible enough for this app; the
-  # build guard below catches the day upstream jumps ahead of what we ship.
-  electron = electron_41;
+  # Upstream pins ^44, newest in nixpkgs.
+  electron = electron_43;
 in
 buildNpmPackage rec {
   pname = "hermes-one";
-  version = "0.7.6";
+  version = "0.7.7";
 
   src = fetchFromGitHub {
     owner = "fathah";
     repo = "hermes-desktop";
     tag = "v${version}";
-    hash = "sha256-Jmc3XFeaKrb9PqizSmh4Pbn//8tNL5dDb+H5dj9fSDM=";
+    hash = "sha256-weKYjjvGL6Vrf1VrwzOT3a2suWvkkaX/YfVth90GNL8=";
   };
 
-  npmDepsHash = "sha256-nxqX2TBcuSVXShzFqrQ6T6BwjIqdi2qyyWzG6vuJ940=";
+  npmDepsHash = "sha256-pW7TEk/pvvUCipdNgzaeQr/yIpLXvZP0VibexdllD8c=";
   npmDepsFetcherVersion = 2;
 
   # Upstream postinstall runs electron-builder install-app-deps and husky;
@@ -39,30 +38,21 @@ buildNpmPackage rec {
 
   nativeBuildInputs = [
     makeWrapper
-    python3 # node-gyp needs it to rebuild better-sqlite3
+    python3
+    node-gyp
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ copyDesktopItems ];
 
   buildPhase = ''
     runHook preBuild
 
-    # Fail loudly if upstream moves to an Electron major newer than ours.
-    upstream_electron=$(node -p "require('./package.json').devDependencies.electron")
-    upstream_major=''${upstream_electron#^}
-    upstream_major=''${upstream_major%%.*}
-    nix_major=${lib.versions.major electron.version}
-    if (( upstream_major > nix_major )); then
-      echo "error: upstream expects electron $upstream_electron but we provide ${electron.version}"
-      echo "Update the electron input in package.nix to match."
-      exit 1
-    fi
-
-    # better-sqlite3 ships no prebuilds for Electron's ABI; compile it
-    # against the Electron headers so the main process can load it.
-    export npm_config_nodedir=${electron.headers}
-    npm rebuild better-sqlite3 --build-from-source
-
     npx electron-vite build
+
+    # Prune first, it reinstalls better-sqlite3 and would drop the addon.
+    npm prune --omit=dev
+    # N-API addon, but the shipped prebuilds are not usable on NixOS.
+    rm -r node_modules/better-sqlite3/prebuilds
+    (cd node_modules/better-sqlite3 && node-gyp rebuild --release --nodedir=${electron.headers})
 
     runHook postBuild
   '';
@@ -77,10 +67,9 @@ buildNpmPackage rec {
     # Runtime dependencies for the main process: electron-vite externalizes
     # everything in package.json "dependencies" (better-sqlite3, i18next,
     # electron-updater, ...), so they must exist in node_modules.
-    npm prune --omit=dev
-    # Drop node-gyp intermediates; only the compiled addon is needed.
-    find node_modules/better-sqlite3/build -mindepth 1 -maxdepth 1 ! -name Release -exec rm -rf {} +
-    find node_modules/better-sqlite3/build/Release -mindepth 1 ! -name better_sqlite3.node -exec rm -rf {} +
+    mv node_modules/better-sqlite3/build/Release/better_sqlite3.node .
+    rm -r node_modules/better-sqlite3/build
+    install -D better_sqlite3.node node_modules/better-sqlite3/build/Release/better_sqlite3.node
     cp -r node_modules $out/share/hermes-one/
 
     install -Dm644 build/icon.png $out/share/icons/hicolor/512x512/apps/hermes-one.png
