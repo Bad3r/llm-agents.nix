@@ -1736,6 +1736,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/toon/package.nix](packages/toon/package.nix)
 
 </details>
+<details>
+<summary><strong>tui-test</strong> - Control, inspect, test, and record any TUI app or CLI in a headless terminal</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://github.com/microsoft/tui-test
+- **Usage**: `nix run github:numtide/llm-agents.nix#tui-test -- --help`
+- **Nix**: [packages/tui-test/package.nix](packages/tui-test/package.nix)
+
+</details>
 <!-- END GENERATED PACKAGE DOCS -->
 
 ## Installation

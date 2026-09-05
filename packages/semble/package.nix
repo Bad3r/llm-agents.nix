@@ -149,14 +149,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "semble";
-  version = "0.5.5";
+  version = "0.5.6";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "MinishLab";
     repo = "semble";
     tag = "v${version}";
-    hash = "sha256-bKPIA/hdgv7rfKptWkXfIW0wKaDc8sD3uCpBKlGahxo=";
+    hash = "sha256-pV/ermCbbGv8xJIjHNQcCzZBxkqmUBUaM6LZ7Sdues4=";
   };
 
   build-system = with python3.pkgs; [

@@ -39,6 +39,9 @@ let
     } -C $out --strip-components=1
     rm -f $out/npm-shrinkwrap.json
     cp ${./package-lock.json} $out/package-lock.json
+    # 0.85.0 imports pi-server without declaring it (earendil-works/pi#9132).
+    sed -i '/"@earendil-works\/pi-protocol"/a\    "@earendil-works/pi-server": "^${version}",' $out/package.json
+    grep -q pi-server $out/package.json
   '';
 in
 buildNpmPackage {
