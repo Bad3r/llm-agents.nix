@@ -264,6 +264,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 42895613;
         name = "Adithya Balasubramani";
       };
+      willenbug = {
+        github = "willenbug";
+        githubId = 76489193;
+        name = "Brayden Willenborg";
+      };
     };
   }
 )
