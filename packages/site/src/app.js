@@ -19,18 +19,17 @@ const CATEGORY_ORDER = [
 const $ = (s) => document.querySelector(s);
 const q = $("#q");
 const platform = $("#platform");
-const source = $("#source");
 const results = $("#results");
 const tpl = $("#card");
 
-const state = { category: "", pkgs: [] };
+const state = { category: "", open: "", pkgs: [] };
 
 function readUrl() {
   const p = new URLSearchParams(location.search);
   q.value = p.get("q") ?? "";
   state.category = p.get("category") ?? "";
   platform.value = p.get("platform") ?? "";
-  source.value = p.get("source") ?? "";
+  state.open = p.get("pkg") ?? "";
 }
 
 function writeUrl() {
@@ -38,7 +37,7 @@ function writeUrl() {
   if (q.value) p.set("q", q.value);
   if (state.category) p.set("category", state.category);
   if (platform.value) p.set("platform", platform.value);
-  if (source.value) p.set("source", source.value);
+  if (state.open) p.set("pkg", state.open);
   const s = p.toString();
   history.replaceState(null, "", s ? `?${s}` : location.pathname);
 }
@@ -62,7 +61,6 @@ function render() {
   const rows = state.pkgs
     .filter((p) => !state.category || p.category === state.category)
     .filter((p) => !platform.value || p.platforms.includes(platform.value))
-    .filter((p) => !source.value || p.source === source.value)
     .map((p) => [score(p, terms), p])
     .filter(([s]) => s >= 0)
     .sort((a, b) => b[0] - a[0] || a[1].name.localeCompare(b[1].name));
@@ -74,21 +72,6 @@ function render() {
     b.setAttribute("aria-pressed", b.dataset.value === state.category);
   }
   writeUrl();
-}
-
-const BADGE_TITLES = {
-  source: "Built from source",
-  binary: "Prebuilt upstream binary",
-  bytecode: "Prebuilt bytecode",
-  unfree: "Unfree license",
-};
-
-function badge(text, cls) {
-  const s = document.createElement("span");
-  s.className = `badge ${cls}`;
-  s.textContent = text;
-  s.title = BADGE_TITLES[text] ?? text;
-  return s;
 }
 
 function link(href, text, label) {
@@ -113,28 +96,100 @@ function announce(msg) {
   $("#announce").textContent = msg;
 }
 
-function card(p) {
-  const li = tpl.content.firstElementChild.cloneNode(true);
-  li.querySelector(".name").textContent = p.name;
-  li.querySelector(".version").replaceChildren(described("version", p.version));
-  li.querySelector(".desc").textContent = p.description;
-  const badges = li.querySelector(".badges");
-  badges.append(badge(p.source, p.source));
-  // flake.lib sets `free = true` on unfree licenses, so match by name.
-  if (/unfree/i.test(p.license)) badges.append(badge("unfree", "unfree"));
-  const cmd = `nix run ${REPO}#${p.name}`;
-  const code = li.querySelector(".cmd code");
-  code.textContent = cmd;
-  // Scrollable on narrow screens, so it must be focusable.
+const moduleSnippet = (attr, name) => `# flake.nix
+inputs.llm-agents.url = "${REPO}";
+
+# configuration module
+{ inputs, pkgs, ... }:
+{
+  ${attr} = [
+    inputs.llm-agents.packages.\${pkgs.stdenv.hostPlatform.system}.${name}
+  ];
+}`;
+
+const INSTALL = [
+  { id: "run", label: "Run", snippet: (n) => `nix run ${REPO}#${n}` },
+  { id: "shell", label: "Shell", snippet: (n) => `nix shell ${REPO}#${n}` },
+  { id: "nixos", label: "NixOS", snippet: (n) => moduleSnippet("environment.systemPackages", n) },
+  { id: "hm", label: "Home Manager", snippet: (n) => moduleSnippet("home.packages", n) },
+];
+
+// Same method across all cards, like search.nixos.org.
+let method = INSTALL.some((i) => i.id === localStorage.getItem("install-method"))
+  ? localStorage.getItem("install-method")
+  : "run";
+
+function installPanel(p) {
+  const box = document.createElement("div");
+  box.className = "install";
+  const tabs = document.createElement("div");
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", `Install ${p.name}`);
+  const pre = document.createElement("pre");
+  const code = document.createElement("code");
+  // Scrollable, so it must be focusable.
   code.tabIndex = 0;
-  const copy = li.querySelector(".copy");
-  copy.setAttribute("aria-label", `Copy nix run command for ${p.name}`);
+  pre.append(code);
+  pre.setAttribute("role", "tabpanel");
+  const copy = document.createElement("button");
+  copy.type = "button";
+  copy.className = "copy";
+  copy.textContent = "Copy";
+
+  const select = (id) => {
+    method = id;
+    localStorage.setItem("install-method", id);
+    const m = INSTALL.find((i) => i.id === id);
+    code.textContent = m.snippet(p.name);
+    copy.setAttribute("aria-label", `Copy ${m.label} instructions for ${p.name}`);
+    for (const b of tabs.children) {
+      const on = b.dataset.id === id;
+      b.setAttribute("aria-selected", on);
+      b.tabIndex = on ? 0 : -1;
+    }
+  };
+  for (const m of INSTALL) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.dataset.id = m.id;
+    b.textContent = m.label;
+    b.addEventListener("click", () => {
+      // Switch every open card so the choice sticks visibly.
+      document.querySelectorAll(".install").forEach((el) => el._select(m.id));
+    });
+    b.addEventListener("keydown", (e) => {
+      const i = INSTALL.findIndex((x) => x.id === method);
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      const next = INSTALL[(i + d + INSTALL.length) % INSTALL.length].id;
+      document.querySelectorAll(".install").forEach((el) => el._select(next));
+      tabs.querySelector(`[data-id="${next}"]`).focus();
+    });
+    tabs.append(b);
+  }
   copy.addEventListener("click", async () => {
-    await navigator.clipboard.writeText(cmd);
+    await navigator.clipboard.writeText(code.textContent);
     copy.textContent = "Copied";
-    announce(`Copied: ${cmd}`);
+    announce(`Copied ${INSTALL.find((i) => i.id === method).label} instructions for ${p.name}`);
     setTimeout(() => (copy.textContent = "Copy"), 1500);
   });
+  box._select = select;
+  select(method);
+  const bar = document.createElement("div");
+  bar.className = "bar";
+  bar.append(tabs, copy);
+  box.append(bar, pre);
+  return box;
+}
+
+function card(p) {
+  const li = tpl.content.firstElementChild.cloneNode(true);
+  const toggle = li.querySelector(".name button");
+  toggle.textContent = p.name;
+  li.querySelector(".version").replaceChildren(described("version", p.version));
+  li.querySelector(".desc").textContent = p.description;
   const links = li.querySelector(".links");
   const item = (...nodes) => {
     const el = document.createElement("li");
@@ -144,8 +199,27 @@ function card(p) {
   if (p.homepage) item(link(p.homepage, "Homepage", `${p.name} homepage`));
   item(link(`${SRC}/${p.name}/package.nix`, "package.nix", `Nix source for ${p.name}`));
   if (p.hasReadme) item(link(`${SRC}/${p.name}/README.md`, "README", `README for ${p.name}`));
-  item(described("license", p.license));
   item(described("platforms", p.platforms.join(", ")));
+
+  let panel = null;
+  const open = (on) => {
+    toggle.setAttribute("aria-expanded", on);
+    li.classList.toggle("open", on);
+    if (on && !panel) {
+      panel = installPanel(p);
+      panel.id = `install-${p.name}`;
+      toggle.setAttribute("aria-controls", panel.id);
+      li.append(panel);
+    }
+    if (panel) panel.hidden = !on;
+  };
+  toggle.addEventListener("click", () => {
+    const on = toggle.getAttribute("aria-expanded") !== "true";
+    state.open = on ? p.name : "";
+    open(on);
+    writeUrl();
+  });
+  open(state.open === p.name);
   return li;
 }
 
@@ -183,7 +257,7 @@ state.pkgs = (await res.json()).map((p) => ({
 readUrl();
 buildChips();
 render();
-for (const el of [q, platform, source]) el.addEventListener("input", render);
+for (const el of [q, platform]) el.addEventListener("input", render);
 addEventListener("keydown", (e) => {
   if (e.key === "/" && document.activeElement !== q) {
     e.preventDefault();

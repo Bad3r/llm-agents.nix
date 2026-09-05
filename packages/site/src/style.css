@@ -76,30 +76,38 @@ main { background: var(--lightgray); color: var(--black); padding: 1.5rem 0 2rem
   display: flex; flex-direction: column;
 }
 .card .head { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
-.card .name { margin: 0; font-weight: 600; font-size: 1.2rem; color: var(--white); letter-spacing: 0.01em; }
+.card .name { margin: 0; font-size: 1.2rem; }
+.card .name button {
+  font: inherit; font-weight: 600; letter-spacing: 0.01em; color: var(--white);
+  background: none; border: 0; padding: 0; cursor: pointer; text-align: left;
+}
+.card .name button::after { content: " +"; color: var(--primary); font-weight: 400; }
+.card .name button[aria-expanded="true"]::after { content: " \2212"; }
+.card .name button:hover { color: var(--primary); }
 .card .version { font-size: 0.8rem; font-family: ui-monospace, monospace; }
-.card .badges { margin-left: auto; display: flex; gap: 0.3rem; }
-.badge {
-  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em;
-  padding: 0.05rem 0.4rem; border-radius: 3px; border: 1px solid var(--border); color: var(--gray);
+.card .desc { margin: 0.4rem 0 0.6rem; font-size: 0.92rem; flex: 1; }
+.links { font-size: 0.8rem; margin: 0; padding: 0; list-style: none; color: var(--gray); }
+.links li { display: inline; }
+.links li + li::before { content: " \b7 "; }
+.links a { text-decoration: underline; text-underline-offset: 2px; }
+.card.open { grid-column: 1 / -1; }
+.install { margin-top: 0.8rem; border-top: 1px solid var(--border); padding-top: 0.7rem; }
+.install .bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+[role="tablist"] { display: flex; gap: 0.25rem; flex-wrap: wrap; flex: 1; }
+[role="tab"] {
+  font: inherit; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem; border: 1px solid var(--border); border-radius: 999px;
+  background: transparent; color: var(--gray); cursor: pointer;
 }
-.badge.unfree { color: var(--primary); border-color: var(--primary-dark); }
-.card .desc { margin: 0.4rem 0 0.8rem; font-size: 0.92rem; flex: 1; }
-.cmd {
-  display: flex; align-items: center; gap: 0.5rem;
-  background: var(--ink); border-radius: 4px; padding: 0.35rem 0.4rem 0.35rem 0.7rem;
-}
-.cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font-size: 0.78rem; }
+[role="tab"][aria-selected="true"] { color: var(--black); background: var(--primary); border-color: var(--primary); }
+.install pre { margin: 0.6rem 0 0; background: var(--ink); border-radius: 4px; padding: 0.6rem 0.7rem; overflow-x: auto; }
+.install pre code { font-size: 0.78rem; white-space: pre; display: block; }
 .copy {
   font: inherit; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em;
   padding: 0.15rem 0.5rem; cursor: pointer;
   border: 1px solid var(--white); border-radius: 999px; background: transparent; color: var(--white);
 }
 .copy:hover { border-color: var(--primary); color: var(--primary); }
-.links { font-size: 0.8rem; margin: 0.6rem 0 0; padding: 0; list-style: none; color: var(--gray); }
-.links li { display: inline; }
-.links li + li::before { content: " · "; }
-.links a { text-decoration: underline; text-underline-offset: 2px; }
 #empty { color: var(--black); }
 footer { padding: 1.25rem; font-size: 0.85rem; text-align: center; }
 footer a { text-decoration: underline; text-underline-offset: 2px; }
@@ -116,5 +124,4 @@ footer code { color: var(--white); }
   /* Scroll chips sideways so results stay above the fold. */
   .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .chip { white-space: nowrap; }
-  .card .badges { margin-left: 0; }
 }
