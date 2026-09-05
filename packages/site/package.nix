@@ -6,27 +6,6 @@
 }:
 
 let
-  formatLicense =
-    l:
-    if builtins.isList l then
-      lib.concatMapStringsSep " / " formatLicense l
-    else
-      l.spdxId or l.shortName or (if builtins.isString l then l else "unknown");
-
-  sourceType =
-    pkg:
-    let
-      names = map (s: s.shortName or "") (lib.toList (pkg.meta.sourceProvenance or [ ]));
-    in
-    if lib.elem "fromSource" names then
-      "source"
-    else if lib.elem "binaryNativeCode" names then
-      "binary"
-    else if lib.elem "binaryBytecode" names then
-      "bytecode"
-    else
-      "source";
-
   supportedSystems = [
     "x86_64-linux"
     "aarch64-linux"
@@ -43,8 +22,6 @@ let
         version = pkg.version or "";
         description = pkg.meta.description or "";
         homepage = pkg.meta.homepage or null;
-        license = formatLicense (pkg.meta.license or "unknown");
-        source = sourceType pkg;
         category = pkg.passthru.category or "Uncategorized";
         mainProgram = pkg.meta.mainProgram;
         platforms = lib.filter (

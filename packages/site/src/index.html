@@ -31,11 +31,6 @@
               <option value="aarch64-linux">aarch64-linux</option>
               <option value="aarch64-darwin">aarch64-darwin</option>
             </select>
-            <select id="source" aria-label="Source type">
-              <option value="">Any build</option>
-              <option value="source">Built from source</option>
-              <option value="binary">Prebuilt binary</option>
-            </select>
             <span id="count" class="muted" role="status" aria-live="polite"></span>
           </div>
         </div>
@@ -61,15 +56,10 @@
     <template id="card">
       <li class="card">
         <div class="head">
-          <h3 class="name"></h3>
+          <h3 class="name"><button type="button" aria-expanded="false"></button></h3>
           <span class="version muted"></span>
-          <span class="badges"></span>
         </div>
         <p class="desc"></p>
-        <div class="cmd">
-          <code></code>
-          <button type="button" class="copy">Copy</button>
-        </div>
         <ul class="links muted"></ul>
       </li>
     </template>
