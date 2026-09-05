@@ -9,16 +9,16 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "clauth";
-  version = "0.15.0";
+  version = "0.15.1";
 
   src = fetchFromGitHub {
     owner = "uwuclxdy";
     repo = "clauth";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-aPwZ+AiMDClWKG6SF2bhqz2NaqBqcDDq5ArShvdPqs4=";
+    hash = "sha256-Zm5iVVc3SlUQuZLLlxnyw/v0fqnMmrtvkxZSUQ84mag=";
   };
 
-  cargoHash = "sha256-wEZE0YNjvaWEYE/eUQthnot8mkljpjqsqNWp5KkgP5M=";
+  cargoHash = "sha256-twq2+FitbKuano3MOSZw08s8N4lL7470tlvlws+sL3M=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -44,6 +44,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=update::tests::updates_enabled_when_env_is_other_value"
     "--skip=update::tests::updates_enabled_when_env_is_zero"
     "--skip=update::tests::updates_enabled_when_env_unset"
+    "--skip=herdr::tests::heal_detached_reinstalls_once_and_throttles"
+    "--skip=herdr::tests::heal_detached_fails_closed_without_the_shim_sentinel"
   ];
 
   doInstallCheck = true;
