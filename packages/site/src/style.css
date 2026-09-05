@@ -94,7 +94,12 @@ footer { padding: 1.25rem; font-size: 0.85rem; text-align: center; }
 footer code { color: var(--white); }
 
 @media (max-width: 600px) {
-  header h1 { font-size: 2rem; }
+  /* Keep the first result above the fold on phones. */
+  header { padding: 1rem 0; }
+  .brand { margin-bottom: 0.75rem; }
+  header h1 { font-size: 1.6rem; }
+  header h1 .accent { display: inline; }
+  .tagline { display: none; }
   #results { grid-template-columns: 1fr; }
   /* Category chips would push results below the fold; scroll them sideways instead. */
   .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
