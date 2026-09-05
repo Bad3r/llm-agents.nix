@@ -249,7 +249,8 @@ function buildChips() {
   );
 }
 
-const res = await fetch("packages.json");
+// Reuse the cache-busting query from our own URL for packages.json.
+const res = await fetch(`packages.json${new URL(import.meta.url).search}`);
 state.pkgs = (await res.json()).map((p) => ({
   ...p,
   _hay: `${p.name} ${p.description} ${p.category} ${p.mainProgram}`.toLowerCase(),
