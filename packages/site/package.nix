@@ -76,6 +76,8 @@ stdenvNoCC.mkDerivation {
   meta = {
     description = "Static package search site for llm-agents.nix";
     license = lib.licenses.mit;
-    platforms = lib.platforms.all;
+    # Some packages throw for unsupported systems when their attributes are
+    # forced; the metadata is system-independent and CI deploys from Linux.
+    platforms = [ "x86_64-linux" ];
   };
 }
