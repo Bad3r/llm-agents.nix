@@ -5,6 +5,8 @@
   fetchFromGitHub,
   bun2nixLib,
   bun,
+  bun-bin,
+  wrapBuddy,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -27,7 +29,8 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     bun2nixLib.hook
     bun
-  ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
   bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
@@ -55,10 +58,12 @@ stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
 
+    # --watch needs a bun >= 1.3.14 runtime (modem-dev/hunk src/core/watch/runtime.ts).
     mkdir -p .bun-tmp .bun-install
+    cp ${bun-bin}/share/bun-bin/* "$BUN_INSTALL_CACHE_DIR"/
     BUN_TMPDIR=$PWD/.bun-tmp \
     BUN_INSTALL=$PWD/.bun-install \
-    ${lib.getExe bun} build --compile "./src/main.tsx" --outfile "hunk-bin"
+    ${lib.getExe bun} build --compile --target=${bun-bin.target} "./src/main.tsx" --outfile "hunk-bin"
 
     runHook postBuild
   '';

@@ -351,6 +351,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>muse-code</strong> - Meta's terminal coding agent</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://dev.meta.ai/
+- **Usage**: `nix run github:numtide/llm-agents.nix#muse-code -- --help`
+- **Nix**: [packages/muse-code/package.nix](packages/muse-code/package.nix)
+
+</details>
+<details>
 <summary><strong>nanocoder</strong> - A beautiful local-first coding agent running in your terminal - built by the community for the community ⚒</summary>
 
 - **Source**: source
