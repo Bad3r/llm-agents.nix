@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "jcode";
-  version = "0.82.0";
+  version = "0.84.0";
 
   src = fetchFromGitHub {
     owner = "1jehuang";
     repo = "jcode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-7IpOYkEPqH9I//BzH80umyylXtyqgNXwFSeOLi2Go4k=";
+    hash = "sha256-Mz2z13RjNsfcpSePiVUyaW8fOS7lb68z7a99j8FmsA0=";
   };
 
-  cargoHash = "sha256-P53OiFKf9XKfM7TBlMSMQE1yPx+3sXbpXLrzpz+l7/A=";
+  cargoHash = "sha256-iQqeaa5YGQ/9RNzlDTXwPX5ZLeJp7mUwS8KF2iaM0Ho=";
 
   # .cargo/config.toml caps builds at 4 jobs; let Nix parallelism decide.
   postPatch = ''
