@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.37";
+  version = "0.1.39";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-48tpQtvjv2hRxzUUNTQKGPqqhaiuWufy8ycQtVFgnss=";
+    hash = "sha256-qSkwsW6vmSYrOBZa80jMdD5FI1IU+e+TZPmh8F6bODY=";
   };
 
-  cargoHash = "sha256-TDPU/TaEv/xhqhHL44N3TdPoCfPH/qqkBfqLxZXoSNs=";
+  cargoHash = "sha256-2AVjbHLQkOcYmmSoBHAfAdpnn1TjgLTo1n4vreKcnJA=";
 
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
@@ -66,6 +66,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # /usr/bin/false) and compile a fixture with `rustc` at run time, none of
     # which exist in the sandbox, so every invocation fails to start.
     "--skip=tui::app::tests::custom_commands"
+  ]
+  # needs wl-copy/xclip and a desktop session
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    "--skip=sync_pair_copy_delivers_only_to_clipboard_without_qr_capacity_limit"
   ];
 
   # Many tests rely on inferring the project from the surrounding git repo;

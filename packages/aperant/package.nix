@@ -4,7 +4,7 @@
   buildNpmPackage,
   fetchFromGitHub,
   makeWrapper,
-  electron_41,
+  electron_42,
   python3,
 }:
 
@@ -12,7 +12,7 @@ let
   # Upstream pins electron 40, but electron_40 is EOL/insecure in nixpkgs.
   # Electron majors are backwards compatible enough for this app; the build
   # guard below catches the day upstream jumps ahead of what we ship.
-  electron = electron_41;
+  electron = electron_42;
 in
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;

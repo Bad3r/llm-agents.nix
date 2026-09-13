@@ -14,24 +14,25 @@
 }:
 
 let
-  # Native (PyO3) runtime for hermes' Relay lifecycle and shared metrics;
+  # Native (PyO3) runtime for hermes' Relay lifecycle and shared metrics.
   # PyPI ships wheels only, so build from source with maturin.
+  # Version is kept in range of hermes' pyproject constraint by update.py.
   nemo-relay = python3.pkgs.buildPythonPackage rec {
     pname = "nemo-relay";
-    version = "0.7.3";
+    version = "0.8.4";
     pyproject = true;
 
     src = fetchFromGitHub {
       owner = "NVIDIA";
       repo = "NeMo-Relay";
       tag = version;
-      hash = "sha256-g7xHQOcccuyHIBiVY5GQHpd1vk99RMwuw923OR4+x3E=";
+      hash = "sha256-5jGFu+DNb1zlCkejY9IPFXkJH1BbY48aNrQhdKisCyg=";
     };
 
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit src;
       name = "nemo-relay-${version}";
-      hash = "sha256-Re/R/0aSxFNNG9jnbSg+3D0OhQV1mPyxmIJT7ExFaP0=";
+      hash = "sha256-M8FZngHmCN7fns6yXKInAUCT21T1k2q54VChG7MUzAk=";
     };
 
     nativeBuildInputs =
@@ -40,9 +41,7 @@ let
         cargoSetupHook
         maturinBuildHook
       ]
-      # The 0.7.3 tag still carries version 0.7.0 in the workspace Cargo.toml
-      # (pyproject's version is dynamic from it), which fails the metadata
-      # check and hermes' nemo-relay>=0.7.1 requirement.
+      # Tags lag the workspace Cargo.toml version that pyproject derives from.
       ++ [ python3.pkgs.pyprojectVersionPatchHook ];
 
     pythonImportsCheck = [
@@ -173,13 +172,13 @@ let
     };
   };
 
-  version = "2026.8.31";
+  version = "2026.9.11";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-vT5ZhN2NUd0Iv5YplUQfwdHEOVM8yoy94MqJjLvXOJ8=";
+    hash = "sha256-7duZGU7pwdtYu4Rfuynbrl7GSvwwKwGbUHz1EkSWRxA=";
     # contributors/emails/ holds paths differing only in case; they collapse
     # on case-insensitive stores (APFS) so the NAR hash diverges between
     # Linux and darwin. Unused at build/runtime. Upstream:
@@ -197,7 +196,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-Ej35hMbJGzixgwp5kFEw8Np/XDiYzTvLwxRigMP4a+U=";
+    npmDepsHash = "sha256-hJe0Fv8TadHoo64cmA3g3eC0fcSoX2bbb0C00QhOoCo=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -398,19 +397,17 @@ python3.pkgs.buildPythonApplication {
   # into the read-only store on any drift, silently disabling the feature
   # (e.g. nixpkgs aiosqlite 0.21.0 vs hermes pin 0.22.1 disabled matrix).
   # The closure already provides every dep, so presence is sufficient.
-  # Dashboard slash workers re-exec the bare sys.executable, which cannot
-  # import Hermes modules or its dependencies under Nix; run them with the
-  # wrapper-provided interpreter and source root instead of leaking a global
-  # PYTHONPATH into every subprocess Hermes spawns.
   # DaemonThreadPoolExecutor mirrors CPython <=3.13 ThreadPoolExecutor
   # internals; Python 3.14 refactored _worker around WorkerContext, so every
   # tool call fails with AttributeError: no attribute '_initializer' (#7725).
-  patches = [
-    ./slash-worker-hermes-python.patch
-    ./daemon-pool-python314.patch
-  ];
+  patches = [ ./daemon-pool-python314.patch ];
 
+  # Slash workers re-exec sys.executable, which is the bare interpreter
+  # without Hermes' dependencies under Nix. Use the wrapper-provided env.
   postPatch = ''
+    substituteInPlace tui_gateway/server.py \
+      --replace-fail 'argv = [sys.executable, "-m", "tui_gateway.slash_worker"' \
+        'argv = [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "tui_gateway.slash_worker"'
     substituteInPlace tools/lazy_deps.py \
       --replace-fail 'Version(installed) in SpecifierSet(spec_tail)' 'True'
   '';
@@ -545,7 +542,7 @@ python3.pkgs.buildPythonApplication {
 
   passthru = {
     category = "AI Assistants";
-    inherit hermes-frontend;
+    inherit hermes-frontend nemo-relay;
   };
 
   meta = with lib; {

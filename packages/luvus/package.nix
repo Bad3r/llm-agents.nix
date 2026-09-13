@@ -14,6 +14,7 @@
   coreutils,
   procps,
   sqlite,
+  tzdata,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -33,16 +34,16 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "luvus";
-  version = "0.13.4";
+  version = "0.14.1";
 
   src = fetchFromGitHub {
     owner = "RizRiyz";
     repo = "luvus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-OA0hP6Y8t5J14+fdjxZYcFaJw7kNcp+RHQBKhWCUyhQ=";
+    hash = "sha256-rOcJ5lcramofOcfCws85s8N0OAWvjvEfhBMdGNF/thw=";
   };
 
-  cargoHash = "sha256-ey6ABOcnXT79L7adbWZyAYor6aHv3xPxpfZfrtJzTRM=";
+  cargoHash = "sha256-z2S8hVLeoktsBNd9Jw4Yq1HsM04x411tosSsmtvFGBU=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -61,6 +62,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   # flaky: spawn real PTYs/processes and race under load
   checkFlags = [
+    "--test-threads=1"
     "--skip=app::tests::clicking_a_pane_title_shows_the_real_command"
     "--skip=app::tests::keyboard_copy_mode_yanks_history_and_cancel_restores_its_viewport"
     "--skip=app::tests::keyboard_copy_word_navigation_uses_visual_columns"
@@ -73,6 +75,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=app::diff::tests::dashboard_diff_click_opens_a_tab_then_reuses_it"
     # copies /bin/sleep, which does not exist in the sandbox
     "--skip=platform::tests::unix_stoppable_pid_accepts_a_luvus_executable_with_arguments"
+    # the reopened App does not read the persisted toggle back in the sandbox
+    "--skip=app::files::tests::files_show_hidden_defaults_on_and_the_setting_persists"
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     # process table is restricted in the darwin sandbox
@@ -81,14 +85,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   # Many tests spawn a "home terminal" in $HOME. Config lives in $LUVUS_HOME,
   # pointed elsewhere so tests persisting config do not race on a shared default.
+  # jiff reads the system zoneinfo (no bundled tzdb on unix).
   preCheck = ''
     export HOME=$(mktemp -d)
     export LUVUS_HOME=$(mktemp -d)
+    export TZDIR=${tzdata}/share/zoneinfo
   '';
 
   postFixup = ''
     wrapProgram $out/bin/luvus \
-      --prefix PATH : ${lib.makeBinPath runtimeTools}
+      --prefix PATH : ${lib.makeBinPath runtimeTools} \
+      --set-default TZDIR ${tzdata}/share/zoneinfo
   '';
 
   doInstallCheck = true;

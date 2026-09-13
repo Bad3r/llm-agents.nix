@@ -9,12 +9,12 @@
   nodejs,
   pnpm_10,
   pnpmConfigHook,
-  electron_41,
+  electron_42,
   multica,
 }:
 
 let
-  electron = electron_41;
+  electron = electron_42;
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "multica-desktop";
@@ -23,7 +23,7 @@ stdenv.mkDerivation (finalAttrs: {
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_10;
-    hash = "sha256-gbC1gnlgzwV7aMNJf0hH8xwkcxQb3qbBScsLhkM1tvw=";
+    hash = "sha256-e+WjQmcIvTw7jBjNfIEMTimUAhwcCQmol10StyhcKYM=";
     fetcherVersion = 3;
   };
 

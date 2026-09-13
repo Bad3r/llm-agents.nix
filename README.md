@@ -1546,6 +1546,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>agent-slack</strong> - Slack automation CLI for AI agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/stablyai/agent-slack
+- **Usage**: `nix run github:numtide/llm-agents.nix#agent-slack -- --help`
+- **Nix**: [packages/agent-slack/package.nix](packages/agent-slack/package.nix)
+
+</details>
+<details>
 <summary><strong>apm</strong> - Agent Package Manager — dependency manager for AI agents</summary>
 
 - **Source**: source

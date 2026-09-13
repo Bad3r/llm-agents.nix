@@ -6,9 +6,9 @@
   bun,
   nodejs,
   python3,
-  # better-sqlite3 12.x does not build against electron >= 43 headers
-  electron_41,
+  electron_42,
   fetchFromGitHub,
+  fetchpatch,
   runCommand,
   makeWrapper,
   glib,
@@ -16,7 +16,7 @@
 }:
 
 let
-  electron = electron_41;
+  electron = electron_42;
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash;
 
@@ -117,6 +117,13 @@ stdenv.mkDerivation {
     betterSqliteDir=$(echo node_modules/.bun/better-sqlite3@*/node_modules/better-sqlite3)
     nodeGyp=$PWD/$(echo node_modules/.bun/node-gyp@*/node_modules/node-gyp/bin/node-gyp.js)
     if [ -d "$betterSqliteDir" ]; then
+      # better-sqlite3 < 12.11 vs. the V8 14.8 External API in electron >= 42
+      patch -d "$betterSqliteDir" -p1 < ${
+        fetchpatch {
+          url = "https://github.com/WiseLibs/better-sqlite3/commit/5bb63a2f4c5aa34de2c292b983d2b6c4fcfc6f94.patch";
+          hash = "sha256-Ln40MtZD7YSHhmBVagY0AJl7ZcPh9gaxC+TdMxPG57c=";
+        }
+      }
       (cd "$betterSqliteDir" && node "$nodeGyp" rebuild --release)
     fi
 

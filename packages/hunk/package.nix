@@ -63,7 +63,9 @@ stdenv.mkDerivation {
     cp ${bun-bin}/share/bun-bin/* "$BUN_INSTALL_CACHE_DIR"/
     BUN_TMPDIR=$PWD/.bun-tmp \
     BUN_INSTALL=$PWD/.bun-install \
-    ${lib.getExe bun} build --compile --target=${bun-bin.target} "./src/main.tsx" --outfile "hunk-bin"
+    ${lib.getExe bun} build --compile --no-compile-autoload-bunfig --target=${bun-bin.target} \
+      ./packages/hunk/src/main.tsx ./packages/hunk/src/highlightWorkerEntry.ts \
+      --outfile hunk-bin
 
     runHook postBuild
   '';
@@ -73,8 +75,8 @@ stdenv.mkDerivation {
     install -Dm755 ./hunk-bin $out/bin/hunk
     # The binary locates the bundled review skill by walking ancestor
     # directories of process.execPath looking for skills/hunk-review/SKILL.md
-    # (src/core/paths.ts), so it must live at $out/skills.
-    cp -r ./skills $out/
+    # (packages/hunk/src/core/paths.ts), so it must live at $out/skills.
+    cp -r ./packages/hunk/skills $out/
     runHook postInstall
   '';
 

@@ -158,14 +158,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
-  version = "2.25.0";
+  version = "2.25.4";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "mistralai";
     repo = "mistral-vibe";
     tag = "v${version}";
-    hash = "sha256-vwlN4VdyVhaALT8Ob233Lcc7261teCD7jyfn8uiH0MA=";
+    hash = "sha256-v+Pl15r32DaB/+Yo1zKvMP1iFmC1q111s16KNpWLanI=";
   };
 
   build-system = with python.pkgs; [
@@ -228,6 +228,9 @@ python.pkgs.buildPythonApplication rec {
   # Upstream pins the whole dependency closure with `==`; overrides above still
   # satisfy the otel requirements (issue #3668).
   pythonRelaxDeps = true;
+
+  # Closed-source binary wheel. Optional at runtime (find_spec fallback).
+  pythonRemoveDeps = [ "mistralai-vibe-local-harness" ];
 
   # `import vibe` alone is lazy and misses dependency drift: mistralai 2.1.3
   # lacked mistralai.extra.observability.telemetry yet built fine and crashed

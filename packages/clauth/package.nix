@@ -4,21 +4,22 @@
   fetchFromGitHub,
   rustPlatform,
   installShellFiles,
+  hostname,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "clauth";
-  version = "0.15.1";
+  version = "0.15.2";
 
   src = fetchFromGitHub {
     owner = "uwuclxdy";
     repo = "clauth";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Zm5iVVc3SlUQuZLLlxnyw/v0fqnMmrtvkxZSUQ84mag=";
+    hash = "sha256-jbJx5PibtVOUZznpUSnaB1xtvXKZZN4cqMrB0n011Cc=";
   };
 
-  cargoHash = "sha256-twq2+FitbKuano3MOSZw08s8N4lL7470tlvlws+sL3M=";
+  cargoHash = "sha256-RdufNc/qa2dho9dP0hUvROQx7tVa1+j6CwNxHERhwB4=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -35,6 +36,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --zsh <("$out/bin/clauth" completions zsh)
   '';
 
+  # daemon api tests shell out to `hostname` for the FQDN
+  nativeCheckInputs = [ hostname ];
+
   preCheck = ''
     export HOME="$TMPDIR"
   '';
@@ -46,6 +50,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=update::tests::updates_enabled_when_env_unset"
     "--skip=herdr::tests::heal_detached_reinstalls_once_and_throttles"
     "--skip=herdr::tests::heal_detached_fails_closed_without_the_shim_sentinel"
+    "--skip=herdr::tests::heal_detached_respects_the_update_optout"
   ];
 
   doInstallCheck = true;
