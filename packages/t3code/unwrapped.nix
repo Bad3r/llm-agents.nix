@@ -43,6 +43,8 @@ let
     inherit version src;
 
     sourceRoot = "${src.name}/native/resource-monitor";
+    # inspects the test process's own RSS via procfs, 0 on some builders
+    checkFlags = [ "--skip=tests::loads_details_when_an_existing_process_becomes_selected" ];
     cargoHash = "sha256-5cmG2daM1bVOA23gjjoalbx0fEL1hmqV6WZov0sUZp8=";
   };
 
@@ -127,6 +129,13 @@ stdenv.mkDerivation {
 
   # build:desktop compiles native/browser-secret against libsecret on linux
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libsecret ];
+
+  # We run electron on an unpacked tree, so app.isPackaged is false and the
+  # backend would treat the store path as the workspace root (#9182).
+  postPatch = ''
+    substituteInPlace apps/desktop/src/app/DesktopEnvironment.ts \
+      --replace-fail "backendCwd: input.isPackaged ? homeDirectory : appRoot," "backendCwd: homeDirectory,"
+  '';
 
   preBuild = ''
     export pnpm_config_verify_deps_before_run=false

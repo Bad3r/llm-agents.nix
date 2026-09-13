@@ -54,13 +54,13 @@
 
 let
   pname = "kandev";
-  version = "0.91.0";
+  version = "0.94.0";
 
   src = fetchFromGitHub {
     owner = "kdlbs";
     repo = "kandev";
     tag = "v${version}";
-    hash = "sha256-N6TxVX+CKf+vfq3F91GQllO/JZcNfBWuek35YwliipQ=";
+    hash = "sha256-9mYY2WlEEjGL8DuQNl2gox097DE3nE18q//xnZbhaqM=";
   };
 
   runtimeTools = [
@@ -151,7 +151,7 @@ let
         ;
       inherit pnpm;
       fetcherVersion = 4;
-      hash = "sha256-5GBYP7Ryr7RkIzxTsc15y1squza74KwgyS39rtfJPq0=";
+      hash = "sha256-dH1BWJx4WbN+rmxzhgptlqCTq0boyGWVtDlEo2UCD70=";
     };
 
     nativeBuildInputs = [
@@ -178,7 +178,13 @@ buildGoModule (_finalAttrs: {
   inherit pname version src;
 
   modRoot = "apps/backend";
-  vendorHash = "sha256-x6tHHmA4jZr8iUddi0q7VzCb9qgsATkT5StvYEfwugA=";
+  vendorHash = "sha256-jH8w+6A3LO0S+WTtb2K8GKafi83n3HkwOHXeRcOBQKQ=";
+  # Keep the vendor FOD independent of our source patch so nix-update can
+  # compute vendorHash even when the patch needs a rebase.
+  overrideModAttrs = _: _: {
+    patches = [ ];
+    postPatch = "";
+  };
 
   subPackages = [
     "cmd/kandev"
@@ -196,12 +202,9 @@ buildGoModule (_finalAttrs: {
   patches = [ ./prefer-native-acp-runtimes.patch ];
 
   postPatch = ''
-    # Nix sandboxes do not populate FHS bin directories. Preserve the fake curl
-    # precedence while letting this upstream test find mktemp and shell tools.
-    old_path='"PATH=" + binDir + ":/usr/bin:/bin",'
-    sandbox_path='"PATH=" + binDir + ":" + os.Getenv("PATH"),'
-    substituteInPlace apps/backend/internal/agent/agents/devin_acp_test.go \
-      --replace-fail "$old_path" "$sandbox_path"
+    # Install-script tests run sh with a fake curl first on an FHS PATH.
+    substituteInPlace apps/backend/internal/agent/agents/{devin,goose}_acp_test.go \
+      --replace-fail '":/usr/bin:/bin"' '":" + os.Getenv("PATH")'
   '';
 
   preBuild = ''

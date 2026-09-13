@@ -4,7 +4,9 @@
   buildNpmPackage,
   fetchurl,
   flake,
+  jq,
   makeWrapper,
+  mkUpdater,
   nodejs,
   runCommand,
   versionCheckHook,
@@ -15,7 +17,9 @@ let
   versionData = lib.importJSON ./hashes.json;
   inherit (versionData) version;
 
-  srcWithLock = runCommand "dsh-source" { } ''
+  # The npm tarball ships no lockfile. Ours is generated without
+  # devDependencies (see updater), so drop them from the manifest too.
+  srcWithLock = runCommand "dsh-source" { nativeBuildInputs = [ jq ]; } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
@@ -23,6 +27,8 @@ let
         hash = versionData.sourceHash;
       }
     } -C $out --strip-components=1
+    jq 'del(.devDependencies)' $out/package.json > $out/package.json.tmp
+    mv $out/package.json.tmp $out/package.json
     cp ${./package-lock.json} $out/package-lock.json
   '';
 in
@@ -59,6 +65,12 @@ buildNpmPackage {
   versionCheckProgramArg = "--version";
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/%40deepseek-ai/dsh";
+    # devDependencies reference an unpublished @deepseek-ai package (E404).
+    stripDevDependencies = true;
+  };
 
   meta = {
     description = "Open-source agent harness developed by DeepSeek AI";
