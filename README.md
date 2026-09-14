@@ -431,7 +431,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>opencode2</strong> - OpenCode 2 preview CLI</summary>
+<summary><strong>opencode2</strong> - OpenCode 2 CLI</summary>
 
 - **Source**: binary
 - **License**: MIT
