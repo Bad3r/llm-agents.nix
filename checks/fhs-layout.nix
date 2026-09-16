@@ -46,9 +46,15 @@ in
 pkgs.runCommand "fhs-layout"
   {
     allowed = lib.concatStringsSep "\n" allowedRootEntries;
-    # "<name>\t<store path>" per line.  Interpolating the outputs is what
-    # makes every package an input of this derivation.
-    manifest = lib.concatStringsSep "\n" (lib.mapAttrsToList (name: pkg: "${name}\t${pkg}") checked);
+    # "<name>\t<store path>" per line, each line terminated so that read sees
+    # the last one as well.  Interpolating the outputs is what makes every
+    # package an input of this derivation.
+    manifest = lib.concatMapStrings (line: line + "\n") (
+      lib.mapAttrsToList (name: pkg: "${name}\t${pkg}") checked
+    );
+    # Cross-check against the number of lines the loop actually reads, so a
+    # manifest the shell truncates cannot pass the check silently.
+    expected = toString (builtins.length (builtins.attrNames checked));
     passAsFile = [
       "allowed"
       "manifest"
@@ -56,9 +62,11 @@ pkgs.runCommand "fhs-layout"
   }
   ''
     status=0
+    seen=0
 
     while IFS="$(printf '\t')" read -r name path; do
       [ -n "$name" ] || continue
+      seen=$((seen + 1))
 
       if [ ! -d "$path" ]; then
         echo "$name: output is not a directory: $path"
@@ -73,6 +81,11 @@ pkgs.runCommand "fhs-layout"
         status=1
       fi
     done < "$manifestPath"
+
+    if [ "$seen" -ne "$expected" ]; then
+      echo "inspected $seen package roots, expected $expected"
+      exit 1
+    fi
 
     if [ "$status" -ne 0 ]; then
       echo
