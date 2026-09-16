@@ -54,22 +54,17 @@ stdenv.mkDerivation rec {
     runHook postUnpack
   '';
 
+  # Everything lives under share/ so that only bin/ reaches shared profiles;
+  # index.js at the package root collided with playwright-core (#9364).
   installPhase = ''
     runHook preInstall
 
-    # Copy the dist-package contents
-    mkdir -p $out
-    cp -r dist-package/* $out/
+    mkdir -p $out/bin $out/share
+    cp -r dist-package $out/share/cursor-agent
+    chmod +x $out/share/cursor-agent/{cursor-agent,node,rg}
 
-    # Ensure binaries are executable
-    chmod +x $out/cursor-agent
-    chmod +x $out/node
-    chmod +x $out/rg
-
-    # Create a wrapper in bin directory
-    mkdir -p $out/bin
-    makeWrapper $out/cursor-agent $out/bin/cursor-agent \
-      --prefix PATH : $out \
+    makeWrapper $out/share/cursor-agent/cursor-agent $out/bin/cursor-agent \
+      --prefix PATH : $out/share/cursor-agent \
       --prefix PATH : ${coreutils}/bin
 
     runHook postInstall

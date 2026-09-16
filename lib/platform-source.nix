@@ -2,7 +2,14 @@
 # hashes.json. Returns both the build `src` and a matching `updater` fragment
 # from the same urlTemplate + platform map, so build and updater never diverge
 # (see scripts/updater/run.py, kind = "platform").
-{ stdenv, fetchurlTemplate }:
+{
+  lib,
+  stdenv,
+  fetchurlTemplate,
+}:
+let
+  versionVars = import ./version-vars.nix { inherit lib; };
+in
 
 {
   hashesFile, # { version, hashes.<system> }
@@ -24,10 +31,7 @@ let
     in
     fetchurlTemplate {
       inherit urlTemplate;
-      vars = {
-        inherit version;
-      }
-      // platformVars;
+      vars = versionVars version // platformVars;
       hash = versionData.hashes.${system};
     };
   darwinSystems = builtins.filter (s: builtins.match ".*-darwin" s != null) (

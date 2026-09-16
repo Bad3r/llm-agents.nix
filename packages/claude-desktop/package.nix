@@ -9,6 +9,7 @@
   copyDesktopItems,
   makeDesktopItem,
   unzip,
+  codesignCheckHook,
 
   # Directly linked (DT_NEEDED); autoPatchelfHook resolves these from
   # buildInputs and fails the build if any are missing.
@@ -85,6 +86,13 @@ let
   # version, which update.py keeps in sync with x86_64-linux.
   version = (versionData.versions or { }).${platform} or versionData.version;
 
+  srcFor =
+    system:
+    fetchurl {
+      url = urls.${system} or (throw "Unsupported system: ${system}");
+      hash = hashes.${system} or (throw "Unsupported system: ${system}");
+    };
+
   # x-scheme-handler/claude registers the OAuth sign-in handler.
   desktopItem = makeDesktopItem {
     name = "claude-desktop";
@@ -151,16 +159,20 @@ let
       passthru
       ;
 
-    src = fetchurl {
-      url = urls.${platform} or (throw "Unsupported system: ${platform}");
-      hash = hashes.${platform} or (throw "Unsupported system: ${platform}");
-    };
+    src = srcFor platform;
 
+    # unzip: codesignCheckHook unpacks the darwin zip on Linux too.
     nativeBuildInputs = [
       formatelf
       copyDesktopItems
       makeWrapper
+      unzip
     ];
+
+    doInstallCheck = true;
+    nativeInstallCheckInputs = [ codesignCheckHook ];
+    codesignTeamId = "Q6L2SF6YDW";
+    codesignSources = [ (srcFor "aarch64-darwin") ];
 
     buildInputs = [
       adwaita-icon-theme
@@ -251,10 +263,7 @@ let
       passthru
       ;
 
-    src = fetchurl {
-      url = urls.${platform} or (throw "Unsupported system: ${platform}");
-      hash = hashes.${platform} or (throw "Unsupported system: ${platform}");
-    };
+    src = srcFor platform;
 
     nativeBuildInputs = [ unzip ];
 
@@ -265,6 +274,10 @@ let
 
     # Preserve the upstream code signature; fixup could modify sealed files.
     dontFixup = true;
+
+    doInstallCheck = true;
+    nativeInstallCheckInputs = [ codesignCheckHook ];
+    codesignTeamId = "Q6L2SF6YDW";
 
     installPhase = ''
       runHook preInstall

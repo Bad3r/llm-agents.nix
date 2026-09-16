@@ -6,6 +6,7 @@
   makeWrapper,
   formatelf,
   versionCheckHook,
+  codesignCheckHook,
 
   # DT_NEEDED by the bundled Electron and the pixel.node engine.
   alsa-lib,
@@ -120,8 +121,13 @@ stdenv.mkDerivation {
 
   dontStrip = true;
 
-  doInstallCheck = stdenv.hostPlatform.isLinux;
-  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    codesignCheckHook
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ versionCheckHook ];
+  codesignTeamId = "7YBC6H852Y";
+  codesignSources = source.darwinSrcs;
   versionCheckProgramArg = "--version";
 
   passthru.category = "Utilities";
