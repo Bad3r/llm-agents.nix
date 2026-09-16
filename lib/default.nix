@@ -274,6 +274,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 76489193;
         name = "Brayden Willenborg";
       };
+      jonjitsu = {
+        github = "jonjitsu";
+        githubId = 5445990;
+        name = "jonjitsu";
+      };
       jiezhuzzz = {
         github = "jiezhuzzz";
         githubId = 45086830;

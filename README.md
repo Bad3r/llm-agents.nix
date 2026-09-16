@@ -614,6 +614,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>grok-bot</strong> - Grok Bot desktop agent — AI teammates that finish the work</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://x.ai/bot
+- **Usage**: `nix run github:numtide/llm-agents.nix#grok-bot -- --help`
+- **Nix**: [packages/grok-bot/package.nix](packages/grok-bot/package.nix)
+
+</details>
+<details>
 <summary><strong>hermes-agent</strong> - Self-improving AI agent by Nous Research — creates skills from experience and runs anywhere</summary>
 
 - **Source**: source
@@ -1596,6 +1606,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>auv</strong> - Scriptable computer-use automation CLI that turns GUI operations into reusable commands</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0
+- **Homepage**: https://github.com/moeru-ai/auv
+- **Usage**: `nix run github:numtide/llm-agents.nix#auv -- --help`
+- **Nix**: [packages/auv/package.nix](packages/auv/package.nix)
+
+</details>
+<details>
 <summary><strong>ax</strong> - The AI-era curl: fetch, discover, extract. One command</summary>
 
 - **Source**: source
@@ -1774,6 +1794,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Usage**: `nix run github:numtide/llm-agents.nix#sub2api -- --help`
 - **Nix**: [packages/sub2api/package.nix](packages/sub2api/package.nix)
 - **Documentation**: See [packages/sub2api/README.md](packages/sub2api/README.md) for detailed usage
+
+</details>
+<details>
+<summary><strong>terminal-browser</strong> - Browser that runs inside your terminal, with a CLI for agents</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://terminal-browser.com/
+- **Usage**: `nix run github:numtide/llm-agents.nix#terminal-browser -- --help`
+- **Nix**: [packages/terminal-browser/package.nix](packages/terminal-browser/package.nix)
 
 </details>
 <details>

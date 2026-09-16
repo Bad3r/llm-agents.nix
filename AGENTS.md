@@ -179,6 +179,39 @@ stdenv.mkDerivation {
 }
 ```
 
+### Code Signature Check Hook
+
+Upstream macOS binaries that ship with a Developer ID signature can be pinned to
+their publisher. `codesignCheckHook` fails the build unless every Mach-O in the
+outputs and in `codesignSources` is signed by `codesignTeamId` with a certificate
+that chains to Apple's root CA. It runs on Linux too, so pass the darwin
+artifacts through `codesignSources`; `platformSource` exposes them as
+`darwinSrcs`. Keep `dontStrip = true`: stripping invalidates the signature.
+
+```nix
+{
+  platformSource,
+  versionCheckHook,
+  codesignCheckHook,
+  # ...
+}:
+stdenv.mkDerivation {
+  # ...
+  dontStrip = true;
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [
+    versionCheckHook
+    codesignCheckHook
+  ];
+  codesignTeamId = "433DLLA855";
+  codesignSources = source.darwinSrcs;
+}
+```
+
+Find the team ID with `rcodesign print-signature-info <binary>` (`team_name`).
+Ad-hoc or linker-signed binaries (most bun-compiled tools) carry no publisher
+and cannot use the hook.
+
 ## Linting with ast-grep
 
 Structural lint rules live in `rules/*.yml` (wired via `sgconfig.yml`). Run

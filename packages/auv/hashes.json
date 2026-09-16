@@ -1,0 +1,8 @@
+{
+  "version": "0.0.18",
+  "hashes": {
+    "aarch64-darwin": "sha256-C5kPsxkxc0UvgpumzUKME0Jhc78jeTw6PcB91ObAEaQ=",
+    "x86_64-linux": "sha256-K61VbvFNDcXyBfsfzXo2tYZO5sSlpmFMnELWC4Cu/rI=",
+    "aarch64-linux": "sha256-zhce8om/nAy5zu1OTbhSOP2yIZJLeNxyF3Fx0/Km9pc="
+  }
+}

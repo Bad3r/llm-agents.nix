@@ -16,20 +16,31 @@ let
   versionData = builtins.fromJSON (builtins.readFile hashesFile);
   inherit (versionData) version;
   system = stdenv.hostPlatform.system;
-  entry = platforms.${system} or (throw "Unsupported system: ${system}");
-  platformVars = if builtins.isAttrs entry then entry else { platform = entry; };
+  srcFor =
+    system:
+    let
+      entry = platforms.${system} or (throw "Unsupported system: ${system}");
+      platformVars = if builtins.isAttrs entry then entry else { platform = entry; };
+    in
+    fetchurlTemplate {
+      inherit urlTemplate;
+      vars = {
+        inherit version;
+      }
+      // platformVars;
+      hash = versionData.hashes.${system};
+    };
+  darwinSystems = builtins.filter (s: builtins.match ".*-darwin" s != null) (
+    builtins.attrNames platforms
+  );
 in
 {
   inherit version;
   platforms = builtins.attrNames platforms;
-  src = fetchurlTemplate {
-    inherit urlTemplate;
-    vars = {
-      inherit version;
-    }
-    // platformVars;
-    hash = versionData.hashes.${system};
-  };
+  src = srcFor system;
+  # The darwin artifacts, fetchable on any host, so codesignCheckHook can verify
+  # their signatures from a Linux build too.
+  darwinSrcs = map srcFor darwinSystems;
   # Ready-to-merge passthru.updater fragment; caller adds a versionSource.
   updater = {
     kind = "platform";

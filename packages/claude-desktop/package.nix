@@ -8,6 +8,7 @@
   bintools,
   copyDesktopItems,
   makeDesktopItem,
+  unzip,
 
   # Directly linked (DT_NEEDED); autoPatchelfHook resolves these from
   # buildInputs and fails the build if any are missing.
@@ -71,11 +72,18 @@
 let
   pname = "claude-desktop";
 
-  # update.py refreshes version/urls/hashes from Anthropic's APT index.
+  # update.py refreshes version/urls/hashes from Anthropic's APT index for
+  # Linux and from the darwin RELEASES.json feed for macOS.
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
-  inherit (versionData) version urls hashes;
+  inherit (versionData) urls hashes;
 
   platform = stdenvNoCC.hostPlatform.system;
+
+  # The darwin channel is versioned independently of the APT one (it even
+  # uses a different numbering scheme), so hashes.json carries per-platform
+  # version overrides; platforms without an entry follow the top-level
+  # version, which update.py keeps in sync with x86_64-linux.
+  version = (versionData.versions or { }).${platform} or versionData.version;
 
   # x-scheme-handler/claude registers the OAuth sign-in handler.
   desktopItem = makeDesktopItem {
@@ -128,6 +136,9 @@ let
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
+      # The macOS artifact is one universal zip (arm64 + x86_64 slices), but
+      # x86_64-darwin is not a supported system in this repo.
+      "aarch64-darwin"
     ];
     mainProgram = "claude-desktop";
   };
@@ -228,28 +239,71 @@ let
       runHook postInstall
     '';
   };
-in
-# The app downloads and execs generic-linux binaries (claude-code CLI, uv) at
-# runtime, which need an FHS loader path.
-buildFHSEnv {
-  inherit pname version meta;
-  passthru = passthru // {
-    inherit unwrapped;
+
+  # macOS ships as a signed and notarized universal zip containing Claude.app
+  # at the root. It is installed as-is: any post-install munging (strip,
+  # shebang patching, ...) would invalidate Anthropic's Developer ID signature.
+  darwin = stdenvNoCC.mkDerivation {
+    inherit
+      pname
+      version
+      meta
+      passthru
+      ;
+
+    src = fetchurl {
+      url = urls.${platform} or (throw "Unsupported system: ${platform}");
+      hash = hashes.${platform} or (throw "Unsupported system: ${platform}");
+    };
+
+    nativeBuildInputs = [ unzip ];
+
+    # The default unpack phase would cd into the single top-level Claude.app
+    # directory it detects; keep the extraction root as the working directory
+    # so the install phase can copy the bundle itself.
+    sourceRoot = ".";
+
+    # Preserve the upstream code signature; fixup could modify sealed files.
+    dontFixup = true;
+
+    installPhase = ''
+      runHook preInstall
+
+      mkdir -p $out/Applications $out/bin
+      cp -a Claude.app $out/Applications/Claude.app
+
+      # The bundle's own Info.plist registers the claude:// scheme handlers;
+      # this symlink just puts the GUI binary on PATH.
+      ln -s $out/Applications/Claude.app/Contents/MacOS/Claude $out/bin/claude-desktop
+
+      runHook postInstall
+    '';
   };
+in
+if stdenvNoCC.hostPlatform.isDarwin then
+  darwin
+else
+  # The app downloads and execs generic-linux binaries (claude-code CLI, uv) at
+  # runtime, which need an FHS loader path.
+  buildFHSEnv {
+    inherit pname version meta;
+    passthru = passthru // {
+      inherit unwrapped;
+    };
 
-  targetPkgs = _: [
-    unwrapped
-    gcc-unwrapped.lib
-    # GPU acceleration
-    libglvnd
-    mesa
-    libgbm
-    vulkan-loader
-  ];
+    targetPkgs = _: [
+      unwrapped
+      gcc-unwrapped.lib
+      # GPU acceleration
+      libglvnd
+      mesa
+      libgbm
+      vulkan-loader
+    ];
 
-  runScript = "claude-desktop";
+    runScript = "claude-desktop";
 
-  extraInstallCommands = ''
-    ln -s ${unwrapped}/share $out/share
-  '';
-}
+    extraInstallCommands = ''
+      ln -s ${unwrapped}/share $out/share
+    '';
+  }
