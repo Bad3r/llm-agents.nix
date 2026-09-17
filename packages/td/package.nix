@@ -1,20 +1,20 @@
 {
   lib,
   flake,
-  buildGoModule,
+  buildGo127Module,
   fetchFromGitHub,
   versionCheckHook,
 }:
 
-buildGoModule rec {
+buildGo127Module rec {
   pname = "td";
-  version = "0.62.0";
+  version = "0.65.0";
 
   src = fetchFromGitHub {
     owner = "marcus";
     repo = "td";
     tag = "v${version}";
-    hash = "sha256-QYsywb2fXl5zIKxh+HkSjKrPh/pJkcXYWy5ZzSachx8=";
+    hash = "sha256-Qausm1RXJAqS1+KHAzP8o+vBxdttUwfEjMAdunmCKvo=";
   };
 
   vendorHash = "sha256-/IWBYL+WfLz7vDdUs//0KY8rb9mOv4S1jBXCZbYxJRo=";

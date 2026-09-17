@@ -4,7 +4,7 @@
   flake,
   fetchFromGitHub,
   rustPlatform,
-  zig_0_15,
+  zig,
   xcbuild,
   cctools,
   installShellFiles,
@@ -16,29 +16,29 @@
 # build.rs shells out to `zig build` to compile vendored libghostty-vt.
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr";
-  version = "0.9.0";
+  version = "0.9.1";
 
   src = fetchFromGitHub {
     owner = "herdrdev";
     repo = "herdr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-SUYF4bbaYwNgoe498VoCUzuLPcjBLQXR0o0DWjjoSnI=";
+    hash = "sha256-N6+kprfWRyh0AkAiopkGsNXUGGORyPVFHEaDHCpGQs8=";
   };
 
-  cargoHash = "sha256-CW/SF/cAPDv47gS5B7XbVZEE6LC9F1a2I1TLTJ4AWdw=";
+  cargoHash = "sha256-1VAmsDE3zeU0wMVQKleQcd/zq8/k/oor8tasrsRQfeY=";
 
   # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
   # build offline.  fetchDeps is a fixed-output derivation, so this does not
   # require import-from-derivation (disabled repo-wide).
-  zigDeps = zig_0_15.fetchDeps {
+  zigDeps = zig.fetchDeps {
     inherit (finalAttrs) pname version;
     src = "${finalAttrs.src}/vendor/libghostty-vt";
     fetchAll = true;
-    hash = "sha256-PnM+hZIlLyQwK8vJgd/Bhjt1lNIz06T8FahwliRmMrY=";
+    hash = "sha256-Cy0DdSvce+fhOFIfxHMQGF2b2j16UkS27UpGbfC42XI=";
   };
 
   nativeBuildInputs = [
-    zig_0_15
+    zig
     installShellFiles
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [

@@ -1,23 +1,23 @@
 {
   lib,
   flake,
-  buildGoModule,
+  buildGo127Module,
   fetchFromGitHub,
   versionCheckHook,
 }:
 
-buildGoModule rec {
+buildGo127Module rec {
   pname = "sidecar";
-  version = "1.3.0";
+  version = "1.14.0";
 
   src = fetchFromGitHub {
     owner = "marcus";
     repo = "sidecar";
     tag = "v${version}";
-    hash = "sha256-/XrGNJ0/o2jhbELjc3CHTF0VrggcNDt4CcjxyMuU30k=";
+    hash = "sha256-CRU8goMGWUbELCSVsDYDFk24VkTuDTt0waVlm92PNsM=";
   };
 
-  vendorHash = "sha256-aR4O8YcW6T9g8BfcKVjfe3iTLfJNy0pcjMDYAWsoCiE=";
+  vendorHash = "sha256-VOnnjbhOdQBhxIPRkBUKoKX0OpW3PXcOJudsZPJuDMY=";
 
   subPackages = [ "cmd/sidecar" ];
 
