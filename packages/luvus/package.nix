@@ -34,16 +34,16 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "luvus";
-  version = "0.14.1";
+  version = "0.14.2";
 
   src = fetchFromGitHub {
     owner = "RizRiyz";
     repo = "luvus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-rOcJ5lcramofOcfCws85s8N0OAWvjvEfhBMdGNF/thw=";
+    hash = "sha256-QhiPA1oV/WRgPrAeR+PlbFxKfquMkyKsjjPLLRzPiDw=";
   };
 
-  cargoHash = "sha256-z2S8hVLeoktsBNd9Jw4Yq1HsM04x411tosSsmtvFGBU=";
+  cargoHash = "sha256-yqfN+zngeryaPxKbVW4UihOvdjHw/toXBAX7yEbr6MY=";
 
   nativeBuildInputs = [
     makeWrapper

@@ -16,13 +16,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "agentty";
-  version = "0.8.0";
+  version = "0.9.0";
 
   src = fetchFromGitHub {
     owner = "1ay1";
     repo = "agentty";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-ukez5KR3DBp0GAOuSXCaagwBljYrrDlw9idT41HD3Tk=";
+    hash = "sha256-nnzT209HJ6VGme/FSbvjaFzK869Ht5vSUCm1d4ljUbY=";
     fetchSubmodules = true;
   };
 

@@ -12,17 +12,17 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "openhands-agent-canvas";
-  version = "1.18.0";
+  version = "1.19.0";
 
   src = fetchFromGitHub {
     owner = "OpenHands";
     repo = "OpenHands";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-HtELbzLjVgX6m7C/3cjuEUKkpykj29yfMMm7nYHjJqk=";
+    hash = "sha256-8rVUYfRMc4EIs5bEAAoWK3KM4m3vSQml3hvEk61BI0w=";
   };
 
   npmDepsFetcherVersion = 2;
-  npmDepsHash = "sha256-bop3SNbr8iwN7euR9GKKZIHoXLNEFPQcJ7ktxfaHnko=";
+  npmDepsHash = "sha256-QvrF3MOY8h5xLO0OHpTC8ZKtNxikPqhpfEtoWMvAPzg=";
 
   # husky prepare hook, electron binary download
   npmFlags = [ "--ignore-scripts" ];
