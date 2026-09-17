@@ -13,7 +13,7 @@
   libsecret,
   python3,
   cacert,
-  electron_43,
+  electron_44,
   makeBinaryWrapper,
   installShellFiles,
   makeDesktopItem,
@@ -28,14 +28,25 @@
 
 let
   pname = "t3code";
-  version = "0.0.40";
+  version = "0.0.42";
   pnpm = pnpm_11;
 
   src = fetchFromGitHub {
     owner = "pingdotgg";
     repo = "t3code";
     tag = "v${version}";
-    hash = "sha256-J8kXpfMfm03/DDAiWXJuANwUNDshhiUn7Lf9tV42Xfw=";
+    hash = "sha256-YV86WqqpGQwjeovXB0IoE3f/o4IUC5DDVdBEdT4xzjc=";
+  };
+
+  # The web build's third-party-licenses vite plugin downloads SPDX license
+  # texts unless they are already cached under .generated/. Keep rev in sync
+  # with SPDX_LICENSE_LIST_REVISION in scripts/lib/third-party-licenses.ts.
+  spdxLicenses = fetchFromGitHub {
+    owner = "spdx";
+    repo = "license-list-data";
+    rev = "c4a7237ec8f4654e867546f9f409749300f1bf4c";
+    sparseCheckout = [ "json/details" ];
+    hash = "sha256-DnrdJ13M8Vf8Dq8qKlO7Ad5jXa8L9YU9PBlpp7B9BoI=";
   };
 
   resourceMonitor = rustPlatform.buildRustPackage {
@@ -105,7 +116,7 @@ stdenv.mkDerivation {
       pnpmWorkspaces
       ;
     fetcherVersion = 4;
-    hash = "sha256-+UsoURSM4VP+CgF1fWROBEB85EuH+iJJM/xDPFigCKk=";
+    hash = "sha256-gEY2em9pNTC1EuVX0V3L/Wu1apZ+BKBXxALEcPQ/pwA=";
   };
 
   nativeBuildInputs = [
@@ -135,6 +146,15 @@ stdenv.mkDerivation {
   postPatch = ''
     substituteInPlace apps/desktop/src/app/DesktopEnvironment.ts \
       --replace-fail "backendCwd: input.isPackaged ? homeDirectory : appRoot," "backendCwd: homeDirectory,"
+
+    spdxRev=$(sed -n 's/^const SPDX_LICENSE_LIST_REVISION = "\(.*\)";/\1/p' scripts/lib/third-party-licenses.ts)
+    if [[ "$spdxRev" != "${spdxLicenses.rev}" ]]; then
+      echo "error: upstream pins SPDX license-list-data $spdxRev, update spdxLicenses" >&2
+      exit 1
+    fi
+    spdxVer=$(sed -n 's/^const SPDX_LICENSE_LIST_VERSION = "\(.*\)";/\1/p' scripts/lib/third-party-licenses.ts)
+    mkdir -p .generated/third-party-licenses/spdx
+    ln -s ${spdxLicenses}/json/details ".generated/third-party-licenses/spdx/$spdxVer"
   '';
 
   preBuild = ''
@@ -145,9 +165,9 @@ stdenv.mkDerivation {
     upstream_electron=$(node -p "require('./apps/desktop/package.json').dependencies.electron")
     upstream_major=''${upstream_electron#^}
     upstream_major=''${upstream_major%%.*}
-    nix_major=${lib.versions.major electron_43.version}
+    nix_major=${lib.versions.major electron_44.version}
     if (( upstream_major > nix_major )); then
-      echo "error: upstream expects Electron $upstream_electron but nixpkgs provides ${electron_43.version}" >&2
+      echo "error: upstream expects Electron $upstream_electron but nixpkgs provides ${electron_44.version}" >&2
       exit 1
     fi
 
@@ -198,7 +218,7 @@ stdenv.mkDerivation {
     find "$out/libexec/t3code" "$desktop/libexec/t3code" -xtype l -delete
 
     mkdir -p "$desktop/bin"
-    makeWrapper ${lib.getExe electron_43} "$desktop/bin/t3code-desktop" \
+    makeWrapper ${lib.getExe electron_44} "$desktop/bin/t3code-desktop" \
       --add-flags "$desktop/libexec/t3code/apps/desktop" \
       --inherit-argv0
 
