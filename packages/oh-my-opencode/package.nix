@@ -8,6 +8,7 @@
   fetchFromGitHub,
   makeWrapper,
   formatelf,
+  libxcb,
 }:
 
 let
@@ -46,6 +47,15 @@ stdenv.mkDerivation {
     builtins.readFile ./fix-stale-bun-lock.patch != ""
   ) ./fix-stale-bun-lock.patch;
 
+  # bun.lock does not record workspace lifecycle scripts. bun >= 1.4 treats
+  # a workspace that has one as changed against the lockfile and re-fetches
+  # the manifests of its dependencies, which fails offline. The script only
+  # patches the omo-native harness, which is not part of this package.
+  postPatch = ''
+    substituteInPlace packages/omo-native/package.json \
+      --replace-fail '"postinstall": "node bin/senpi-patch.mjs"' ""
+  '';
+
   nativeBuildInputs = [
     bun2nixLib.hook
     bun
@@ -56,6 +66,8 @@ stdenv.mkDerivation {
 
   buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib
+    # senpi-tui's linux-platform-x11.node clipboard prebuild
+    libxcb
   ];
 
   bunDeps = bun2nixLib.fetchBunDeps {
