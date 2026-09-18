@@ -20,6 +20,7 @@
   file,
   xprop,
   xdg-utils,
+  gdk-pixbuf,
 }:
 
 let
@@ -86,7 +87,11 @@ buildNpmPackage {
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals isLinux [ copyDesktopItems ]
+  ++ lib.optionals isLinux [
+    copyDesktopItems
+    # gdk-pixbuf-thumbnailer, already in the build closure via electron
+    gdk-pixbuf
+  ]
   ++ lib.optionals isDarwin [
     file
     xcbuild
@@ -267,8 +272,14 @@ buildNpmPackage {
         --prefix PATH : ${runtimePath} \
         --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
 
+      sourceIcon="$out/share/icons/hicolor/1024x1024/apps/hermes-desktop.png"
       install -Dm644 apps/desktop/assets/icon.png \
-        $out/share/icons/hicolor/1024x1024/apps/hermes-desktop.png
+        "$sourceIcon"
+      for size in 256 512; do
+        install -d "$out/share/icons/hicolor/''${size}x''${size}/apps"
+        gdk-pixbuf-thumbnailer -s "$size" "$sourceIcon" \
+          "$out/share/icons/hicolor/''${size}x''${size}/apps/hermes-desktop.png"
+      done
     ''}
 
     ${lib.optionalString isDarwin ''

@@ -196,6 +196,7 @@ python.pkgs.buildPythonApplication rec {
     keyring
     markdownify
     mcp
+    miniaudio
     mistralai
     opentelemetry-api
     opentelemetry-exporter-otlp-proto-http
