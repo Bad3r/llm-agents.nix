@@ -1,19 +1,20 @@
 {
   lib,
   python3,
+  gitMinimal,
   fetchFromGitHub,
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.7.16";
+  version = "0.7.17";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-fCzrwKKLrNlkTgk5b/2JL4Yx9V7e9vqW4wJizNyDb88=";
+    hash = "sha256-+dthjvqXXW94rYfKEzeCpTpK644Upxwjai6rFB7oGgU=";
   };
 
   # Upstream tags releases without bumping __version__ (v0.2.2 still
@@ -28,8 +29,10 @@ python3.pkgs.buildPythonApplication rec {
 
   pythonImportsCheck = [ "mcptoon" ];
 
-  nativeCheckInputs = with python3.pkgs; [
-    pytestCheckHook
+  nativeCheckInputs = [
+    python3.pkgs.pytestCheckHook
+    # test_skills.py tombstone tests commit into a scratch repo
+    gitMinimal
   ];
 
   # config.py creates ~/.config/mcptoon at import time; the tests
