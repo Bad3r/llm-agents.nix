@@ -13,16 +13,16 @@
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.16.10";
+  version = "1.16.11";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     tag = "v${version}";
-    hash = "sha256-R8VGgiay5IoBImRsjMCQKXEjzjn6bV+kMHfY4CLJUTQ=";
+    hash = "sha256-kRnVaNF8M6uPl+iPpx6OooR3JOOk76D7EDWegHU8jeM=";
   };
 
-  vendorHash = "sha256-jYCRbLdZxeR6gh9jyc7HTipbinj9QLoafFg8nujo9eI=";
+  vendorHash = "sha256-ZIBWsEa6IpoW66/kd40UNihBrbo5yjCsRIQatCbt4q8=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -53,6 +53,8 @@ buildGoModule rec {
   # TestCleanup{ExcludesLiveProcessCWDInside,RevalidatesRealityBeforeRemoval,
   # ForceCannotOverrideRealityExclusions} run lsof against live processes,
   # which the darwin sandbox denies.
+  # TestHealthRemoteExecJSONParity requires an OpenSSH client. Providing one
+  # enables further remote parity tests that need a reachable sshd.
   checkFlags = [
     "-short"
     (
@@ -63,6 +65,7 @@ buildGoModule rec {
           "TestValidatePluginFlags_EmptyCatalogActionableError"
           "TestVerifyPromptConsumedAfterLaunch_UnsentFirstWindow_RetryThenConsumed_OneRetry_NoWarning"
           "TestWaitForFreshOutput_UniquePeerStillReads"
+          "TestHealthRemoteExecJSONParity"
         ]
         ++ lib.optionals stdenv.hostPlatform.isDarwin [
           "TestCleanupExcludesLiveProcessCWDInside"
@@ -77,9 +80,15 @@ buildGoModule rec {
     # Since 1.9.48 a test-only guard refuses to touch paths under the real
     # user home, taken from the passwd entry (/build for nixbld). All temp
     # dirs (t.TempDir, mktemp) default to TMPDIR=/build and trip it, so move
-    # HOME and TMPDIR to /tmp, which is outside the passwd home.
-    export TMPDIR=$(mktemp -d -p /tmp)
-    export HOME=$(mktemp -d -p /tmp)
+    # HOME and TMPDIR to /tmp, which is outside the passwd home. The
+    # template avoids mktemp's default "tmp." prefix: ctxfixture redacts the
+    # Claude project key by mapping "/" to "-" only, while the key derivation
+    # also maps ".", so a dotted TMPDIR breaks TestSessionContextJSONGolden.
+    # Resolve /tmp first: on darwin it is a symlink to /private/tmp and some
+    # tests compare git/getwd-canonicalised paths against TMPDIR verbatim.
+    tmp=$(cd /tmp && pwd -P)
+    export TMPDIR=$(mktemp -d "$tmp/nix-XXXXXX")
+    export HOME=$(mktemp -d "$tmp/nix-XXXXXX")
     export PATH="${git}/bin:$PATH"
   '';
 
