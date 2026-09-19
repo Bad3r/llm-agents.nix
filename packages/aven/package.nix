@@ -41,6 +41,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "aven"
   ];
 
+  # Compiling the 130k-line aven crate with --test in release mode peaks at
+  # ~8.6 GB RSS in a single rustc and gets OOM-killed on the aarch64-linux
+  # builders. Debug brings that to ~3 GB and halves the check time.
+  checkType = "debug";
+  # Upstream runs its (debug) test suite with this too, see checkle.toml.
+  env.RUST_MIN_STACK = "4194304";
+
   postInstall = ''
     install -d $out/share/aven
     cp -r skills $out/share/aven/skills
