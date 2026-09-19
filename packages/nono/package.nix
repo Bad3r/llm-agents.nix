@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage rec {
   version = "0.78.0";
 
   src = fetchFromGitHub {
-    owner = "always-further";
+    owner = "nolabs-ai";
     repo = "nono";
     tag = "v${version}";
     hash = "sha256-40ekvTMiIrFW8Fv2P7M/5vGpx3ekKq1kbPXPtXfbRWc=";
@@ -50,7 +50,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Kernel-enforced agent sandbox. Capability-based isolation with secure key management, atomic rollback, cryptographic immutable audit chain of provenance. Run your agents in a zero-trust environment.";
     homepage = "https://nono.sh/";
-    changelog = "https://github.com/always-further/nono/releases/tag/v${version}";
+    changelog = "https://github.com/nolabs-ai/nono/releases/tag/v${version}";
     license = licenses.asl20;
     sourceProvenance = with sourceTypes; [ fromSource ];
     maintainers = with maintainers; [ pogobanane ];
