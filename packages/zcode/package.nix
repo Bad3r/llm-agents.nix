@@ -40,6 +40,7 @@
   systemdLibs,
 
   libglvnd,
+  vulkan-loader,
   libsecret,
   libnotify,
   libpulseaudio,
@@ -135,11 +136,10 @@ stdenvNoCC.mkDerivation {
     systemdLibs
   ];
 
-  # dlopen()ed at runtime, so not discoverable from DT_NEEDED; list them
-  # here to put them on the RUNPATH.
+  # dlopen()ed by the main binary at runtime, so not discoverable from
+  # DT_NEEDED. List them here to put them on its RUNPATH.
   runtimeDependencies = lib.optionals isLinux [
     libayatana-appindicator
-    libglvnd
     libnotify
     libpulseaudio
     libsecret
@@ -147,6 +147,16 @@ stdenvNoCC.mkDerivation {
     pipewire
     wayland
   ];
+
+  # The bundled ANGLE libEGL.so/libGLESv2.so dlopen() the system GL/Vulkan
+  # loaders themselves. runtimeDependencies only reaches executables, while
+  # appendRunpaths is applied to every patched ELF.
+  appendRunpaths = lib.optionals isLinux (
+    map (p: "${lib.getLib p}/lib") [
+      libglvnd
+      vulkan-loader
+    ]
+  );
 
   desktopItems = [ desktopItem ];
 
