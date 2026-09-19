@@ -26,7 +26,7 @@ buildNpmPackage rec {
     inherit pname version src;
     inherit pnpm;
     fetcherVersion = 4;
-    hash = "sha256-kQHYvZ8LNHGw1pPuTnOTUn26yUY8TmgA0+BO2+cSvLY=";
+    hash = "sha256-Zc/e7J7+2VntYqxT96uKQ2C0emG6Iy8Q/YIgUpAa5Wo=";
   };
 
   nativeBuildInputs = [ pnpm ];
