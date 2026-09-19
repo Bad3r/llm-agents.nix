@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.39";
+  version = "0.1.40";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-qSkwsW6vmSYrOBZa80jMdD5FI1IU+e+TZPmh8F6bODY=";
+    hash = "sha256-2evgWbj59MJoMabohoXVGstCsRmkieatgDPG8lzOB1w=";
   };
 
-  cargoHash = "sha256-2AVjbHLQkOcYmmSoBHAfAdpnn1TjgLTo1n4vreKcnJA=";
+  cargoHash = "sha256-T2I9ybF3JrBJL/0WETwi4QM2kWd/CLImq+gBrDUzMRM=";
 
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
@@ -40,6 +40,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--package"
     "aven"
   ];
+
+  # Compiling the 130k-line aven crate with --test in release mode peaks at
+  # ~8.6 GB RSS in a single rustc and gets OOM-killed on the aarch64-linux
+  # builders. Debug brings that to ~3 GB and halves the check time.
+  checkType = "debug";
+  # Upstream runs its (debug) test suite with this too, see checkle.toml.
+  env.RUST_MIN_STACK = "4194304";
 
   postInstall = ''
     install -d $out/share/aven
