@@ -18,14 +18,14 @@ let
 in
 python.pkgs.buildPythonApplication rec {
   pname = "code-review-graph";
-  version = "2.3.8";
+  version = "2.3.9";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "tirth8205";
     repo = "code-review-graph";
     tag = "v${version}";
-    hash = "sha256-NhssTYN0McUEpxAlb4bWDrdlCA6jFmXj9Cn9IxdkcUg=";
+    hash = "sha256-UiQg1ygebw6PePJVHNNOUsL6buw1/oMzX34jloui9Bg=";
   };
 
   build-system = with python.pkgs; [
