@@ -120,13 +120,14 @@ stdenv.mkDerivation {
   # The bundled Electron is a zenbu-labs fork with terminal rendering
   # patches, so it cannot be swapped for nixpkgs' electron. The CLI locates
   # everything under TERMINAL_BROWSER_DIST_ROOT, so the upstream tree stays
-  # intact. Upstream's bin/terminal-browser launcher needs coreutils on PATH;
-  # the wrapper replaces it.
+  # intact. Upstream's bin/terminal-browser launcher needs coreutils on PATH,
+  # so it is replaced by a symlink to the wrapper. `open --split` execs that
+  # path in the new pane.
   installPhase = ''
     runHook preInstall
     mkdir -p $out/lib
     cp -a . $out/lib/terminal-browser
-    rm $out/lib/terminal-browser/bin/terminal-browser
+    ln -sf $out/bin/terminal-browser $out/lib/terminal-browser/bin/terminal-browser
     makeWrapper "$out/lib/terminal-browser/${electronBinary}" $out/bin/terminal-browser \
       --set TERMINAL_BROWSER_DIST_ROOT "$out/lib/terminal-browser" \
       --set ELECTRON_RUN_AS_NODE 1 \
