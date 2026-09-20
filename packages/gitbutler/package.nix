@@ -104,8 +104,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   doCheck = false;
 
   env = {
-    # Stable GitButler production channel. This must be set at build time so
-    # the frontend and backend use the production API/login endpoints.
+    # Read via option_env! to pick the app identifier/data dir. Unset means dev build.
     CHANNEL = "release";
 
     # Let `crates/gitbutler-tauri/inject-git-binaries.sh` find the Rust target dir.
