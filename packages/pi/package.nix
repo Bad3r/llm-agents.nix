@@ -4,6 +4,8 @@
   bun,
   fetchurl,
   fd,
+  formatelf,
+  libxcb,
   mkUpdater,
   rcodesign,
   ripgrep,
@@ -17,16 +19,16 @@
 let
   versionData = lib.importJSON ./hashes.json;
   version = versionData.version;
-  # napi-rs target triple, e.g. darwin-arm64, linux-x64-gnu
-  napiTargets = {
+  nativeTargets = {
     aarch64-darwin = "darwin-arm64";
-    aarch64-linux = "linux-arm64-${if stdenv.hostPlatform.isMusl then "musl" else "gnu"}";
-    x86_64-linux = "linux-x64-${if stdenv.hostPlatform.isMusl then "musl" else "gnu"}";
+    aarch64-linux = "linux-arm64";
+    x86_64-linux = "linux-x64";
   };
-  napiTarget =
-    napiTargets.${stdenv.hostPlatform.system}
+  nativeTarget =
+    nativeTargets.${stdenv.hostPlatform.system}
       or (throw "Unsupported Pi platform: ${stdenv.hostPlatform.system}");
-  clipboardNativeFile = "clipboard.${napiTarget}.node";
+  nativePlatform = if stdenv.hostPlatform.isDarwin then "darwin" else "linux";
+  nativeFile = "${nativePlatform}-platform${lib.optionalString stdenv.hostPlatform.isLinux "-x11"}.node";
 
   # Create a source with package-lock.json included
   srcWithLock = runCommand "pi-src-with-lock" { } ''
@@ -59,9 +61,12 @@ buildNpmPackage {
 
   nativeBuildInputs =
     lib.optional useBun bun
+    ++ lib.optional (useBun && stdenv.hostPlatform.isLinux) formatelf
     ++ lib.optionals (useBun && stdenv.hostPlatform.isDarwin) [
       rcodesign
     ];
+
+  buildInputs = lib.optional (useBun && stdenv.hostPlatform.isLinux) libxcb;
 
   # Compile a standalone binary like upstream's build:binary script. Running
   # dist/bun/cli.js directly with Bun breaks extension module aliasing (#6794).
@@ -91,16 +96,9 @@ buildNpmPackage {
         cp dist/pi "$pkgdir/"
         cp package.json README.md CHANGELOG.md "$pkgdir/"
         # Mirror scripts/build-binaries.sh: Bun cannot embed these runtime assets.
-        mkdir -p "$pkgdir/node_modules/@mariozechner"
-        cp -r node_modules/@mariozechner/clipboard "$pkgdir/node_modules/@mariozechner/"
-        cp -r node_modules/@mariozechner/clipboard-${napiTarget} "$pkgdir/node_modules/@mariozechner/"
-        cp node_modules/@mariozechner/clipboard-${napiTarget}/${clipboardNativeFile} \
-          "$pkgdir/node_modules/@mariozechner/clipboard/"
-        ${lib.optionalString stdenv.hostPlatform.isDarwin ''
-          mkdir -p "$pkgdir/native/darwin/prebuilds/${napiTarget}"
-          cp node_modules/@earendil-works/pi-tui/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node \
-            "$pkgdir/native/darwin/prebuilds/${napiTarget}/"
-        ''}
+        mkdir -p "$pkgdir/native/${nativePlatform}/prebuilds"
+        cp -r node_modules/@earendil-works/pi-tui/native/${nativePlatform}/prebuilds/${nativeTarget} \
+          "$pkgdir/native/${nativePlatform}/prebuilds/"
         cp node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm "$pkgdir/"
         cp dist/modes/interactive/theme/*.json "$pkgdir/theme/"
         cp dist/modes/interactive/assets/* "$pkgdir/assets/"
@@ -147,15 +145,10 @@ buildNpmPackage {
     versionCheckHomeHook
   ];
 
-  postInstallCheck =
-    lib.optionalString useBun ''
-      ${bun}/bin/bun --eval 'require(process.argv[1])' \
-        "$out/libexec/pi/node_modules/@mariozechner/clipboard/${clipboardNativeFile}"
-    ''
-    + lib.optionalString (useBun && stdenv.hostPlatform.isDarwin) ''
-      ${bun}/bin/bun --eval 'require(process.argv[1])' \
-        "$out/libexec/pi/native/darwin/prebuilds/${napiTarget}/darwin-modifiers.node"
-    '';
+  postInstallCheck = lib.optionalString useBun ''
+    ${bun}/bin/bun --eval 'require(process.argv[1])' \
+      "$out/libexec/pi/native/${nativePlatform}/prebuilds/${nativeTarget}/${nativeFile}"
+  '';
 
   passthru.category = "AI Coding Agents";
   passthru.updater = mkUpdater {
@@ -170,7 +163,7 @@ buildNpmPackage {
     license = lib.licenses.mit;
     sourceProvenance = with lib.sourceTypes; [ binaryBytecode ];
     maintainers = with lib.maintainers; [ aos ];
-    platforms = if useBun then builtins.attrNames napiTargets else lib.platforms.all;
+    platforms = if useBun then builtins.attrNames nativeTargets else lib.platforms.all;
     mainProgram = "pi";
   };
 }
