@@ -45,6 +45,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     export HOME=$(mktemp -d)
   '';
 
+  dontUseCargoParallelTests = true; # ETXTBSY: tests write+exec scripts
+
   nativeCheckInputs = [
     bash
     coreutils
