@@ -52,6 +52,7 @@
   xclip,
   xdotool,
   xdg-utils,
+  xvfb,
   xvfb-run,
 
   # Needed for XDG_ICON_DIRS and GSETTINGS_SCHEMAS_PATH.
@@ -170,6 +171,7 @@ stdenvNoCC.mkDerivation {
           xclip
           xdg-utils
           xdotool
+          xvfb
           xvfb-run
         ]
       }" \
@@ -187,6 +189,7 @@ stdenvNoCC.mkDerivation {
           xclip
           xdg-utils
           xdotool
+          xvfb
           xvfb-run
         ]
       }"
