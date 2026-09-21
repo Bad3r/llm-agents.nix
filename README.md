@@ -351,7 +351,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>minimax-code</strong> - An open-source coding agent for your terminal, powered by MiniMax.</summary>
+<summary><strong>minimax-code</strong> - Open-source coding agent for your terminal, powered by MiniMax</summary>
 
 - **Source**: bytecode
 - **License**: MIT
