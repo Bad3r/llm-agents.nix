@@ -3,8 +3,8 @@
 
 """Update script for go-bin package.
 
-Fetches the latest patch release of the Go minor version we track from the
-official Go download API and updates hashes.json.
+Fetches the latest stable Go release from the official download API and
+updates hashes.json.
 """
 
 import sys
@@ -27,25 +27,14 @@ HASHES_FILE = Path(__file__).parent / "hashes.json"
 PLATFORMS = ("linux-amd64", "linux-arm64", "darwin-amd64", "darwin-arm64")
 
 
-def minor_version(v: str) -> str:
-    """Return the major.minor portion of a version string."""
-    parts = v.split(".")
-    return f"{parts[0]}.{parts[1]}"
-
-
-def fetch_latest_go_release(minor: str) -> dict[str, Any] | None:
-    """Find the latest stable release for a Go minor version.
-
-    The Go download API returns releases newest-first, so the first
-    match for our minor wins.
-    """
+def fetch_latest_go_release() -> dict[str, Any] | None:
+    """Return the newest stable release (the API lists newest first)."""
     data = fetch_json("https://go.dev/dl/?mode=json")
     if not isinstance(data, list):
         msg = f"Expected list from Go API, got {type(data)}"
         raise TypeError(msg)
     for release in data:
-        ver = cast("str", release["version"]).removeprefix("go")
-        if minor_version(ver) == minor and release.get("stable", False):
+        if release.get("stable", False):
             return cast("dict[str, Any]", release)
     return None
 
@@ -70,13 +59,11 @@ def main() -> None:
     """Update the go-bin package."""
     data = load_hashes(HASHES_FILE)
     current = data["version"]
-    minor = minor_version(current)
+    print(f"Current: {current}")
 
-    print(f"Current: {current}, tracking Go {minor}.x")
-
-    release = fetch_latest_go_release(minor)
+    release = fetch_latest_go_release()
     if release is None:
-        print(f"No stable release found for Go {minor}")
+        print("No stable Go release found")
         return
 
     latest = cast("str", release["version"]).removeprefix("go")
