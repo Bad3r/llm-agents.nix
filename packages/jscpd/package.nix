@@ -8,18 +8,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "jscpd";
-  version = "5.3.0";
+  version = "5.3.1";
 
   src = fetchFromGitHub {
     owner = "kucherenko";
     repo = "jscpd";
     tag = "v${version}";
-    hash = "sha256-MpNcI55qMzQ9VX+kv43omUT3lgKHygTyKf82yizdXIE=";
+    hash = "sha256-Cl8GvRM8hUPO4Kss4kjnZ5u0V/3/SGiMu1YuQ+TAjic=";
   };
 
   sourceRoot = "${src.name}/rust";
 
-  cargoHash = "sha256-Kl8iSOVjWHCb+dSxhI2YS0Gd0PEVJkaNul7GmvpJsUQ=";
+  cargoHash = "sha256-iQGUJACqLwNHvveV8Vq4henJ6dtPXSAM06n/2JPe+5s=";
 
   cargoBuildFlags = [
     "-p"
