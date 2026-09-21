@@ -1,16 +1,16 @@
 diff --git gitnexus/src/core/embeddings/embedder.ts gitnexus/src/core/embeddings/embedder.ts
-index 800652a..b7d8dba 100644
+index e41c4f4..96dfbdb 100644
 --- gitnexus/src/core/embeddings/embedder.ts
 +++ gitnexus/src/core/embeddings/embedder.ts
-@@ -25,6 +25,7 @@ import { resolveEmbeddingConfig } from './config.js';
- import { applyHfEnvOverrides, isHfDownloadFailure, withHfDownloadRetry } from './hf-env.js';
- import { getLocalEmbeddingRuntimeBlocker } from './runtime-support.js';
+@@ -33,6 +33,7 @@ import {
+   getMissingLocalEmbeddingStackMessage,
+ } from './runtime-support.js';
  import { ensureOnnxRuntimeCommonResolvable } from './onnxruntime-common-resolver.js';
 +import { applyOnnxruntimeNodeBindingOverride } from './onnxruntime-node-loader.js';
+ import { ensureEmbeddingStackResolvable } from './runtime-install.js';
  import {
    ensureOnnxRuntimeNodeMatchesSystem,
-   isEffectiveCudaAvailable,
-@@ -107,6 +108,7 @@ export const initEmbedder = async (
+@@ -121,6 +122,7 @@ export const initEmbedder = async (
        // Under pnpm-strict / `pnpm dlx`, transformers' phantom `onnxruntime-common`
        // import is unresolvable; register the fallback resolver first (#307).
        ensureOnnxRuntimeCommonResolvable();
@@ -78,18 +78,18 @@ index 0000000..252064f
 +  };
 +};
 diff --git gitnexus/src/mcp/core/embedder.ts gitnexus/src/mcp/core/embedder.ts
-index f856446..f632fcd 100644
+index 663d74b..e24ae7c 100644
 --- gitnexus/src/mcp/core/embedder.ts
 +++ gitnexus/src/mcp/core/embedder.ts
-@@ -23,6 +23,7 @@ import {
- } from '../../core/embeddings/hf-env.js';
- import { getLocalEmbeddingRuntimeBlocker } from '../../core/embeddings/runtime-support.js';
+@@ -26,6 +26,7 @@ import {
+   getMissingLocalEmbeddingStackMessage,
+ } from '../../core/embeddings/runtime-support.js';
  import { ensureOnnxRuntimeCommonResolvable } from '../../core/embeddings/onnxruntime-common-resolver.js';
 +import { applyOnnxruntimeNodeBindingOverride } from '../../core/embeddings/onnxruntime-node-loader.js';
+ import { ensureEmbeddingStackResolvable } from '../../core/embeddings/runtime-install.js';
  import { ensureOnnxRuntimeNodeMatchesSystem } from '../../core/embeddings/onnxruntime-node-resolver.js';
  import { silenceStdout, restoreStdout, realStderrWrite } from '../../core/lbug/pool-adapter.js';
- 
-@@ -70,6 +71,7 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
+@@ -79,6 +80,7 @@ export const initEmbedder = async (): Promise<FeatureExtractionPipeline> => {
        // Under pnpm-strict / `pnpm dlx`, transformers' phantom `onnxruntime-common`
        // import is unresolvable; register the fallback resolver first (#307).
        ensureOnnxRuntimeCommonResolvable();

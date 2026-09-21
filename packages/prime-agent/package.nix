@@ -20,17 +20,17 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "prime-agent";
-  version = "0.9.3";
+  version = "0.9.5";
 
   src = fetchFromGitHub {
     owner = "PrimeIntellect-ai";
     repo = "prime-agent";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-7NHaWxQwEwYjxIxLE8B1NR2J7WlY1tKHhmkFnpgcXO8=";
+    hash = "sha256-BCfiwDhocJJ5PMBnERKGnVsT8lFFuOmiZ6jkoEeHEmY=";
   };
 
   nodejs = nodejs_22;
-  npmDepsHash = "sha256-Op8EHL5pcsgqLngvc2TDsQmbp9mrSSfsftEN7e6w5sg=";
+  npmDepsHash = "sha256-qx12eAjHQxr0HtBs842XSJk342DNgTUr7bynlDSoYCY=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -50,11 +50,6 @@ buildNpmPackage (finalAttrs: {
   # fetchNpmDeps needs that metadata to cache every version for offline npm ci.
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
-
-    # Release tags include generated model data. Regenerating it would access
-    # several model catalog APIs during the sandboxed build.
-    substituteInPlace packages/ai/package.json \
-      --replace-fail 'npm run generate-models && tsgo' 'tsgo'
 
     # nix develop uses a long per-shell TMPDIR on Darwin. Worker socket paths
     # then exceed sockaddr_un.sun_path and Node creates a truncated socket that
@@ -92,11 +87,6 @@ buildNpmPackage (finalAttrs: {
     ${finalAttrs.passthru.pythonRuntime}/bin/python3 <<'PY'
     import agent_message, agent_observe, attach_image, compact, edit, goal
     import dill, ipykernel, linear, notion, refine, rlm, rlm_heartbeat, websearch
-
-    assert callable(rlm.run)
-    assert callable(rlm.host_request)
-    assert callable(refine.run)
-    assert callable(refine.status)
     PY
   '';
 

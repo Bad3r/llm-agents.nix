@@ -3,6 +3,7 @@
   flake,
   stdenv,
   fetchurl,
+  bubblewrap,
   coreutils,
   dpkg,
   formatelf,
@@ -21,6 +22,7 @@
   fontconfig,
   freetype,
   gdk-pixbuf,
+  gitMinimal,
   glib,
   gtk3,
   libGL,
@@ -182,7 +184,9 @@ stdenv.mkDerivation {
           --unset QT_QPA_PLATFORM_PLUGIN_PATH \
           --prefix PATH : ${
             lib.makeBinPath [
+              bubblewrap
               coreutils
+              gitMinimal
               xdg-utils
             ]
           }
