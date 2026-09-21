@@ -4,7 +4,6 @@
   darwin,
   flake,
   buildNpmPackage,
-  nodejs_26,
   electron_42,
   hermes-agent,
   makeWrapper,
@@ -74,7 +73,9 @@ buildNpmPackage {
   # hermes-agent's frontend already fetched rather than storing the same npm
   # graph under a second hash.
   npmDeps = hermes-agent.hermes-frontend.npmDeps;
-  nodejs = nodejs_26;
+  # Upstream .npmrc sets engine-strict and pins a bleeding-edge Node that
+  # nixpkgs does not cache; the offline install works fine with default nodejs.
+  npmFlags = [ "--engine-strict=false" ];
 
   # npmConfigHook already installs with --ignore-scripts. Keep its automatic
   # rebuild inert too: node-pty must be compiled manually for Electron's ABI,
