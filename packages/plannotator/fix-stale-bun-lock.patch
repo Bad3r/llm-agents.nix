@@ -1,5 +1,5 @@
 diff --git a/bun.lock b/bun.lock
-index 0af3b32..9a12036 100644
+index e279504..0f8f3fc 100644
 --- a/bun.lock
 +++ b/bun.lock
 @@ -312,7 +312,7 @@
@@ -7,7 +7,7 @@ index 0af3b32..9a12036 100644
          "@pierre/diffs": "1.3.6",
          "@plannotator/atomic-editor": "^0.8.0",
 -        "@plannotator/core": "0.25.3",
-+        "@plannotator/core": "0.25.4",
++        "@plannotator/core": "0.25.5",
          "@plannotator/markdown-editor": "^0.4.0",
          "@plannotator/web-highlighter": "^0.8.1",
          "@tanstack/react-table": "^8.21.3",
