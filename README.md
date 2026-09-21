@@ -1127,6 +1127,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>openresearch</strong> - Local-first workspace for research agents and autoresearch</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://openresearch.sh/
+- **Usage**: `nix run github:numtide/llm-agents.nix#openresearch -- --help`
+- **Nix**: [packages/openresearch/package.nix](packages/openresearch/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
