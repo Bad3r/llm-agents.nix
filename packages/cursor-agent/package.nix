@@ -54,8 +54,6 @@ stdenv.mkDerivation rec {
     runHook postUnpack
   '';
 
-  # Everything lives under share/ so that only bin/ reaches shared profiles;
-  # index.js at the package root collided with playwright-core (#9364).
   installPhase = ''
     runHook preInstall
 

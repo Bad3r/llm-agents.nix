@@ -161,35 +161,10 @@ under `$out` are:
 bin sbin lib lib64 libexec share include etc opt Applications nix-support
 ```
 
-`checks/fhs-layout.nix` enforces this for every attribute of
-`packages.<system>`, `passthru.hideFromDocs` ones included.
-
-Anything in the package root also lands in the top level of every profile built
-with `pkgs.buildEnv` or home-manager's `home.packages`. Two packages shipping
-the same root file name — an `index.js`, a `node`, an `rg` — then collide and
-the profile fails to build (#9364).
-
-So put the payload one level down, where only the package itself looks:
-
-- `$out/share/<pname>` for data, JS bundles and unpacked app trees;
-- `$out/lib/<pname>` for native libraries that sit next to a binary;
-- `$out/libexec/<pname>` for helper executables the main program calls.
-
-Then keep `$out/bin/<mainProgram>` working. A symlink is enough when the
-launcher resolves its siblings itself; use a `makeWrapper` wrapper when it
-needs the new directory on `PATH`, or when it locates its data relative to
-`process.execPath`/`current_exe` and the real path has to be the one it sees.
-
-```nix
-installPhase = ''
-  runHook preInstall
-  mkdir -p $out/bin $out/share
-  cp -r dist $out/share/example
-  makeWrapper $out/share/example/example $out/bin/example \
-    --prefix PATH : $out/share/example
-  runHook postInstall
-'';
-```
+Anything else collides in `buildEnv`/home-manager profiles (#9364) and fails
+`checks/fhs-layout.nix`. Put app trees under `$out/share/<pname>` or
+`$out/libexec/<pname>` and symlink/`makeWrapper` the entry point into
+`$out/bin`.
 
 ### Version Check Hooks
 

@@ -72,12 +72,7 @@ stdenv.mkDerivation {
     runHook postBuild
   '';
 
-  # The binary locates its bundled skills by walking the ancestors of
-  # process.execPath for skills/<name>/SKILL.md (packages/hunk/src/core/run/
-  # paths.ts), so the skills have to sit above the real executable. Both live
-  # under share/hunk and $out/bin/hunk is a wrapper, which keeps the package
-  # root free of a generic `skills` directory that collided with other
-  # packages in buildEnv and home-manager profiles (#9364).
+  # hunk finds skills/ by walking up from process.execPath, hence the wrapper.
   installPhase = ''
     runHook preInstall
     install -Dm755 ./hunk-bin $out/share/hunk/bin/hunk

@@ -41,8 +41,6 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [ jq ];
   passAsFile = [ "packagesJson" ];
   inherit packagesJson;
-  # The document root lives at share/llm-agents-site so that the package root
-  # stays FHS-like; lib/hercules-ci.nix copies that directory to gh-pages.
   installPhase = ''
     runHook preInstall
     doc=$out/share/llm-agents-site
