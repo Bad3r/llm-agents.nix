@@ -22,6 +22,7 @@
   fontconfig,
   freetype,
   gdk-pixbuf,
+  gitMinimal,
   glib,
   gtk3,
   libGL,
@@ -185,6 +186,7 @@ stdenv.mkDerivation {
             lib.makeBinPath [
               bubblewrap
               coreutils
+              gitMinimal
               xdg-utils
             ]
           }
