@@ -120,50 +120,6 @@ let
         };
       });
 
-      # The harness wheel (below) enforces certifi>=2026.7.22 via
-      # pythonRuntimeDepsCheck; nixpkgs ships 2026.6.17.
-      certifi = pyprev.certifi.overridePythonAttrs (_: rec {
-        version = "2026.7.22";
-        src = fetchPypi {
-          pname = "certifi";
-          inherit version;
-          hash = "sha256-dB4sOzUd3xaac42p8sBIYI/38sXMAvHrxrEYuwkNXVU=";
-        };
-      });
-
-      # The h2 cancellation tests race a 10ms anyio window and flake on
-      # loaded builders.
-      httpcore2 = pyprev.httpcore2.overridePythonAttrs (old: {
-        disabledTests = (old.disabledTests or [ ]) ++ [
-          "test_h2_timeout_during_handshake"
-          "test_h2_timeout_during_request"
-          "test_h2_timeout_during_response"
-        ];
-      });
-
-      # watchfiles' test suite needs real filesystem event delivery
-      # (FSEvents/inotify); build sandboxes without it (nixbuild's darwin
-      # builders) cannot run it. Vibe consumes watchfiles as a library.
-      watchfiles = pyprev.watchfiles.overridePythonAttrs (_: {
-        doCheck = false;
-      });
-
-      # mcp's test inputs pull every optional extra into the build closure,
-      # and vibe consumes it purely as a runtime library.
-      mcp = pyprev.mcp.overridePythonAttrs (_: {
-        doCheck = false;
-      });
-
-      # sse-starlette's test inputs drag in fastapi and, transitively,
-      # scipy -- which needs big-parallel builders that nixbuild's darwin
-      # fleet does not offer. Vibe only consumes sse-starlette at runtime.
-      # nixpkgs lists starlette only under the "examples" extra while the
-      # built wheel requires it, so keep it as a real runtime dep.
-      sse-starlette = pyprev.sse-starlette.overridePythonAttrs (old: {
-        doCheck = false;
-        dependencies = (old.dependencies or [ ]) ++ [ pyprev.starlette ];
-      });
-
       # Build mistralai/acp in this set so they link the overridden otel
       # packages; stock python3.pkgs would drag old otel into the closure.
       mistralai = callPackage ./mistralai.nix { python3 = python; };
@@ -201,11 +157,7 @@ let
     };
   };
 
-  # Closed-source binary runtime (cp312-abi3 wheels) that backs Vibe's unified
-  # harness session backend. Upstream pins the exact version; it used to be
-  # optional at runtime, but since 2.25.5 vibe imports it unconditionally on
-  # the interactive startup path (vibe.app_server._provided_tools, issue
-  # #9563), so it must ship in the closure.
+  # Closed-source wheel, imported unconditionally at startup since 2.25.5 (#9563).
   harnessWheels = {
     x86_64-linux = {
       platform = "manylinux_2_28_x86_64";
@@ -248,6 +200,7 @@ let
       truststore
     ];
 
+    pythonRelaxDeps = [ "certifi" ];
     pythonImportsCheck = [ "mistralai_vibe_local_harness" ];
 
     meta = with lib; {
@@ -337,9 +290,7 @@ python.pkgs.buildPythonApplication rec {
   # `import vibe` alone is lazy and misses dependency drift: mistralai 2.1.3
   # lacked mistralai.extra.observability.telemetry yet built fine and crashed
   # at runtime (issue #6462). Import submodules that pull in the vendored deps
-  # so drift fails the build. `vibe.app_server.local` covers the interactive
-  # startup path, which imports mistralai_vibe_local_harness unconditionally
-  # since 2.25.5 (issue #9563).
+  # so drift fails the build.
   pythonImportsCheck = [
     "vibe"
     "vibe.cli.cli"
