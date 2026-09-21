@@ -12,6 +12,7 @@ import argparse
 import logging
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 from dataclasses import dataclass
@@ -114,11 +115,23 @@ def git_ro(repo: Path, *args: str) -> str:
     return result.stdout
 
 
-def allowed_roots(update_type: UpdateType, name: str) -> tuple[str, ...]:
+def allowed_roots(repo: Path, update_type: UpdateType, name: str) -> tuple[str, ...]:
     """Return the paths an update is allowed to touch."""
     match update_type:
         case UpdateType.PACKAGE:
-            return (f"packages/{name}/",)
+            # Read companions from origin/main, not the tree the updater could edit.
+            try:
+                companions = git_ro(
+                    repo, "show", f"origin/main:packages/{name}/update-companions"
+                )
+            except subprocess.CalledProcessError:
+                companions = ""
+            names = [name] + [
+                c
+                for line in companions.splitlines()
+                if (c := line.strip()) and not c.startswith("#")
+            ]
+            return tuple(f"packages/{n}/" for n in names)
         case UpdateType.FLAKE_INPUT:
             return ("flake.lock",)
 
@@ -208,7 +221,7 @@ def create_or_update_pr(
     rebased onto main by the workflow. Their content survives the copy,
     squashed into the update commit.
     """
-    allowed = allowed_roots(update_type, name)
+    allowed = allowed_roots(Path.cwd(), update_type, name)
     check_confinement(Path.cwd(), allowed, name)
     clean = clone_and_publish(config, allowed)
 
