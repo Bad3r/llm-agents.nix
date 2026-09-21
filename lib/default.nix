@@ -303,9 +303,6 @@ inputs."nixpkgs".lib.extend (
         github = "74k1";
         githubId = 49000471;
         name = "Tim";
-        email = "git.t@betsumei.com";
-        keys = [ { fingerprint = "46F3 422F 63A3 1369 7EAB  83D5 1CF1 55F7 6F21 3503"; } ];
-        matrix = "@74k1:matrix.org";
       };
     };
   }
