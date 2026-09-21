@@ -152,6 +152,20 @@ stdenv.mkDerivation rec {
 }
 ```
 
+### Output Layout
+
+A package output must have an FHS-like root. The only entries allowed directly
+under `$out` are:
+
+```text
+bin sbin lib lib64 libexec share include etc opt Applications nix-support
+```
+
+Anything else collides in `buildEnv`/home-manager profiles (#9364) and fails
+the `pkgs-<name>` check. Put app trees under `$out/share/<pname>` or
+`$out/libexec/<pname>` and symlink/`makeWrapper` the entry point into
+`$out/bin`.
+
 ### Version Check Hooks
 
 Use `versionCheckHook` to verify packages report correct versions during build:

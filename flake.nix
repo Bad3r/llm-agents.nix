@@ -201,7 +201,12 @@
 
       checks = eachSystem (
         system:
-        lib.mapAttrs' (name: pkg: lib.nameValuePair "pkgs-${name}" pkg) packages.${system}
+        lib.mapAttrs' (
+          name: pkg:
+          lib.nameValuePair "pkgs-${name}" (
+            import ./lib/check-package.nix { pkgs = pkgsFor.${system}; } name pkg
+          )
+        ) packages.${system}
         // lib.genAttrs checkNames (
           name:
           callWith {
