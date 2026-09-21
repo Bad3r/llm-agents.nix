@@ -19,7 +19,8 @@
     };
     bun2nix = {
       # https://github.com/nix-community/bun2nix/pull/106
-      url = "github:Mic92/bun2nix/fix-structured-attrs-hook";
+      # https://github.com/nix-community/bun2nix/pull/110
+      url = "github:Mic92/bun2nix/llm-agents";
       inputs."nixpkgs".follows = "nixpkgs";
       inputs."systems".follows = "systems";
       inputs."treefmt-nix".follows = "treefmt-nix";
