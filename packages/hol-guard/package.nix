@@ -37,12 +37,7 @@ python3.pkgs.buildPythonApplication rec {
     rich
   ];
 
-  # Upstream pins exact versions of these.
-  pythonRelaxDeps = [
-    "idna"
-    "publicsuffixlist"
-    "rich"
-  ];
+  pythonRelaxDeps = true;
 
   pythonImportsCheck = [ "codex_plugin_scanner" ];
 
