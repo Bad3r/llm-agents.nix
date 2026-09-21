@@ -1,5 +1,6 @@
 {
   lib,
+  flake,
   python3,
   fetchFromGitHub,
   fetchPypi,
@@ -155,6 +156,61 @@ let
           });
     };
   };
+
+  # Closed-source wheel, imported unconditionally at startup since 2.25.5 (#9563).
+  harnessWheels = {
+    x86_64-linux = {
+      platform = "manylinux_2_28_x86_64";
+      hash = "sha256-YB3esbdTEGGBFtP1xjBf9yDU9DF7jARwyOK8VSu/HEU=";
+    };
+    aarch64-linux = {
+      platform = "manylinux_2_28_aarch64";
+      hash = "sha256-C3Ndi70LgbXoYa6NqhsZSmRK/tPoguvEgD7QrbSFKcw=";
+    };
+    aarch64-darwin = {
+      platform = "macosx_11_0_arm64";
+      hash = "sha256-+XiH5c3zO4++nfoBjeDsyzph1HNYwHX4MsWgI48vJ/I=";
+    };
+  };
+
+  mistralai-vibe-local-harness = python.pkgs.buildPythonPackage rec {
+    pname = "mistralai-vibe-local-harness";
+    version = "0.5.1";
+    format = "wheel";
+
+    src = fetchPypi {
+      pname = "mistralai_vibe_local_harness";
+      inherit version;
+      format = "wheel";
+      dist = "cp312";
+      python = "cp312";
+      abi = "abi3";
+      inherit (harnessWheels.${python3.stdenv.hostPlatform.system}) platform hash;
+    };
+
+    dependencies = with python.pkgs; [
+      anyio
+      certifi
+      httpx
+      mcp
+      mistralai
+      opentelemetry-api
+      pydantic
+      rfc8785
+      truststore
+    ];
+
+    pythonRelaxDeps = [ "certifi" ];
+    pythonImportsCheck = [ "mistralai_vibe_local_harness" ];
+
+    meta = with lib; {
+      description = "Local Unified Harness runtime and native bindings for Vibe";
+      homepage = "https://pypi.org/project/mistralai-vibe-local-harness/";
+      license = flake.lib.licenses.unfree;
+      sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+      platforms = builtins.attrNames harnessWheels;
+    };
+  };
 in
 python.pkgs.buildPythonApplication rec {
   pname = "mistral-vibe";
@@ -198,6 +254,7 @@ python.pkgs.buildPythonApplication rec {
     mcp
     miniaudio
     mistralai
+    mistralai-vibe-local-harness
     opentelemetry-api
     opentelemetry-exporter-otlp-proto-http
     opentelemetry-sdk
@@ -230,9 +287,6 @@ python.pkgs.buildPythonApplication rec {
   # satisfy the otel requirements (issue #3668).
   pythonRelaxDeps = true;
 
-  # Closed-source binary wheel. Optional at runtime (find_spec fallback).
-  pythonRemoveDeps = [ "mistralai-vibe-local-harness" ];
-
   # `import vibe` alone is lazy and misses dependency drift: mistralai 2.1.3
   # lacked mistralai.extra.observability.telemetry yet built fine and crashed
   # at runtime (issue #6462). Import submodules that pull in the vendored deps
@@ -240,6 +294,7 @@ python.pkgs.buildPythonApplication rec {
   pythonImportsCheck = [
     "vibe"
     "vibe.cli.cli"
+    "vibe.app_server.local"
     "vibe.core.llm.backend.mistral"
     "vibe.cli.transcribe.mistral_transcribe_client"
   ];
@@ -251,7 +306,10 @@ python.pkgs.buildPythonApplication rec {
   ];
   versionCheckProgramArg = [ "--version" ];
 
-  passthru.category = "AI Coding Agents";
+  passthru = {
+    category = "AI Coding Agents";
+    inherit mistralai-vibe-local-harness;
+  };
 
   meta = with lib; {
     description = "Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral";

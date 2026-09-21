@@ -6,6 +6,7 @@
   bun2nixLib,
   bun,
   bun-bin,
+  makeWrapper,
   wrapBuddy,
   versionCheckHook,
   versionCheckHomeHook,
@@ -29,6 +30,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     bun2nixLib.hook
     bun
+    makeWrapper
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
 
@@ -70,13 +72,12 @@ stdenv.mkDerivation {
     runHook postBuild
   '';
 
+  # hunk finds skills/ by walking up from process.execPath, hence the wrapper.
   installPhase = ''
     runHook preInstall
-    install -Dm755 ./hunk-bin $out/bin/hunk
-    # The binary locates the bundled review skill by walking ancestor
-    # directories of process.execPath looking for skills/hunk-review/SKILL.md
-    # (packages/hunk/src/core/paths.ts), so it must live at $out/skills.
-    cp -r ./packages/hunk/skills $out/
+    install -Dm755 ./hunk-bin $out/share/hunk/bin/hunk
+    cp -r ./packages/hunk/skills $out/share/hunk/
+    makeWrapper $out/share/hunk/bin/hunk $out/bin/hunk
     runHook postInstall
   '';
 

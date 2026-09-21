@@ -89,12 +89,18 @@ rustPlatform.buildRustPackage (
 
     inherit preBuild;
 
+    # codex looks for codex-resources/bwrap and codex-code-mode-host next to
+    # its own executable, so the real binaries live together in libexec/.
     postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-      mkdir -p $out/codex-resources
-      ln -s ${lib.getExe bubblewrap} $out/codex-resources/bwrap
+      mkdir -p $out/libexec/codex/bin $out/libexec/codex/codex-resources
+      ln -s ${lib.getExe bubblewrap} $out/libexec/codex/codex-resources/bwrap
+      mv $out/bin/codex $out/bin/codex-code-mode-host $out/bin/logs_client \
+        $out/libexec/codex/bin/
 
-      wrapProgram $out/bin/codex \
+      makeWrapper $out/libexec/codex/bin/codex $out/bin/codex \
         --prefix PATH : ${lib.makeBinPath [ bubblewrap ]}
+      ln -s ../libexec/codex/bin/codex-code-mode-host $out/bin/codex-code-mode-host
+      ln -s ../libexec/codex/bin/logs_client $out/bin/logs_client
     '';
 
     doCheck = false;

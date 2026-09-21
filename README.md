@@ -351,6 +351,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>minimax-code</strong> - Open-source coding agent for your terminal, powered by MiniMax</summary>
+
+- **Source**: bytecode
+- **License**: MIT
+- **Homepage**: https://github.com/MiniMax-AI/minimax-code
+- **Usage**: `nix run github:numtide/llm-agents.nix#minimax-code -- --help`
+- **Nix**: [packages/minimax-code/package.nix](packages/minimax-code/package.nix)
+
+</details>
+<details>
 <summary><strong>mistral-vibe</strong> - Minimal CLI coding agent by Mistral AI - open-source command-line coding assistant powered by Devstral</summary>
 
 - **Source**: source
@@ -1117,6 +1127,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>openresearch</strong> - Local-first workspace for research agents and autoresearch</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://openresearch.sh/
+- **Usage**: `nix run github:numtide/llm-agents.nix#openresearch -- --help`
+- **Nix**: [packages/openresearch/package.nix](packages/openresearch/package.nix)
+
+</details>
+<details>
 <summary><strong>openspec</strong> - Spec-driven development for AI coding assistants</summary>
 
 - **Source**: bytecode
@@ -1723,6 +1743,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/slopus/happy
 - **Usage**: `nix run github:numtide/llm-agents.nix#happy-coder -- --help`
 - **Nix**: [packages/happy-coder/package.nix](packages/happy-coder/package.nix)
+
+</details>
+<details>
+<summary><strong>hol-guard</strong> - Open-source antivirus and runtime protection for AI agents</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://hol.org/guard
+- **Usage**: `nix run github:numtide/llm-agents.nix#hol-guard -- --help`
+- **Nix**: [packages/hol-guard/package.nix](packages/hol-guard/package.nix)
 
 </details>
 <details>
