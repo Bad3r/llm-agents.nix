@@ -162,7 +162,7 @@ bin sbin lib lib64 libexec share include etc opt Applications nix-support
 ```
 
 Anything else collides in `buildEnv`/home-manager profiles (#9364) and fails
-`checks/fhs-layout.nix`. Put app trees under `$out/share/<pname>` or
+the `pkgs-<name>` check. Put app trees under `$out/share/<pname>` or
 `$out/libexec/<pname>` and symlink/`makeWrapper` the entry point into
 `$out/bin`.
 
