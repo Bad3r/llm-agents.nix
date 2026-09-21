@@ -8,3 +8,8 @@ rule:
   has:
     field: attrpath
     regex: '^(sha256|cargoSha256|vendorSha256)$'
+  not:
+    inside:
+      kind: apply_expression
+      stopBy: end
+      regex: '^builtins\.fetchTarball'
