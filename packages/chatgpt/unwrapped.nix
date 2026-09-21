@@ -67,18 +67,17 @@ stdenv.mkDerivation {
   dontStrip = true;
   dontWrapGApps = true;
 
-  nativeBuildInputs = [
-    python3
-  ]
-  ++ lib.optionals isLinux [
-    formatelf
-    dpkg
-    makeWrapper
-    wrapGAppsHook3
-  ]
-  ++ lib.optionals isDarwin [
-    unzip
-  ];
+  nativeBuildInputs =
+    lib.optionals isLinux [
+      python3
+      formatelf
+      dpkg
+      makeWrapper
+      wrapGAppsHook3
+    ]
+    ++ lib.optionals isDarwin [
+      unzip
+    ];
 
   buildInputs = lib.optionals isLinux [
     alsa-lib
@@ -197,26 +196,19 @@ stdenv.mkDerivation {
         mkdir -p "$out/Applications"
         mv ChatGPT.app "$out/Applications/"
 
-        python3 ${./patch-asar.py} "$out/Applications/ChatGPT.app/Contents/Resources/app.asar" darwin
-
         runHook postInstall
       '';
 
-  postFixup =
-    lib.optionalString isLinux ''
-      patchelf --add-rpath ${lib.makeLibraryPath [ qt5.qtbase ]} \
-        "$out/lib/chatgpt/libqt5_shim.so"
-      patchelf --add-rpath ${lib.makeLibraryPath [ qt6.qtbase ]} \
-        "$out/lib/chatgpt/libqt6_shim.so"
-    ''
-    + lib.optionalString isDarwin ''
-      # Patching app.asar and script shebangs invalidates OpenAI's signature.
-      # An invalid signature makes macOS refuse to launch the application.
-      /usr/bin/codesign --force --deep --sign - \
-        "$out/Applications/ChatGPT.app"
-      /usr/bin/codesign --verify --deep --strict \
-        "$out/Applications/ChatGPT.app"
-    '';
+  postFixup = lib.optionalString isLinux ''
+    patchelf --add-rpath ${lib.makeLibraryPath [ qt5.qtbase ]} \
+      "$out/lib/chatgpt/libqt5_shim.so"
+    patchelf --add-rpath ${lib.makeLibraryPath [ qt6.qtbase ]} \
+      "$out/lib/chatgpt/libqt6_shim.so"
+  '';
+
+  # Any modification forces ad-hoc re-signing, which drops OpenAI's keychain
+  # entitlements and breaks Remote Control (#9315).
+  dontFixup = isDarwin;
 
   meta = with lib; {
     description = "Desktop application for ChatGPT and Codex";
