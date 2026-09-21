@@ -3,6 +3,7 @@
   flake,
   stdenv,
   fetchurl,
+  bubblewrap,
   coreutils,
   dpkg,
   formatelf,
@@ -182,6 +183,7 @@ stdenv.mkDerivation {
           --unset QT_QPA_PLATFORM_PLUGIN_PATH \
           --prefix PATH : ${
             lib.makeBinPath [
+              bubblewrap
               coreutils
               xdg-utils
             ]
