@@ -304,6 +304,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 14110063;
         name = "Jakob Ankarhem";
       };
+      _74k1 = {
+        github = "74k1";
+        githubId = 49000471;
+        name = "Tim";
+      };
     };
   }
 )
