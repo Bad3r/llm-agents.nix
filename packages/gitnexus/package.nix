@@ -5,7 +5,6 @@
   buildNpmPackage,
   fetchFromGitHub,
   makeWrapper,
-  typescript,
   mkUpdater,
 }:
 
@@ -38,13 +37,6 @@ buildNpmPackage (finalAttrs: {
     rm -f source/gitnexus-web/package.json
   '';
 
-  # build.js invokes a cwd-relative node_modules/.bin/tsc which does not exist
-  # in gitnexus-shared; use the tsc from nativeBuildInputs on PATH instead.
-  postPatch = ''
-    substituteInPlace scripts/build.js \
-      --replace-fail "path.join('node_modules', '.bin', 'tsc')" "'tsc'"
-  '';
-
   inherit (versionData) npmDepsHash;
   makeCacheWritable = true;
 
@@ -60,7 +52,6 @@ buildNpmPackage (finalAttrs: {
 
   nativeBuildInputs = [
     makeWrapper
-    typescript
   ];
 
   dontPatchELF = stdenv.hostPlatform.isDarwin;
