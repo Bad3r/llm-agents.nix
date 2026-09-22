@@ -56,7 +56,8 @@ stdenvNoCC.mkDerivation {
 
   # The linux install.sh refuses to run without mkfs.ext4 on PATH and touches
   # /etc/apparmor.d, so lay out <prefix>/{bin,libexec} ourselves. The darwin
-  # tarball already ships that layout plus completions.
+  # tarball ships Sbx.app plus bin/ symlinks into it; sbx finds its helpers
+  # relative to its resolved path, so keep the bundle intact.
   installPhase = ''
     runHook preInstall
   ''
@@ -69,11 +70,15 @@ stdenvNoCC.mkDerivation {
   ''
   + lib.optionalString (!isLinux) ''
     mkdir -p $out
-    cp -r bin libexec $out
+    # Nix cannot clear flags on a store path named *.app, so drop the suffix.
+    mkdir -p $out/bin
+    cp -r Sbx.app $out/Sbx
+    ln -s ../Sbx/Contents/MacOS/sbx $out/bin/sbx
+    ln -s ../Sbx/Contents/MacOS/llmman $out/bin/llmman
     installShellCompletion \
-      --bash --name sbx.bash completions/bash/sbx \
-      --zsh --name _sbx completions/zsh/_sbx \
-      --fish --name sbx.fish completions/fish/sbx.fish
+      --bash --name sbx.bash Sbx.app/Contents/Resources/completions/bash/sbx \
+      --zsh --name _sbx Sbx.app/Contents/Resources/completions/zsh/_sbx \
+      --fish --name sbx.fish Sbx.app/Contents/Resources/completions/fish/sbx.fish
   ''
   + ''
     runHook postInstall
