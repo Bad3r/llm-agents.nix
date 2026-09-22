@@ -37,6 +37,9 @@ stdenvNoCC.mkDerivation {
   # The darwin tarball has no top-level directory.
   sourceRoot = lib.optionalString (!isLinux) ".";
 
+  # Preserve the upstream code signature; fixup could modify sealed files.
+  dontFixup = !isLinux;
+
   nativeBuildInputs = [
     installShellFiles
   ]
@@ -69,12 +72,12 @@ stdenvNoCC.mkDerivation {
     wrapProgram $out/bin/sbx --prefix PATH : ${lib.makeBinPath [ e2fsprogs ]}
   ''
   + lib.optionalString (!isLinux) ''
-    mkdir -p $out
-    # Nix cannot clear flags on a store path named *.app, so drop the suffix.
-    mkdir -p $out/bin
-    cp -r Sbx.app $out/Sbx
-    ln -s ../Sbx/Contents/MacOS/sbx $out/bin/sbx
-    ln -s ../Sbx/Contents/MacOS/llmman $out/bin/llmman
+    # Nix fails to clear flags on any store path named *.app, so install the
+    # bundle under a plain name; sbx locates its helpers relative to itself.
+    mkdir -p $out/libexec $out/bin
+    cp -a Sbx.app $out/libexec/docker-sbx
+    ln -s $out/libexec/docker-sbx/Contents/MacOS/sbx $out/bin/sbx
+    ln -s $out/libexec/docker-sbx/Contents/MacOS/llmman $out/bin/llmman
     installShellCompletion \
       --bash --name sbx.bash Sbx.app/Contents/Resources/completions/bash/sbx \
       --zsh --name _sbx Sbx.app/Contents/Resources/completions/zsh/_sbx \
