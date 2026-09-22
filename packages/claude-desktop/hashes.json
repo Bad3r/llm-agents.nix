@@ -1,18 +1,18 @@
 {
-  "version": "2.2553.1",
+  "version": "2.2553.13",
   "versions": {
-    "x86_64-linux": "2.2553.1",
-    "aarch64-linux": "2.2553.1",
-    "aarch64-darwin": "2.2553.1"
+    "x86_64-linux": "2.2553.13",
+    "aarch64-linux": "2.2553.13",
+    "aarch64-darwin": "2.7032.0"
   },
   "urls": {
-    "x86_64-linux": "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_2.2553.1_amd64.deb",
-    "aarch64-linux": "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_2.2553.1_arm64.deb",
-    "aarch64-darwin": "https://downloads.claude.ai/releases/darwin/universal/2.2553.1/Claude-c38127e27202ddc1c8c187102f7798a93b1b8ede.zip"
+    "x86_64-linux": "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_2.2553.13_amd64.deb",
+    "aarch64-linux": "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_2.2553.13_arm64.deb",
+    "aarch64-darwin": "https://downloads.claude.ai/releases/darwin/universal/2.7032.0/Claude-6c468ab6ed862a68c9555cce34f11186c35f526d.zip"
   },
   "hashes": {
-    "x86_64-linux": "sha256-ZwD92E53prjJORLC9p610eQPqZvNnTf0OPgJ7ypv5vg=",
-    "aarch64-linux": "sha256-AAOm+WBaIQ8Dw4Zw1izVnHEVPCcCqkQn5Mq+Li5fM5A=",
-    "aarch64-darwin": "sha256-GMWR59il2fdnwjiNBO7lGyKtkiLFhyxtKoCh4b/g3dk="
+    "x86_64-linux": "sha256-AqlanRM0csG3c8jp297lZoG4FkUAF4CDvYtTudEdEJ8=",
+    "aarch64-linux": "sha256-/b2cmAn0sxR4qyHgUf/CvpiVXqcvF6VKhCARXGY8s6c=",
+    "aarch64-darwin": "sha256-9hahGSWMeEBtbFds+YhREIpZdUx2a9tzuy43dZtxqs0="
   }
 }
