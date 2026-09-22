@@ -54,13 +54,13 @@
 
 let
   pname = "kandev";
-  version = "0.94.0";
+  version = "0.95.0";
 
   src = fetchFromGitHub {
     owner = "kdlbs";
     repo = "kandev";
     tag = "v${version}";
-    hash = "sha256-9mYY2WlEEjGL8DuQNl2gox097DE3nE18q//xnZbhaqM=";
+    hash = "sha256-oz37nDrIxG93cWq9i8zezJXUdfizHo5m4Gk6KWe3aT4=";
   };
 
   runtimeTools = [
@@ -178,7 +178,7 @@ buildGoModule (_finalAttrs: {
   inherit pname version src;
 
   modRoot = "apps/backend";
-  vendorHash = "sha256-jH8w+6A3LO0S+WTtb2K8GKafi83n3HkwOHXeRcOBQKQ=";
+  vendorHash = "sha256-SQHwFl/tXRDWbkJTwdncfhdBqSfxHELD6H9dPkn7qhU=";
   # Keep the vendor FOD independent of our source patch so nix-update can
   # compute vendorHash even when the patch needs a rebase.
   overrideModAttrs = _: _: {
