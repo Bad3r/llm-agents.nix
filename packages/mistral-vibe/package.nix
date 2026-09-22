@@ -230,12 +230,21 @@ python.pkgs.buildPythonApplication rec {
     editables
   ];
 
-  # Upstream pins exact build-backend versions (hatchling==x.y.z); strip the
-  # pins so the nixpkgs-provided versions satisfy pypa build.
+  # Since 2.25.7 upstream builds the harness and a Rust TUI into one wheel via
+  # a custom maturin backend. The Rust TUI is opt-in (VIBE_CLI=rust) and the
+  # harness ships as a prebuilt wheel below, so build the pure-Python part with
+  # hatchling instead.
   postPatch = ''
+    sed -i '/^\[tool.maturin\]/,/^\[project.scripts\]/{/^\[project.scripts\]/!d}' pyproject.toml
     substituteInPlace pyproject.toml \
-      --replace-fail 'requires = ["hatchling==1.31.0", "hatch-vcs==0.5.0", "editables==0.6"]' \
-        'requires = ["hatchling", "hatch-vcs", "editables"]'
+      --replace-fail 'requires = ["maturin==1.14.1"]' \
+        'requires = ["hatchling", "hatch-vcs", "editables"]' \
+      --replace-fail 'build-backend = "maturin_backend"' \
+        'build-backend = "hatchling.build"' \
+      --replace-fail 'backend-path = ["build_backend"]' \
+        '[tool.hatch.build.targets.wheel]
+    include = ["vibe/"]
+    exclude = ["vibe/cli-rust"]'
   '';
 
   dependencies = with python.pkgs; [
