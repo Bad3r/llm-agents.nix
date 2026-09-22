@@ -358,9 +358,9 @@ index bb79bc6dd..58607f9b1 100644
  	settingsmodels "github.com/kandev/kandev/internal/agent/settings/models"
  	agentctlutil "github.com/kandev/kandev/internal/agentctl/server/utility"
 +	"github.com/kandev/kandev/internal/agentruntime"
+ 	"github.com/kandev/kandev/internal/common/acpprovider"
  	"github.com/kandev/kandev/internal/common/logger"
  	"github.com/kandev/kandev/internal/system/storage"
- 	"github.com/kandev/kandev/internal/system/storage/tempartifacts"
 @@ -821,22 +823,42 @@ func (m *Manager) resolveInferenceCommand(
  	}
  	command := cfg.Command
