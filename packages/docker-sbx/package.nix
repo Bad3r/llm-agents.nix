@@ -37,6 +37,9 @@ stdenvNoCC.mkDerivation {
   # The darwin tarball has no top-level directory.
   sourceRoot = lib.optionalString (!isLinux) ".";
 
+  # Preserve the upstream code signature; fixup could modify sealed files.
+  dontFixup = !isLinux;
+
   nativeBuildInputs = [
     installShellFiles
   ]
@@ -56,7 +59,8 @@ stdenvNoCC.mkDerivation {
 
   # The linux install.sh refuses to run without mkfs.ext4 on PATH and touches
   # /etc/apparmor.d, so lay out <prefix>/{bin,libexec} ourselves. The darwin
-  # tarball already ships that layout plus completions.
+  # tarball ships Sbx.app plus bin/ symlinks into it; sbx finds its helpers
+  # relative to its resolved path, so keep the bundle intact.
   installPhase = ''
     runHook preInstall
   ''
@@ -68,12 +72,16 @@ stdenvNoCC.mkDerivation {
     wrapProgram $out/bin/sbx --prefix PATH : ${lib.makeBinPath [ e2fsprogs ]}
   ''
   + lib.optionalString (!isLinux) ''
-    mkdir -p $out
-    cp -r bin libexec $out
+    # Nix fails to clear flags on any store path named *.app, so install the
+    # bundle under a plain name; sbx locates its helpers relative to itself.
+    mkdir -p $out/libexec $out/bin
+    cp -a Sbx.app $out/libexec/docker-sbx
+    ln -s $out/libexec/docker-sbx/Contents/MacOS/sbx $out/bin/sbx
+    ln -s $out/libexec/docker-sbx/Contents/MacOS/llmman $out/bin/llmman
     installShellCompletion \
-      --bash --name sbx.bash completions/bash/sbx \
-      --zsh --name _sbx completions/zsh/_sbx \
-      --fish --name sbx.fish completions/fish/sbx.fish
+      --bash --name sbx.bash Sbx.app/Contents/Resources/completions/bash/sbx \
+      --zsh --name _sbx Sbx.app/Contents/Resources/completions/zsh/_sbx \
+      --fish --name sbx.fish Sbx.app/Contents/Resources/completions/fish/sbx.fish
   ''
   + ''
     runHook postInstall

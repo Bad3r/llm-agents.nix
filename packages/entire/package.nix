@@ -13,18 +13,18 @@
 # 1.26.3 so far; go-bin tracks the latest upstream patch release.
 (buildGoModule.override { go = go-bin; }) rec {
   pname = "entire";
-  version = "0.10.6";
+  version = "0.11.0";
 
   src = fetchFromGitHub {
     owner = "entireio";
     repo = "cli";
     tag = "v${version}";
-    hash = "sha256-l2elFxZi01SO6zrRGxKNoU50ELtrX8G4YTMnxbpdBqE=";
+    hash = "sha256-Lzzi69wI8mSFTk/kcNZ1ZvTtKoTEHuK3Dd3+sVAWmeM=";
   };
 
   nativeBuildInputs = [ unpinGoModVersionHook ];
 
-  vendorHash = "sha256-3LWRfnyT3OgHsu4SA2cGtCJizjDRolZQs75yjBA4tXc=";
+  vendorHash = "sha256-hZgQT2DlTGJxw63OH+1r7x5dNuRuH8qGsOFDKQXFx/A=";
 
   subPackages = [ "./cmd/entire" ];
 
