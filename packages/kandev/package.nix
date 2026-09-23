@@ -54,13 +54,13 @@
 
 let
   pname = "kandev";
-  version = "0.95.0";
+  version = "0.95.1";
 
   src = fetchFromGitHub {
     owner = "kdlbs";
     repo = "kandev";
     tag = "v${version}";
-    hash = "sha256-oz37nDrIxG93cWq9i8zezJXUdfizHo5m4Gk6KWe3aT4=";
+    hash = "sha256-7WNpiyGpwhMzsQyRfwDcVCVU1ZB6KCY7e+Os1aubXLU=";
   };
 
   runtimeTools = [
@@ -203,7 +203,7 @@ buildGoModule (_finalAttrs: {
 
   postPatch = ''
     # Install-script tests run sh with a fake curl first on an FHS PATH.
-    substituteInPlace apps/backend/internal/agent/agents/{devin,goose}_acp_test.go \
+    substituteInPlace apps/backend/internal/agent/agents/{devin,goose,muse}_acp_test.go \
       --replace-fail '":/usr/bin:/bin"' '":" + os.Getenv("PATH")'
   '';
 
