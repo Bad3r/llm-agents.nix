@@ -19,41 +19,41 @@
     url = "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.3.0.tgz";
     hash = "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==";
   };
-  "@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-darwin-arm64/-/claude-agent-sdk-darwin-arm64-0.3.278.tgz";
-    hash = "sha512-lwkbWfYucsgiFo6mWF3Dw7ImohlWXEkkh+4e93EpeVPCxwN4IJuLztFkl28qEwY17sZ9SYQw1mRksKauqKccqg==";
+  "@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-darwin-arm64/-/claude-agent-sdk-darwin-arm64-0.3.280.tgz";
+    hash = "sha512-Yws14X5g5hgDtF565Tld/+dILAhH9QZpundjKMyO3dFasq9miXZlhU0NwXqwTO2xP0jDjJ54zduIiJwkcfcvGw==";
   };
-  "@anthropic-ai/claude-agent-sdk-darwin-x64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-darwin-x64/-/claude-agent-sdk-darwin-x64-0.3.278.tgz";
-    hash = "sha512-IYTWl9mVeXe1GnHPkpw04p+fZ23zgTBuxNXv06h7xgjSZ7zhudL05d6NpkY5T13m/zL5b+fyYkXxGciTXVhiUg==";
+  "@anthropic-ai/claude-agent-sdk-darwin-x64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-darwin-x64/-/claude-agent-sdk-darwin-x64-0.3.280.tgz";
+    hash = "sha512-B1eLx/oZ5RL1c3a13nQ4cRUksWyhGcVNS5vbCHnOVu4Pz+dH0moZ+iY8VaE6FvikVAQwFEW6VDU00b6m3tYdsQ==";
   };
-  "@anthropic-ai/claude-agent-sdk-linux-arm64-musl@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-arm64-musl/-/claude-agent-sdk-linux-arm64-musl-0.3.278.tgz";
-    hash = "sha512-xbNx5TXiAr9REDh7znPnkvR8GoBe8A653hYXaVq+fNNLjXidOIvOhICMyUUrBC+wgZV1FenC46oSPIMH4n+EOQ==";
+  "@anthropic-ai/claude-agent-sdk-linux-arm64-musl@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-arm64-musl/-/claude-agent-sdk-linux-arm64-musl-0.3.280.tgz";
+    hash = "sha512-uDh+Ggjb36l+jcVgaYxSziGHmBSSR3clqvGlQ0Bgc1v5dLF4igwqZ6ZPW/hS9dArG27fislIOetH1waEgIr+GA==";
   };
-  "@anthropic-ai/claude-agent-sdk-linux-arm64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-arm64/-/claude-agent-sdk-linux-arm64-0.3.278.tgz";
-    hash = "sha512-gt03vjRLsfnT3NyOaCVZFdM6V6p0NNGxhUr6e0Yfd9a28LlIeUtNB/kMtFJDibDtsjVi4Mp+Wj9R7dsXPLOFfw==";
+  "@anthropic-ai/claude-agent-sdk-linux-arm64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-arm64/-/claude-agent-sdk-linux-arm64-0.3.280.tgz";
+    hash = "sha512-6s96OIvBHT2817hCFLIZ421JBpQnvrmZucpjlWsyCODKmwGsSxiEhlWqK2h5Q7lwS6F7bzeAhqjGvC7FzDl9Rw==";
   };
-  "@anthropic-ai/claude-agent-sdk-linux-x64-musl@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-x64-musl/-/claude-agent-sdk-linux-x64-musl-0.3.278.tgz";
-    hash = "sha512-OJ103bvIglKrp7LLS3Bpiy9ISnFIvUikcg5kJVqovA+uU/ElP96v3kCUli7nUL75TnguSL0PwdAb/rYujycLqQ==";
+  "@anthropic-ai/claude-agent-sdk-linux-x64-musl@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-x64-musl/-/claude-agent-sdk-linux-x64-musl-0.3.280.tgz";
+    hash = "sha512-IVbIgvi5C0sdLg/p9hpiVvAQ/ikvTKwOOEy5C1aT7w8XLqBgfpJbzzVuk06df1Q0HlILUmf63EKPmq48lbxtqA==";
   };
-  "@anthropic-ai/claude-agent-sdk-linux-x64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-x64/-/claude-agent-sdk-linux-x64-0.3.278.tgz";
-    hash = "sha512-xbW4MkKyPMKdWzdA499WnAP9H7p8YlMsQCVEVyz6CemePZPSLwBP9GBeUTnSS57+MievEqj8knckJPVv5I3+yw==";
+  "@anthropic-ai/claude-agent-sdk-linux-x64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-linux-x64/-/claude-agent-sdk-linux-x64-0.3.280.tgz";
+    hash = "sha512-vpPyxYLy+zNc7LwQDWsZf0GZtTYa0PJLxzuv2vK9iV2dG+hrbRNTl35NSKKRR9rMj6RpKz0i2NLyVQ+D4mREgw==";
   };
-  "@anthropic-ai/claude-agent-sdk-win32-arm64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-win32-arm64/-/claude-agent-sdk-win32-arm64-0.3.278.tgz";
-    hash = "sha512-r75c3+Ymw4bn+If8LCoYLaYu5xXH8tWtP1xsd6KNtwda0KjFJA6/wmgicwCi3W+Vcdw6AfoFtYCQ0Sl1YwePwg==";
+  "@anthropic-ai/claude-agent-sdk-win32-arm64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-win32-arm64/-/claude-agent-sdk-win32-arm64-0.3.280.tgz";
+    hash = "sha512-heTflHwciJF+Hrf7v0J53QBzD+9mxN9gt2VVmEJAN0+ejbPcOcqnGGZHvyc9aZUuGh5INN0ECaiL4Fn1X2vXQQ==";
   };
-  "@anthropic-ai/claude-agent-sdk-win32-x64@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-win32-x64/-/claude-agent-sdk-win32-x64-0.3.278.tgz";
-    hash = "sha512-+7nMK4AYzeNFdqxYP80v2ialF6t29Z46rXeV6NF77xXc1+kqCm6hwOMFXhJkP8EEEclFatyjdU/Dij5vM5YSNA==";
+  "@anthropic-ai/claude-agent-sdk-win32-x64@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk-win32-x64/-/claude-agent-sdk-win32-x64-0.3.280.tgz";
+    hash = "sha512-N+Y1zJb19nx0oPTvzkl/E3ng9AtWGW+K4hySmSHCgYSsgIwfs1YzDj/F5eHDMrxgklTuzFp76TvL3S75z5ge+g==";
   };
-  "@anthropic-ai/claude-agent-sdk@0.3.278" = fetchurl {
-    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk/-/claude-agent-sdk-0.3.278.tgz";
-    hash = "sha512-hXfjyiGraqYul6gq7R7+WmktxJfy9S29Yrx1WK6jQpsYcipf1CYIoYSh22SpGOR3FGiEmeuzXg5U9ncOk19Fww==";
+  "@anthropic-ai/claude-agent-sdk@0.3.280" = fetchurl {
+    url = "https://registry.npmjs.org/@anthropic-ai/claude-agent-sdk/-/claude-agent-sdk-0.3.280.tgz";
+    hash = "sha512-aIQSTKcCJcOgi125GAGQaNZUYgxbEBQwV2Ac+Utp0+gGUjIEWjTqz4B8kXr9XjkcCTYiRUMTDsXPAUfIcBDjnw==";
   };
   "@anthropic-ai/sdk@0.127.0" = fetchurl {
     url = "https://registry.npmjs.org/@anthropic-ai/sdk/-/sdk-0.127.0.tgz";
@@ -339,33 +339,33 @@
     url = "https://registry.npmjs.org/@clack/prompts/-/prompts-1.8.1.tgz";
     hash = "sha512-dlT1m5e/0yUL0kRNcQn7yGLVThkgbB0Ga/1AmfDDC/8ik6AIiSf2QLQO2zPYvefsHP0aFgxO93cVLCCfDp7kzQ==";
   };
-  "@code-yeongyu/senpi-agent-core@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-agent-core/-/senpi-agent-core-2026.9.23.tgz";
-    hash = "sha512-Z7s2ZVAe+t3xunliIptQh5HJcxUB9a2Lf5nD2jz1NmyExQnsHyB9oZM3wRlp4FxiD4o9B+I38GVIIffsgQvvXw==";
+  "@code-yeongyu/senpi-agent-core@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-agent-core/-/senpi-agent-core-2026.9.23-2.tgz";
+    hash = "sha512-3o5jAT+A32hHdzGpYjjKXMbMbJH/QPJxM71MlGtl8+AIE291Wwzav7wraH75i29SszGDWgf9t0QWFTXaTMuKLg==";
   };
-  "@code-yeongyu/senpi-ai@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-ai/-/senpi-ai-2026.9.23.tgz";
-    hash = "sha512-3vqIAZavqrSafcgj2HMDvEsEkEf3EYfZCRiI0efZ2tLmCw4a1d17uWsA92w1qcblhP7ah+Q4zjxXFOLW7Vdscw==";
+  "@code-yeongyu/senpi-ai@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-ai/-/senpi-ai-2026.9.23-2.tgz";
+    hash = "sha512-PYNLgJYk2/g2dlWwvPDFK6GlmdtTB1UHN4jSUyyA0Zm0WqKKxdN+AXO+/YdguA2HqtLBzp7ofJa5P3FwLc24rw==";
   };
-  "@code-yeongyu/senpi-codemode@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-codemode/-/senpi-codemode-2026.9.23.tgz";
-    hash = "sha512-wM9KZEI7+kQYi8OuMweEdpxiGnW1l41GeVM+iXhzpSe2FRGaw2xpIOX5mN6LGs9NWkl0q9eI+r7fKmj8zNkJLA==";
+  "@code-yeongyu/senpi-codemode@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-codemode/-/senpi-codemode-2026.9.23-2.tgz";
+    hash = "sha512-rF2GlolEL2JB0ct06zhuHmfd9195/a8N/T0qP5vxBbMOYrQJZ5JjXlqn7ESfd4ot8ksV+UvT7hH32OwgYApvIA==";
   };
-  "@code-yeongyu/senpi-pty@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-pty/-/senpi-pty-2026.9.23.tgz";
-    hash = "sha512-2vBloNzXrjIXf3g4FBCXdu8RKCGSwJhzIZqe2QNnAupunXhBmGUiS6NrX0j/GxO3sKfrh1uALXa1HmgEaUdbqQ==";
+  "@code-yeongyu/senpi-pty@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-pty/-/senpi-pty-2026.9.23-2.tgz";
+    hash = "sha512-fJkdcLXZuQdkv30AFQ6YV6/LBotGpLbf3fnFmbhn1g+fd3BN6/hXbeNVJMIsa8pQRD1EmpaE6bYsJCYNZxZJTA==";
   };
-  "@code-yeongyu/senpi-telemetry@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-telemetry/-/senpi-telemetry-2026.9.23.tgz";
-    hash = "sha512-g8Vc3BphGt8+/GZo2jmqK6qAiZ4z6nULa6J6RB0Q964axn6Y1nawu8Pz7shXxhhaRMwvSBJ5aiGsBsHo+VcGcg==";
+  "@code-yeongyu/senpi-telemetry@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-telemetry/-/senpi-telemetry-2026.9.23-2.tgz";
+    hash = "sha512-OUF5EfmxUeVlcXE0YkoE3Sth8CnQhrNTgadFDyf+deMzJp3/A9PjRZ0U28UMcSoLRs20xMtNkDJCkdBzi0kFdg==";
   };
-  "@code-yeongyu/senpi-tui@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi-tui/-/senpi-tui-2026.9.23.tgz";
-    hash = "sha512-guXe63whqD8dozdzttxvoy2uKLwUocwYGGTL1xZwvOo8gohxWQz5XGOQKCtH0h6QsKTa2YrW6NfSc66M5PNjLg==";
+  "@code-yeongyu/senpi-tui@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi-tui/-/senpi-tui-2026.9.23-2.tgz";
+    hash = "sha512-rdTTFAT4A89bvenf70Y8b9J7U/qGlS8bLzqqWySC82y9g+rshi3yl24uk3t9hAELDqDRyOJ+HSNb0Em4vA1VTA==";
   };
-  "@code-yeongyu/senpi@2026.9.23" = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi/-/senpi-2026.9.23.tgz";
-    hash = "sha512-KszJKTQ5/jCwyCekrhY5Xk4C7r3MUU9QEv851rtAe/O/S1b2o66AqdOLEQ3DnZQ0fHo4MM9ZceRGAuUfIlwfAQ==";
+  "@code-yeongyu/senpi@2026.9.23-2" = fetchurl {
+    url = "https://registry.npmjs.org/@code-yeongyu/senpi/-/senpi-2026.9.23-2.tgz";
+    hash = "sha512-IaACDKiX+aiHwrSVmgn8pG39qK6n0gWjFxwv3e9Roj66eCeOu492AhQG6jZywNpaNtSjBdnmiUSVuT7zSatFTQ==";
   };
   "@earendil-works/chord@0.85.1" = fetchurl {
     url = "https://registry.npmjs.org/@earendil-works/chord/-/chord-0.85.1.tgz";
