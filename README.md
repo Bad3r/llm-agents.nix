@@ -581,6 +581,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>unreal-agent</strong> - Async-first agent harness</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/unreallabsai/unreal-agent
+- **Usage**: `nix run github:numtide/llm-agents.nix#unreal-agent -- --help`
+- **Nix**: [packages/unreal-agent/package.nix](packages/unreal-agent/package.nix)
+
+</details>
+<details>
 <summary><strong>vix</strong> - Sleek, Fast and Token Efficient AI Coding Agent</summary>
 
 - **Source**: source
