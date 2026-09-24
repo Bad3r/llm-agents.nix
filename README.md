@@ -461,6 +461,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>opencode2-desktop</strong> - OpenCode 2 desktop client</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://opencode.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#opencode2-desktop -- --help`
+- **Nix**: [packages/opencode2-desktop/package.nix](packages/opencode2-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>openfang</strong> - Open-source Agent OS built in Rust — CLI for the OpenFang platform</summary>
 
 - **Source**: source
@@ -578,6 +588,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://t3.codes
 - **Usage**: `nix run github:numtide/llm-agents.nix#t3code-desktop -- --help`
 - **Nix**: [packages/t3code-desktop/package.nix](packages/t3code-desktop/package.nix)
+
+</details>
+<details>
+<summary><strong>unreal-agent</strong> - Async-first agent harness</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/unreallabsai/unreal-agent
+- **Usage**: `nix run github:numtide/llm-agents.nix#unreal-agent -- --help`
+- **Nix**: [packages/unreal-agent/package.nix](packages/unreal-agent/package.nix)
 
 </details>
 <details>
@@ -1327,6 +1347,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/backnotprop/plannotator
 - **Usage**: `nix run github:numtide/llm-agents.nix#plannotator -- --help`
 - **Nix**: [packages/plannotator/package.nix](packages/plannotator/package.nix)
+
+</details>
+<details>
+<summary><strong>plannotator-tui</strong> - Annotate Markdown in the terminal and send feedback to coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/plannotator/plannotator-tui
+- **Usage**: `nix run github:numtide/llm-agents.nix#plannotator-tui -- --help`
+- **Nix**: [packages/plannotator-tui/package.nix](packages/plannotator-tui/package.nix)
 
 </details>
 <details>
