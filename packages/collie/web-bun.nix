@@ -2034,6 +2034,10 @@
     url = "https://registry.npmjs.org/strip-indent/-/strip-indent-3.0.0.tgz";
     hash = "sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ==";
   };
+  "sugar-high@2.4.1" = fetchurl {
+    url = "https://registry.npmjs.org/sugar-high/-/sugar-high-2.4.1.tgz";
+    hash = "sha512-w4uhunMgEP+9f/2W/ZLBjvrVBLY14oL4b6a2+Ca/JWECd0Rc45KqL89bDvUOVFGrr0D14q5hoEqBXkgxwxL6RQ==";
+  };
   "supports-preserve-symlinks-flag@1.0.0" = fetchurl {
     url = "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz";
     hash = "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==";
