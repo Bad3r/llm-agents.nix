@@ -461,6 +461,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>opencode2-desktop</strong> - OpenCode 2 desktop client</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://opencode.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#opencode2-desktop -- --help`
+- **Nix**: [packages/opencode2-desktop/package.nix](packages/opencode2-desktop/package.nix)
+
+</details>
+<details>
 <summary><strong>openfang</strong> - Open-source Agent OS built in Rust — CLI for the OpenFang platform</summary>
 
 - **Source**: source
