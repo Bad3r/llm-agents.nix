@@ -1330,6 +1330,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>plannotator-tui</strong> - Annotate Markdown in the terminal and send feedback to coding agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/plannotator/plannotator-tui
+- **Usage**: `nix run github:numtide/llm-agents.nix#plannotator-tui -- --help`
+- **Nix**: [packages/plannotator-tui/package.nix](packages/plannotator-tui/package.nix)
+
+</details>
+<details>
 <summary><strong>tuicr</strong> - Review AI-generated diffs like a GitHub pull request, right from your terminal</summary>
 
 - **Source**: source
