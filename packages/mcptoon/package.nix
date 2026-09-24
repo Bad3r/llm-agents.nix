@@ -41,6 +41,14 @@ python3.pkgs.buildPythonApplication rec {
     export HOME=$TMPDIR
   '';
 
+  # 0.7.22 added registry searches that query smithery and the MCP
+  # registry over the network.
+  disabledTests = [
+    "test_search_registry_returns_list"
+    "test_search_smithery_returns_list"
+    "test_search_mcp_registry_returns_list"
+  ];
+
   passthru.category = "Utilities";
 
   meta = with lib; {
