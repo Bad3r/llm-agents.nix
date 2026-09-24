@@ -26,10 +26,16 @@
   preBuild ? ''
     # Upstream's ThinLTO + codegen-units=4 make late-stage rustc peak at
     # ~12 GiB and the whole build crawl; fall back to cargo defaults like
-    # nixpkgs does.
+    # nixpkgs does. Line tables for codex-core/codex-tui add more memory
+    # and the aarch64 builders OOM-kill rustc when many big crates compile
+    # in parallel, so drop debuginfo and cap cargo's job count.
     substituteInPlace Cargo.toml \
       --replace-fail 'lto = "thin"' "" \
-      --replace-fail 'codegen-units = 4' ""
+      --replace-fail 'codegen-units = 4' "" \
+      --replace-fail 'debug = "line-tables-only"' 'debug = "none"'
+    if [ "$NIX_BUILD_CORES" -gt 8 ]; then
+      export NIX_BUILD_CORES=8
+    fi
   '',
   doInstallCheck ? true,
   librusty_v8 ? mkRustyV8Archive versionData.librusty_v8,
@@ -86,6 +92,19 @@ rustPlatform.buildRustPackage (
       # (`b(l) ARM64 branch out of range`, #4417); lld handles it.
       NIX_CFLAGS_LINK = "-fuse-ld=${lib.getExe' lld "ld64.lld"}";
     };
+
+    # The future returned by `connectors::list_connectors` nests deeply
+    # enough that computing its layout exceeds rustc's default query depth
+    # limit of 128 ("queries overflow the depth limit"). Raise the limit for
+    # this crate, as rustc's diagnostic suggests and as upstream already does
+    # for app-server, exec and tui.
+    postPatch = ''
+      if ! grep -q 'recursion_limit' chatgpt/src/lib.rs; then
+        substituteInPlace chatgpt/src/lib.rs \
+          --replace-fail 'pub mod apply_command;' \
+          $'#![recursion_limit = "256"]\n\npub mod apply_command;'
+      fi
+    '';
 
     inherit preBuild;
 
