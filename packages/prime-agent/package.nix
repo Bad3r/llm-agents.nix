@@ -84,145 +84,279 @@ buildNpmPackage (finalAttrs: {
   ];
 
   postInstallCheck = ''
+    expectedSkills="agent-message agent-observe attach-image compact edit goal linear notion prime-intellect refine rlm-heartbeat skill-creator websearch"
+    installedSkills="$(${finalAttrs.passthru.pythonRuntime}/bin/python3 - "$out/lib/prime-agent/packages/coding-agent/skills" <<'PY'
+    from pathlib import Path
+    import sys
+
+    root = Path(sys.argv[1])
+    print(" ".join(sorted(path.name for path in root.iterdir() if (path / "SKILL.md").is_file())))
+    PY
+    )"
+    test "$installedSkills" = "$expectedSkills"
+
+    ${lib.getExe nodejs_22} --input-type=module - "$out/lib/prime-agent/packages/coding-agent/dist/bundle/amazon-bedrock.js" <<'JS'
+    const bedrockProvider = await import(process.argv[2]);
+
+    for (const name of ["streamBedrock", "streamSimpleBedrock"]) {
+      if (typeof bedrockProvider[name] !== "function") {
+        throw new Error("Bundled Bedrock loader is missing the " + name + " export");
+      }
+    }
+    JS
+
     ${finalAttrs.passthru.pythonRuntime}/bin/python3 <<'PY'
+    import inspect
+    import importlib.metadata
+
     import agent_message, agent_observe, attach_image, compact, edit, goal
-    import dill, ipykernel, linear, notion, refine, rlm, rlm_heartbeat, websearch
+    import linear, notion, refine, rlm, rlm_heartbeat, websearch
+
+    assert callable(rlm.spawn)
+    assert inspect.signature(rlm.spawn).parameters["name"].default is inspect.Parameter.empty
+    assert not hasattr(rlm, "run")
+    assert callable(rlm.host_request)
+    assert callable(rlm.create_session)
+    assert callable(rlm.collect)
+    assert callable(rlm.progress_note)
+    assert callable(agent_observe.list_agents)
+    assert callable(agent_observe.get_agent)
+    assert callable(agent_observe.recent_messages)
+    assert callable(refine.run)
+    assert callable(refine.status)
+
+    distributions = importlib.metadata.packages_distributions()["rlm"]
+    assert distributions == ["prime-agent-runtime"], distributions
+
+    for name, version in {
+        "mcp": "2.0.0",
+        "mcp-types": "2.0.0",
+    }.items():
+        installed = list(importlib.metadata.distributions(name=name))
+        assert len(installed) == 1, (name, installed)
+        assert installed[0].version == version, (name, installed[0].version)
+
+    for name in ["httpx2", "httpcore2"]:
+        installed = list(importlib.metadata.distributions(name=name))
+        assert len(installed) == 1, (name, installed)
+
     PY
   '';
 
-  passthru = {
-    category = "AI Coding Agents";
+  passthru =
+    let
+      # Keep MCP 2 private to Prime Agent; reuse nixpkgs HTTP clients and build tools.
+      # Every runtime/skill below uses this same Python package set.
+      python = python3.override (pythonArgs: {
+        self = python;
+        packageOverrides = lib.composeExtensions (pythonArgs.packageOverrides or (_: _: { })) (
+          pyFinal: pyPrev: {
+            mcp-types = pyFinal.buildPythonPackage {
+              pname = "mcp-types";
+              version = "2.0.0";
+              src = mcpSrc;
+              sourceRoot = "${mcpSrc.name}/src/mcp-types";
+              pyproject = true;
+              build-system = with pyFinal; [
+                hatchling
+                uv-dynamic-versioning
+              ];
+              dependencies = with pyFinal; [
+                pydantic
+                typing-extensions
+              ];
+              pythonImportsCheck = [ "mcp_types" ];
+              meta = pyPrev.mcp.meta // {
+                description = "Model Context Protocol wire types";
+                changelog = "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.0.0";
+              };
+            };
 
-    primeAgentRuntime = python3.pkgs.buildPythonPackage {
-      pname = "prime-agent-runtime";
-      version = "0.1.0";
-      src = "${finalAttrs.src}/prime-agent-runtime";
-      pyproject = true;
-      build-system = [ python3.pkgs.hatchling ];
-      dependencies = with python3.pkgs; [
-        ipykernel
-        mcp
-        nest-asyncio
-        tyro
-      ];
-      # Pins mcp>=2 but rlm/mcp_base.py explicitly supports the 1.x client API.
-      pythonRelaxDeps = [ "mcp" ];
+            # Use the SDK's exact dependencies without inherited substitutions.
+            mcp = pyFinal.buildPythonPackage {
+              pname = "mcp";
+              version = "2.0.0";
+              src = mcpSrc;
+              pyproject = true;
+              build-system = with pyFinal; [
+                hatchling
+                uv-dynamic-versioning
+              ];
+              dependencies =
+                with pyFinal;
+                [
+                  anyio
+                  httpx2
+                  jsonschema
+                  mcp-types
+                  opentelemetry-api
+                  pydantic
+                  pyjwt
+                  python-multipart
+                  sse-starlette
+                  starlette
+                  typing-extensions
+                  typing-inspection
+                  uvicorn
+                ]
+                ++ pyFinal.pyjwt.optional-dependencies.crypto;
+              pythonImportsCheck = [
+                "mcp"
+                "mcp.client.stdio"
+                "mcp.client.streamable_http"
+              ];
+              meta = pyPrev.mcp.meta // {
+                changelog = "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.0.0";
+              };
+            };
+          }
+        );
+      });
+      mcpSrc = fetchFromGitHub {
+        owner = "modelcontextprotocol";
+        repo = "python-sdk";
+        tag = "v2.0.0";
+        hash = "sha256-baeceVB9PC+f3vQO1AaDHflOJ7oD7u7ylXUkVvusT/o=";
+      };
+    in
+    {
+      category = "AI Coding Agents";
+
+      primeAgentRuntime = python.pkgs.buildPythonPackage {
+        pname = "prime-agent-runtime";
+        version = "0.1.0";
+        src = "${finalAttrs.src}/prime-agent-runtime";
+        pyproject = true;
+        build-system = [ python.pkgs.hatchling ];
+        dependencies = with python.pkgs; [
+          mcp
+          tyro
+        ];
+        pythonImportsCheck = [ "rlm" ];
+      };
+
+      pythonSkills =
+        let
+          buildSkill =
+            {
+              directory,
+              version,
+              pname ? directory,
+              dependencies ? [ ],
+            }:
+            python.pkgs.buildPythonPackage {
+              inherit pname version dependencies;
+              src = "${finalAttrs.src}/packages/coding-agent/skills/${directory}";
+              pyproject = true;
+              build-system = [ python.pkgs.hatchling ];
+              pythonImportsCheck = [ (builtins.replaceStrings [ "-" ] [ "_" ] directory) ];
+            };
+          runtime = finalAttrs.passthru.primeAgentRuntime;
+        in
+        # update.py relies on adjacent directory and version fields to update
+        # each bundled skill independently when upstream versions diverge.
+        [
+          (buildSkill {
+            directory = "agent-message";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "agent-observe";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "attach-image";
+            version = "0.1.0";
+            pname = "prime-agent-skill-attach-image";
+            dependencies = with python.pkgs; [
+              pillow
+              runtime
+            ];
+          })
+          (buildSkill {
+            directory = "compact";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "edit";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "goal";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "linear";
+            version = "0.1.0";
+            pname = "prime-agent-skill-linear";
+            dependencies = with python.pkgs; [
+              httpx
+              mcp
+              runtime
+            ];
+          })
+          (buildSkill {
+            directory = "notion";
+            version = "0.1.0";
+            pname = "prime-agent-skill-notion";
+            dependencies = with python.pkgs; [
+              httpx
+              mcp
+              runtime
+            ];
+          })
+          (buildSkill {
+            directory = "refine";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "rlm-heartbeat";
+            version = "0.1.0";
+            dependencies = [ runtime ];
+          })
+          (buildSkill {
+            directory = "websearch";
+            version = "0.1.0";
+            pname = "prime-agent-skill-websearch";
+            dependencies = with python.pkgs; [
+              httpx
+              runtime
+            ];
+          })
+        ];
+
+      pythonRuntime = python.withPackages (
+        ps:
+        (with ps; [
+          beautifulsoup4
+          dill
+          httpx
+          ipykernel
+          ipython
+          lxml
+          mcp
+          nest-asyncio
+          numpy
+          pandas
+          pillow
+          pydantic
+          python-dotenv
+          pyyaml
+          requests
+          scipy
+          tomli
+          tyro
+        ])
+        ++ [ finalAttrs.passthru.primeAgentRuntime ]
+        ++ finalAttrs.passthru.pythonSkills
+      );
     };
-
-    pythonSkills =
-      let
-        buildSkill =
-          {
-            directory,
-            version,
-            pname ? directory,
-            dependencies ? [ ],
-          }:
-          python3.pkgs.buildPythonPackage {
-            inherit pname version dependencies;
-            src = "${finalAttrs.src}/packages/coding-agent/skills/${directory}";
-            pyproject = true;
-            build-system = [ python3.pkgs.hatchling ];
-          };
-        runtime = finalAttrs.passthru.primeAgentRuntime;
-      in
-      # update.py relies on adjacent directory and version fields to update
-      # each bundled skill independently when upstream versions diverge.
-      [
-        (buildSkill {
-          directory = "agent-message";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "agent-observe";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "attach-image";
-          version = "0.1.0";
-          pname = "prime-agent-skill-attach-image";
-          dependencies = with python3.pkgs; [
-            pillow
-            runtime
-          ];
-        })
-        (buildSkill {
-          directory = "compact";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "edit";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "goal";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "linear";
-          version = "0.1.0";
-          pname = "prime-agent-skill-linear";
-          dependencies = with python3.pkgs; [
-            httpx
-            mcp
-            runtime
-          ];
-        })
-        (buildSkill {
-          directory = "notion";
-          version = "0.1.0";
-          pname = "prime-agent-skill-notion";
-          dependencies = with python3.pkgs; [
-            httpx
-            mcp
-            runtime
-          ];
-        })
-        (buildSkill {
-          directory = "refine";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "rlm-heartbeat";
-          version = "0.1.0";
-        })
-        (buildSkill {
-          directory = "websearch";
-          version = "0.1.0";
-          pname = "prime-agent-skill-websearch";
-          dependencies = with python3.pkgs; [
-            httpx
-            runtime
-          ];
-        })
-      ];
-
-    pythonRuntime = python3.withPackages (
-      ps:
-      (with ps; [
-        beautifulsoup4
-        dill
-        httpx
-        ipykernel
-        ipython
-        lxml
-        mcp
-        nest-asyncio
-        numpy
-        pandas
-        pillow
-        pydantic
-        python-dotenv
-        pyyaml
-        requests
-        scipy
-        tomli
-        tyro
-      ])
-      ++ [ finalAttrs.passthru.primeAgentRuntime ]
-      ++ finalAttrs.passthru.pythonSkills
-    );
-  };
 
   meta = {
     description = "A self-improving RLM agent for coding workflows and long-running autonomous tasks.";
