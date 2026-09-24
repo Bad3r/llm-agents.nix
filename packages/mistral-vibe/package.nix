@@ -1,19 +1,33 @@
 {
   lib,
-  flake,
+  stdenv,
   python3,
   fetchFromGitHub,
   fetchPypi,
+  fetchurl,
   callPackage,
   rustPlatform,
   cargo,
   rustc,
   maturin,
+  formatelf,
   versionCheckHook,
   versionCheckHomeHook,
+  mkUpdater,
 }:
 
 let
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hashes;
+
+  wheelPlatforms = {
+    x86_64-linux = "manylinux_2_28_x86_64";
+    aarch64-linux = "manylinux_2_28_aarch64";
+    aarch64-darwin = "macosx_11_0_arm64";
+  };
+
+  wheelUrl = "https://files.pythonhosted.org/packages/cp312/m/mistral_vibe/mistral_vibe-{version}-cp312-abi3-{platform}.whl";
+
   textual-speedups = python3.pkgs.buildPythonPackage rec {
     pname = "textual-speedups";
     version = "0.2.1";
@@ -157,95 +171,26 @@ let
     };
   };
 
-  # Closed-source wheel, imported unconditionally at startup since 2.25.5 (#9563).
-  harnessWheels = {
-    x86_64-linux = {
-      platform = "manylinux_2_28_x86_64";
-      hash = "sha256-YB3esbdTEGGBFtP1xjBf9yDU9DF7jARwyOK8VSu/HEU=";
-    };
-    aarch64-linux = {
-      platform = "manylinux_2_28_aarch64";
-      hash = "sha256-C3Ndi70LgbXoYa6NqhsZSmRK/tPoguvEgD7QrbSFKcw=";
-    };
-    aarch64-darwin = {
-      platform = "macosx_11_0_arm64";
-      hash = "sha256-+XiH5c3zO4++nfoBjeDsyzph1HNYwHX4MsWgI48vJ/I=";
-    };
-  };
-
-  mistralai-vibe-local-harness = python.pkgs.buildPythonPackage rec {
-    pname = "mistralai-vibe-local-harness";
-    version = "0.5.1";
-    format = "wheel";
-
-    src = fetchPypi {
-      pname = "mistralai_vibe_local_harness";
-      inherit version;
-      format = "wheel";
-      dist = "cp312";
-      python = "cp312";
-      abi = "abi3";
-      inherit (harnessWheels.${python3.stdenv.hostPlatform.system}) platform hash;
-    };
-
-    dependencies = with python.pkgs; [
-      anyio
-      certifi
-      httpx
-      mcp
-      mistralai
-      opentelemetry-api
-      pydantic
-      rfc8785
-      truststore
-    ];
-
-    pythonRelaxDeps = [ "certifi" ];
-    pythonImportsCheck = [ "mistralai_vibe_local_harness" ];
-
-    meta = with lib; {
-      description = "Local Unified Harness runtime and native bindings for Vibe";
-      homepage = "https://pypi.org/project/mistralai-vibe-local-harness/";
-      license = flake.lib.licenses.unfree;
-      sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-      platforms = builtins.attrNames harnessWheels;
-    };
-  };
 in
-python.pkgs.buildPythonApplication rec {
+python.pkgs.buildPythonApplication {
   pname = "mistral-vibe";
-  version = "2.25.8";
-  pyproject = true;
+  inherit version;
+  format = "wheel";
 
-  src = fetchFromGitHub {
-    owner = "mistralai";
-    repo = "mistral-vibe";
-    tag = "v${version}";
-    hash = "sha256-D3IQbmb8Tcq03FlrmkEzw2XNu+9w9SiR7wP2814d/dI=";
+  src = fetchurl {
+    url =
+      builtins.replaceStrings
+        [ "{version}" "{platform}" ]
+        [
+          version
+          wheelPlatforms.${stdenv.hostPlatform.system}
+        ]
+        wheelUrl;
+    hash = hashes.${stdenv.hostPlatform.system};
   };
 
-  build-system = with python.pkgs; [
-    hatchling
-    hatch-vcs
-    editables
-  ];
-
-  # Since 2.25.7 upstream builds the harness and a Rust TUI into one wheel via
-  # a custom maturin backend. The Rust TUI is opt-in (VIBE_CLI=rust) and the
-  # harness ships as a prebuilt wheel below, so build the pure-Python part with
-  # hatchling instead.
-  postPatch = ''
-    sed -i '/^\[tool.maturin\]/,/^\[project.scripts\]/{/^\[project.scripts\]/!d}' pyproject.toml
-    substituteInPlace pyproject.toml \
-      --replace-fail 'requires = ["maturin==1.14.1"]' \
-        'requires = ["hatchling", "hatch-vcs", "editables"]' \
-      --replace-fail 'build-backend = "maturin_backend"' \
-        'build-backend = "hatchling.build"' \
-      --replace-fail 'backend-path = ["build_backend"]' \
-        '[tool.hatch.build.targets.wheel]
-    include = ["vibe/"]
-    exclude = ["vibe/cli-rust"]'
-  '';
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
 
   dependencies = with python.pkgs; [
     agent-client-protocol
@@ -263,7 +208,6 @@ python.pkgs.buildPythonApplication rec {
     mcp
     miniaudio
     mistralai
-    mistralai-vibe-local-harness
     opentelemetry-api
     opentelemetry-exporter-otlp-proto-http
     opentelemetry-sdk
@@ -317,7 +261,16 @@ python.pkgs.buildPythonApplication rec {
 
   passthru = {
     category = "AI Coding Agents";
-    inherit mistralai-vibe-local-harness;
+    updater = mkUpdater {
+      kind = "platform";
+      versionSource = {
+        type = "text";
+        url = "https://pypi.org/pypi/mistral-vibe/json";
+        regex = ''"info":\{.*?"version":"([^"]+)"'';
+      };
+      urlTemplate = wheelUrl;
+      platforms = wheelPlatforms;
+    };
   };
 
   meta = with lib; {
@@ -325,7 +278,10 @@ python.pkgs.buildPythonApplication rec {
     homepage = "https://github.com/mistralai/mistral-vibe";
     changelog = "https://github.com/mistralai/mistral-vibe/releases/tag/v${version}";
     license = licenses.asl20;
-    sourceProvenance = with sourceTypes; [ fromSource ];
+    sourceProvenance = with sourceTypes; [
+      fromSource
+      binaryNativeCode
+    ];
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
