@@ -7,14 +7,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.7.20";
+  version = "0.7.22";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-Q8Hy+UzXSQsRXgKqbyOm0LIa0Vj0AxU1AOySKgf17DU=";
+    hash = "sha256-MGOoX82pMbd4K2VzMQu1cqjU0+FLXPFoEDgcyBrl08Q=";
   };
 
   # Upstream tags releases without bumping __version__ (v0.2.2 still
@@ -40,6 +40,14 @@ python3.pkgs.buildPythonApplication rec {
   preCheck = ''
     export HOME=$TMPDIR
   '';
+
+  # 0.7.22 added registry searches that query smithery and the MCP
+  # registry over the network.
+  disabledTests = [
+    "test_search_registry_returns_list"
+    "test_search_smithery_returns_list"
+    "test_search_mcp_registry_returns_list"
+  ];
 
   passthru.category = "Utilities";
 
