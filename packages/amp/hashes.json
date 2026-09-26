@@ -1,8 +1,8 @@
 {
-  "version": "0.0.1790380893-geeadb1",
+  "version": "0.0.1790409661-ga80292",
   "hashes": {
-    "aarch64-linux": "sha256-+drU5Z3G+vDWU9GlC2AO1OSw90KPAsTvVX3pT6OVEyw=",
-    "aarch64-darwin": "sha256-oUpS6aCu8h6LIAX3HBX3ETmNrdKW2bTvyFlXYB/HZzY=",
-    "x86_64-linux": "sha256-Gv2oKfUOYY76kpHEFVHVklDApVTE5NLl7iRTWVk8bvo="
+    "aarch64-darwin": "sha256-EY3moIsUx6b4CU7yT6p9H2sQ51KXvpyzG4EUBa4ao7E=",
+    "aarch64-linux": "sha256-Tgg1zI5AvMsZ5Jn1dTmfmGX6ykEqmZRxlZPv+Xhf6Po=",
+    "x86_64-linux": "sha256-wntLs//Fsauzm0gGiWJfi+SgqdPITG/KqXNq60wZxy8="
   }
 }
