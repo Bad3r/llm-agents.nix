@@ -8,13 +8,13 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "hol-guard";
-  version = "3.7.1";
+  version = "3.7.4";
   pyproject = true;
 
   src = fetchPypi {
     pname = "hol_guard";
     inherit version;
-    hash = "sha256-97UWf+PyiFzg4djFk3Up1lc6zM1IbhvrIukScYM/5U8=";
+    hash = "sha256-JQIjckVdpCQtxVfd/oDodnX6b87tNNoI9eFp1oX8WKw=";
   };
 
   postPatch = ''
