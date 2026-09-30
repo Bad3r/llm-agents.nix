@@ -5,6 +5,7 @@
   mkUpdater,
   stdenvNoCC,
   bintools,
+  unzip,
   formatelf,
   makeWrapper,
   copyDesktopItems,
@@ -64,10 +65,20 @@ let
   source = platformSource {
     hashesFile = ./hashes.json;
     platforms = {
-      x86_64-linux = "amd64";
-      aarch64-linux = "arm64";
+      x86_64-linux = {
+        prefix = "orca-ide_";
+        suffix = "_amd64.deb";
+      };
+      aarch64-linux = {
+        prefix = "orca-ide_";
+        suffix = "_arm64.deb";
+      };
+      aarch64-darwin = {
+        prefix = "Orca-";
+        suffix = "-arm64-mac.zip";
+      };
     };
-    urlTemplate = "https://github.com/stablyai/orca/releases/download/v{version}/orca-ide_{version}_{platform}.deb";
+    urlTemplate = "https://github.com/stablyai/orca/releases/download/v{version}/{prefix}{version}{suffix}";
   };
 
   desktopItem = makeDesktopItem {
@@ -84,7 +95,7 @@ let
     mimeTypes = [ "x-scheme-handler/orca" ];
   };
 in
-stdenvNoCC.mkDerivation {
+(stdenvNoCC.mkDerivation {
   pname = "orca";
   inherit (source) version src;
 
@@ -224,4 +235,24 @@ stdenvNoCC.mkDerivation {
     mainProgram = "orca-ide";
     platforms = source.platforms;
   };
-}
+}).overrideAttrs
+  (
+    lib.optionalAttrs stdenvNoCC.hostPlatform.isDarwin {
+      nativeBuildInputs = [ unzip ];
+      buildInputs = [ ];
+      runtimeDependencies = [ ];
+      desktopItems = [ ];
+      unpackPhase = null;
+      sourceRoot = ".";
+      dontFixup = true;
+
+      installPhase = ''
+        runHook preInstall
+        mkdir -p $out/Applications $out/bin
+        cp -a Orca.app $out/Applications/
+        ln -s $out/Applications/Orca.app/Contents/MacOS/Orca $out/bin/orca-ide
+        ln -s $out/Applications/Orca.app/Contents/Resources/bin/orca $out/bin/orca
+        runHook postInstall
+      '';
+    }
+  )

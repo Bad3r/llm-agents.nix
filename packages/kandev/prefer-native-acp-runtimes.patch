@@ -5,27 +5,25 @@ Subject: [PATCH] Prefer native ACP runtimes when available
 
 Signed-off-by: mulatta <67085791+mulatta@users.noreply.github.com>
 ---
- .../internal/agent/agents/copilot_acp.go      |  7 ++-
- .../internal/agent/agents/copilot_acp_test.go |  9 ++--
- .../internal/agent/agents/droid_acp.go        | 12 +++--
- apps/backend/internal/agent/agents/gemini.go  |  6 +++
- .../internal/agent/agents/kilocode_acp.go     | 12 +++--
- .../agent/agents/native_binary_agents_test.go | 54 +++++++++++++++++++
- .../backend/internal/agent/agents/qwen_acp.go | 12 +++--
- .../internal/agent/hostutility/manager.go     | 47 +++++++++++-----
- .../agent/hostutility/native_binary_test.go   | 43 +++++++++++++++
- .../internal/agent/registry/provider.go       | 17 ++++--
- .../agent/runtime/lifecycle/manager_launch.go |  9 ++--
- .../runtime/lifecycle/manager_launch_test.go  | 27 ++++++++--
- .../agent/runtime/lifecycle/utility.go        | 42 ++++++++++++++-
- .../agent/runtime/lifecycle/utility_test.go   | 42 +++++++++++++++
- .../agent/settings/controller/agent_config.go |  5 +-
- .../settings/controller/controller_test.go    | 12 ++---
- .../agentctl/server/utility/acp_executor.go   |  5 ++
- .../server/utility/probe_allowlist_test.go    | 18 +++++++
- 18 files changed, 329 insertions(+), 50 deletions(-)
- create mode 100644 apps/backend/internal/agent/agents/native_binary_agents_test.go
- create mode 100644 apps/backend/internal/agent/hostutility/native_binary_test.go
+ apps/backend/internal/agent/agents/copilot_acp.go  |  7 ++-
+ .../internal/agent/agents/copilot_acp_test.go      |  9 ++--
+ apps/backend/internal/agent/agents/droid_acp.go    | 12 +++--
+ apps/backend/internal/agent/agents/gemini.go       |  6 +++
+ apps/backend/internal/agent/agents/kilocode_acp.go | 12 +++--
+ .../agent/agents/native_binary_agents_test.go      | 54 ++++++++++++++++++++++
+ apps/backend/internal/agent/agents/qwen_acp.go     | 12 +++--
+ apps/backend/internal/agent/hostutility/manager.go | 45 ++++++++++++------
+ .../agent/hostutility/native_binary_test.go        | 43 +++++++++++++++++
+ apps/backend/internal/agent/registry/provider.go   | 17 +++++--
+ .../agent/runtime/lifecycle/manager_launch.go      |  9 ++--
+ .../agent/runtime/lifecycle/manager_launch_test.go | 27 +++++++++--
+ .../internal/agent/runtime/lifecycle/utility.go    | 42 ++++++++++++++++-
+ .../agent/runtime/lifecycle/utility_test.go        | 42 +++++++++++++++++
+ .../agent/settings/controller/agent_config.go      |  5 +-
+ .../agent/settings/controller/controller_test.go   | 12 ++---
+ .../agentctl/server/utility/acp_executor.go        |  5 ++
+ .../server/utility/probe_allowlist_test.go         | 18 ++++++++
+ 18 files changed, 328 insertions(+), 49 deletions(-)
 
 diff --git a/apps/backend/internal/agent/agents/copilot_acp.go b/apps/backend/internal/agent/agents/copilot_acp.go
 index c02c1850..fb0f9da8 100644
@@ -258,7 +256,7 @@ index f55aa472..b98f9adb 100644
  }
  
 diff --git a/apps/backend/internal/agent/hostutility/manager.go b/apps/backend/internal/agent/hostutility/manager.go
-index 9b1622d5..55a38a30 100644
+index 62d6ab43..a75ef0f3 100644
 --- a/apps/backend/internal/agent/hostutility/manager.go
 +++ b/apps/backend/internal/agent/hostutility/manager.go
 @@ -5,6 +5,7 @@ import (
@@ -277,7 +275,7 @@ index 9b1622d5..55a38a30 100644
  	"github.com/kandev/kandev/internal/common/acpprovider"
  	"github.com/kandev/kandev/internal/common/logger"
  	"github.com/kandev/kandev/internal/system/storage"
-@@ -837,25 +839,42 @@ func (m *Manager) resolveInferenceCommand(
+@@ -838,25 +840,42 @@ func (m *Manager) resolveInferenceCommand(
  	}
  	command := cfg.Command
  	ag, ok := ia.(agents.Agent)
@@ -291,21 +289,22 @@ index 9b1622d5..55a38a30 100644
 -	spec := managed.ManagedNPMRuntime()
 -	if spec.NativeBinaryOnPath() {
 -		return spec.NativeCommand(), nil
--	}
--	selection, found, err := m.managedRuntimeSelections.Get(ctx, agentType, spec.Package)
--	if err != nil {
--		return agents.Command{}, fmt.Errorf("resolve active managed runtime version for %s: %w", agentType, err)
 +	preferNative := false
 +	if native, ok := ag.(agents.NativeBinaryAgent); ok && native.NativeBinaryName() != "" {
 +		_, err := exec.LookPath(native.NativeBinaryName())
 +		preferNative = err == nil
-+	}
+ 	}
+-	selection, found, err := m.managedRuntimeSelections.Get(ctx, agentType, spec.Package)
+-	if err != nil {
+-		return agents.Command{}, fmt.Errorf("resolve active managed runtime version for %s: %w", agentType, err)
 +	if preferNative {
 +		return ag.BuildCommand(agents.CommandOptions{
 +			Runtime:            agentruntime.RuntimeStandalone,
 +			PreferNativeBinary: true,
 +		}), nil
-+	}
+ 	}
+-	if !found || selection.Package != spec.Package {
+-		return spec.ACPCommand(spec.DefaultVersion), nil
 +	managedVersion := ""
 +	if managed, ok := ag.(agents.ManagedNPMRuntimeAgent); ok && m.managedRuntimeSelections != nil {
 +		spec := managed.ManagedNPMRuntime()
@@ -321,15 +320,13 @@ index 9b1622d5..55a38a30 100644
 +			managedVersion = spec.DefaultVersionOrPinned()
 +		}
  	}
--	if !found || selection.Package != spec.Package {
--		return spec.ACPCommand(spec.DefaultVersion), nil
+-	return spec.ACPCommand(selection.Version), nil
 +	if managedVersion != "" {
 +		return ag.BuildCommand(agents.CommandOptions{
 +			Runtime:               agentruntime.RuntimeStandalone,
 +			ManagedRuntimeVersion: managedVersion,
 +		}), nil
- 	}
--	return spec.ACPCommand(selection.Version), nil
++	}
 +	return command, nil
  }
  
@@ -422,7 +419,7 @@ index fcafa667..20096e04 100644
  	}
  	cmd := ag.BuildCommand(opts)
 diff --git a/apps/backend/internal/agent/runtime/lifecycle/manager_launch.go b/apps/backend/internal/agent/runtime/lifecycle/manager_launch.go
-index 03217756..71a20791 100644
+index d9495135..8e9069cd 100644
 --- a/apps/backend/internal/agent/runtime/lifecycle/manager_launch.go
 +++ b/apps/backend/internal/agent/runtime/lifecycle/manager_launch.go
 @@ -609,9 +609,12 @@ func (m *Manager) buildAgentCommandWithContext(
@@ -500,7 +497,7 @@ index 489ae4d2..7fa11990 100644
  			cmds, err := mgr.buildAgentCommandWithContext(context.Background(), &LaunchRequest{}, nil, tt.agent, true)
  			require.NoError(t, err)
 diff --git a/apps/backend/internal/agent/runtime/lifecycle/utility.go b/apps/backend/internal/agent/runtime/lifecycle/utility.go
-index dd51f5d1..751ded12 100644
+index bbda5cab..4a449718 100644
 --- a/apps/backend/internal/agent/runtime/lifecycle/utility.go
 +++ b/apps/backend/internal/agent/runtime/lifecycle/utility.go
 @@ -10,6 +10,35 @@ import (
@@ -555,12 +552,12 @@ index dd51f5d1..751ded12 100644
  		AgentID: agentID,
  		Model:   model,
  		InferenceConfig: &utility.InferenceConfigDTO{
--			Command:   cfg.Command.Args(),
-+			Command:   command.Args(),
- 			ModelFlag: cfg.ModelFlag.Args(),
- 			WorkDir:   execution.WorkspacePath,
- 			StripEnv:  agents.StripEnvFor(ia),
-@@ -137,12 +171,16 @@ func (m *Manager) ExecuteInferenceProfilePrompt(ctx context.Context, sessionID,
+-			Command:         cfg.Command.Args(),
++			Command:         command.Args(),
+ 			ModelFlag:       cfg.ModelFlag.Args(),
+ 			WorkDir:         execution.WorkspacePath,
+ 			StripEnv:        agents.StripEnvFor(ia),
+@@ -138,12 +172,16 @@ func (m *Manager) ExecuteInferenceProfilePrompt(ctx context.Context, sessionID,
  	if providerKey != "" && providerKeyEnvVar != "" {
  		env[providerKeyEnvVar] = providerKey // profile-declared provider key wins
  	}
@@ -576,7 +573,7 @@ index dd51f5d1..751ded12 100644
 -			Command: cfg.Command.Args(), ModelFlag: cfg.ModelFlag.Args(), WorkDir: execution.WorkspacePath,
 +			Command: command.Args(), ModelFlag: cfg.ModelFlag.Args(), WorkDir: execution.WorkspacePath,
  			Env: env, StripEnv: agents.StripEnvFor(ia), CLIFlags: flags, CommandPrefix: prefix,
- 			ProviderGatewayAuth: gatewayAuth,
+ 			ProviderGatewayAuth: gatewayAuth, OperatorDefined: cfg.OperatorDefined,
  		},
 diff --git a/apps/backend/internal/agent/runtime/lifecycle/utility_test.go b/apps/backend/internal/agent/runtime/lifecycle/utility_test.go
 index a21894a2..85ca7584 100644
@@ -668,7 +665,7 @@ index be5ceeb3..fdfd01ee 100644
  		})
  		if len(cliFlagTokens) > 0 {
 diff --git a/apps/backend/internal/agent/settings/controller/controller_test.go b/apps/backend/internal/agent/settings/controller/controller_test.go
-index 3b4fabff..eaff82ab 100644
+index 6177dc50..eaff82ab 100644
 --- a/apps/backend/internal/agent/settings/controller/controller_test.go
 +++ b/apps/backend/internal/agent/settings/controller/controller_test.go
 @@ -661,15 +661,14 @@ func TestDetectAgents_E2EMockPropagatesSupportsMCP(t *testing.T) {
@@ -696,16 +693,16 @@ index 3b4fabff..eaff82ab 100644
  		t.Fatalf("PreviewAgentCommand() error = %v", err)
  	}
 -	managed := agents.NewCopilotACP()
--	want := []string{"npx", "--yes", "--prefer-offline", managed.ManagedNPMRuntime().PackageSpec(""), "--acp"}
+-	want := []string{"npx", "--yes", "--prefer-offline", "--prefix", "~/.kandev/managed-npm-runtime", managed.ManagedNPMRuntime().PackageSpec(""), "--acp"}
 +	want := []string{"copilot", "--acp"}
  	if got := res.Command; !slices.Equal(got, want) {
  		t.Errorf("preview with copilot on PATH = %v, want %v", got, want)
  	}
 diff --git a/apps/backend/internal/agentctl/server/utility/acp_executor.go b/apps/backend/internal/agentctl/server/utility/acp_executor.go
-index a04b6b3b..16d288fa 100644
+index b739fd82..af332bc6 100644
 --- a/apps/backend/internal/agentctl/server/utility/acp_executor.go
 +++ b/apps/backend/internal/agentctl/server/utility/acp_executor.go
-@@ -1227,11 +1227,15 @@ var allowedProbeCommands = map[string]string{
+@@ -1243,11 +1243,15 @@ var allowedProbeCommands = map[string]string{
  	"agy_acp_server.par": "agy_acp_server.par",
  	"agy_acp_server.exe": "agy_acp_server.exe",
  	"auggie":             "auggie",
@@ -721,7 +718,7 @@ index a04b6b3b..16d288fa 100644
  	"kimi":               "kimi",
  	"kiro-cli-chat":      "kiro-cli-chat",
  	"mock-agent":         "mock-agent",
-@@ -1239,6 +1243,7 @@ var allowedProbeCommands = map[string]string{
+@@ -1255,6 +1259,7 @@ var allowedProbeCommands = map[string]string{
  	"omp":                "omp",
  	openCodeCommand:      openCodeCommand,
  	"qodercli":           "qodercli",
@@ -757,4 +754,3 @@ index c6d2ef0e..ecb5d499 100644
 +}
 -- 
 2.54.0
-

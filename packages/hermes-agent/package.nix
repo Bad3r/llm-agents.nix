@@ -172,13 +172,13 @@ let
     };
   };
 
-  version = "2026.9.14";
+  version = "2026.9.24";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-qPo9SlWHBXGFAga0PCnotAbJC4Wsq/28GYwUnN1WjRA=";
+    hash = "sha256-m0kg8DGrAxR6xMG+f1w7z7Ml9vIBbIm8/pC7H6wPInk=";
     # contributors/emails/ holds paths differing only in case; they collapse
     # on case-insensitive stores (APFS) so the NAR hash diverges between
     # Linux and darwin. Unused at build/runtime. Upstream:
@@ -196,7 +196,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-hJe0Fv8TadHoo64cmA3g3eC0fcSoX2bbb0C00QhOoCo=";
+    npmDepsHash = "sha256-94Kho+M7PcZPT+GgJHxcwFDnIwTrzd7UYFeHkvm1VO8=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -339,6 +339,7 @@ let
       croniter
       # [web]
       fastapi
+      httptools
       uvicorn
       # [markdown] — used by matrix and other formatters
       markdown
@@ -397,11 +398,6 @@ python3.pkgs.buildPythonApplication {
   # into the read-only store on any drift, silently disabling the feature
   # (e.g. nixpkgs aiosqlite 0.21.0 vs hermes pin 0.22.1 disabled matrix).
   # The closure already provides every dep, so presence is sufficient.
-  # DaemonThreadPoolExecutor mirrors CPython <=3.13 ThreadPoolExecutor
-  # internals; Python 3.14 refactored _worker around WorkerContext, so every
-  # tool call fails with AttributeError: no attribute '_initializer' (#7725).
-  patches = [ ./daemon-pool-python314.patch ];
-
   # Slash workers re-exec sys.executable, which is the bare interpreter
   # without Hermes' dependencies under Nix. Use the wrapper-provided env.
   postPatch = ''

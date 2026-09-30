@@ -28,7 +28,7 @@ let
   # supplies Electron separately. Keep the intentional major bump explicit and
   # rebuild node-pty against the runtime we actually ship.
   electron = electron_42;
-  desktopVersion = "0.17.2";
+  desktopVersion = "0.17.6";
 
   isLinux = stdenv.hostPlatform.isLinux;
   isDarwin = stdenv.hostPlatform.isDarwin;

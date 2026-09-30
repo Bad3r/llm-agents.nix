@@ -190,6 +190,10 @@ stdenv.mkDerivation {
       bun packages/natives/scripts/gen-enums.ts || true
     fi
 
+    # The loader rejects an addon without the post-link release stamp.
+    bun scripts/stamp-native-version.ts \
+      packages/natives/native/pi_natives.${platform.nodeTag}.node --no-sign
+
     # --generate embeds the omp:// docs index. Without it the script is a no-op
     # and the binary ships no docs, breaking omp:// reads.
     echo "Generating docs index..."
@@ -240,6 +244,8 @@ stdenv.mkDerivation {
   # Re-sign after fixup: install_name_tool and Bun can leave invalid signatures
   postFixup = lib.optionalString stdenv.hostPlatform.isDarwin ''
     ${lib.getExe rcodesign} sign --code-signature-flags linker-signed $out/lib/omp/omp
+    ${lib.getExe rcodesign} sign --code-signature-flags linker-signed \
+      $out/lib/omp/pi_natives.${platform.nodeTag}.node
   '';
 
   # Workers and the stats dashboard only fail at runtime when their bunfs

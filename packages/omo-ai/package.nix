@@ -1,58 +1,52 @@
 {
   lib,
   flake,
-  stdenvNoCC,
+  buildNpmPackage,
   fetchurl,
-  makeWrapper,
+  runCommand,
   nodejs,
   fd,
   ripgrep,
   claude-code,
+  mkUpdater,
   versionCheckHook,
   versionCheckHomeHook,
 }:
 
 let
   versionData = lib.importJSON ./hashes.json;
-  inherit (versionData) version senpiVersion;
+  version = versionData.version;
 
-  # senpi (a pi fork) publishes with its entire dependency tree bundled, so
-  # the only other thing omo needs is senpi itself.
-  senpi = fetchurl {
-    url = "https://registry.npmjs.org/@code-yeongyu/senpi/-/senpi-${senpiVersion}.tgz";
-    hash = versionData.senpiHash;
-  };
+  # The npm tarball ships no lockfile, so vendor the one the updater refreshes
+  # on every bump.
+  srcWithLock = runCommand "omo-ai-src-with-lock" { } ''
+    mkdir -p $out
+    tar -xzf ${
+      fetchurl {
+        url = "https://registry.npmjs.org/omo-ai/-/omo-ai-${version}.tgz";
+        hash = versionData.sourceHash;
+      }
+    } -C $out --strip-components=1
+    cp ${./package-lock.json} $out/package-lock.json
+  '';
 in
-stdenvNoCC.mkDerivation {
+buildNpmPackage {
+  npmDepsFetcherVersion = 2;
   pname = "omo-ai";
   inherit version;
 
-  src = fetchurl {
-    url = "https://registry.npmjs.org/omo-ai/-/omo-ai-${version}.tgz";
-    inherit (versionData) hash;
-  };
-  sourceRoot = "package";
+  src = srcWithLock;
 
-  nativeBuildInputs = [
-    makeWrapper
-    nodejs
-  ];
+  npmDepsHash = versionData.npmDepsHash;
 
-  buildPhase = ''
-    runHook preBuild
-    mkdir -p node_modules/@code-yeongyu/senpi
-    tar -xzf ${senpi} --strip-components=1 -C node_modules/@code-yeongyu/senpi
-    test "$(node -p 'require("./package.json").dependencies["@code-yeongyu/senpi"]')" = ${senpiVersion}
-    node bin/senpi-patch.mjs
-    runHook postBuild
-  '';
+  # The tarball ships prebuilt dist/ and the senpi engine; install scripts
+  # stay enabled so the postinstall (bin/senpi-patch.mjs) floors the
+  # claudeCodeVersion and stamps the engine tree.
+  dontNpmBuild = true;
+  makeCacheWritable = true;
 
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/lib $out/bin
-    cp -r . $out/lib/omo-ai
-    makeWrapper ${lib.getExe nodejs} $out/bin/omo \
-      --add-flags $out/lib/omo-ai/bin/omo.js \
+  postInstall = ''
+    wrapProgram "$out/bin/omo" \
       --prefix PATH : ${
         lib.makeBinPath [
           nodejs
@@ -63,7 +57,6 @@ stdenvNoCC.mkDerivation {
       --set-default CLAUDE_CODE_EXECUTABLE ${lib.getExe claude-code} \
       --set-default OMO_TELEMETRY 0 \
       --set-default OMO_SEND_ANONYMOUS_TELEMETRY 0
-    runHook postInstall
   '';
 
   doInstallCheck = true;
@@ -71,8 +64,19 @@ stdenvNoCC.mkDerivation {
     versionCheckHook
     versionCheckHomeHook
   ];
+  versionCheckProgramArg = "--version";
+
+  # --version never loads the engine bundle, so smoke-test a real launch too.
+  postInstallCheck = ''
+    output=$(HOME=$TMPDIR $out/bin/omo --help 2>&1 || true)
+    grep -q "Usage:" <<<"$output"
+  '';
 
   passthru.category = "AI Coding Agents";
+  passthru.updater = mkUpdater {
+    kind = "npm";
+    purl = "pkg:npm/omo-ai";
+  };
 
   meta = {
     description = "Oh My OpenAgent standalone (Senpi edition) coding agent";

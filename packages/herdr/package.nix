@@ -13,19 +13,19 @@
   versionCheckHomeHook,
 }:
 
-# build.rs shells out to `zig build` to compile vendored libghostty-vt.
+# crates/ghostty-vt/build.rs shells out to `zig build` to compile vendored libghostty-vt.
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr";
-  version = "0.9.1";
+  version = "0.9.3";
 
   src = fetchFromGitHub {
     owner = "herdrdev";
     repo = "herdr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-N6+kprfWRyh0AkAiopkGsNXUGGORyPVFHEaDHCpGQs8=";
+    hash = "sha256-uu452Xe23pSvFk7w7fKPjiaqY5QenUIljao2SFAxpc0=";
   };
 
-  cargoHash = "sha256-1VAmsDE3zeU0wMVQKleQcd/zq8/k/oor8tasrsRQfeY=";
+  cargoHash = "sha256-+gTWtEheyuI59yf2PqRbcbcFIW+/cYb7zZ2mPv2VN0Y=";
 
   # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
   # build offline.  fetchDeps is a fixed-output derivation, so this does not
@@ -64,7 +64,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # but keep Zig's CPU baseline explicit to avoid build-host CPU features
   # leaking into the output.
   postPatch = ''
-    substituteInPlace build.rs \
+    substituteInPlace crates/ghostty-vt/build.rs \
       --replace-fail '.arg("build")' '.arg("build")
           .arg("-Dcpu=baseline")' \
       --replace-fail '.arg(format!("-Dtarget={zig_target}"))' ""
