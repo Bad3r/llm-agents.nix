@@ -236,7 +236,7 @@ stdenv.mkDerivation {
     cp -r ${desktopItem}/share/applications "$desktop/share/"
 
     ${lib.optionalString stdenv.hostPlatform.isDarwin ''
-      find "$desktop/libexec/t3code" \
+      find "$out/libexec/t3code" "$desktop/libexec/t3code" \
         -path '*/node-pty/prebuilds/darwin-*/spawn-helper' \
         -exec chmod 755 {} +
 
