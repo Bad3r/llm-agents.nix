@@ -10,6 +10,7 @@
   nodejs_24,
   node-gyp,
   pkg-config,
+  formatelf,
   libsecret,
   python3,
   cacert,
@@ -130,7 +131,10 @@ stdenv.mkDerivation {
     pnpmConfigHook
     python3
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ]
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    formatelf
+    pkg-config
+  ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     cctools.libtool
     libicns
@@ -139,7 +143,10 @@ stdenv.mkDerivation {
   ];
 
   # build:desktop compiles native/browser-secret against libsecret on linux
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ libsecret ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    libsecret
+    stdenv.cc.cc.lib
+  ];
 
   # We run electron on an unpacked tree, so app.isPackaged is false and the
   # backend would treat the store path as the workspace root (#9182).
@@ -182,6 +189,7 @@ stdenv.mkDerivation {
   # Dependencies include prebuilt artifacts for foreign systems and statically
   # linked executables, which must not be patched or audited as host binaries.
   dontPatchELF = true;
+  dontAutoPatchelf = true;
   noAuditTmpdir = true;
 
   installPhase = ''
@@ -241,6 +249,12 @@ stdenv.mkDerivation {
     ''}
 
     runHook postInstall
+  '';
+
+  # Electron, unlike node, does not already have libstdc++ loaded for the
+  # prebuilt pty.node (#10125).
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    autoPatchelf "$out/libexec/t3code/apps/server/node_modules/node-pty/prebuilds/${platformKey}"
   '';
 
   postInstall = ''

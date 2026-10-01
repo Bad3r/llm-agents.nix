@@ -3,8 +3,9 @@
   mkUpdater,
   stdenv,
   makeWrapper,
-  wrapBuddy,
+  formatelf,
   ripgrep,
+  wayland,
   platformSource,
   versionCheckHook,
   versionCheckHomeHook,
@@ -30,11 +31,20 @@ stdenv.mkDerivation {
 
   sourceRoot = "package";
 
-  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ wrapBuddy ];
+  nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
-
-  wrapBuddyExtraNeeded = lib.optionals stdenv.hostPlatform.isLinux [ "libstdc++.so.6" ];
+  # The native addons embedded in the Bun executable cannot be patched: the
+  # file watcher needs libstdc++ and OpenTUI dlopen()s libwayland-client for
+  # clipboard images. Unlike DT_RUNPATH, the executable's DT_RPATH also applies
+  # to lookups made by the libraries it loads.
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    formatelf --force-rpath --set-rpath ${
+      lib.makeLibraryPath [
+        stdenv.cc.cc.lib
+        wayland
+      ]
+    } $out/bin/.opencode2-wrapped
+  '';
 
   dontBuild = true;
   # Bun-compiled executable; stripping corrupts the embedded payload.
