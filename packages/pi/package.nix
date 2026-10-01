@@ -74,14 +74,23 @@ buildNpmPackage {
   # entry point. The Node mode is useful on older CPUs where Bun's binary
   # requires unsupported instruction sets.
   preInstall = lib.optionalString useBun ''
-    # Upstream embeds the worker as ./src/utils/image-resize-worker.ts and
-    # loads it by that path at runtime; the npm tarball only ships dist/.
-    mkdir -p src/utils src/modes src/core
+    # Upstream embeds the workers under ./src and loads them by that path at
+    # runtime; the npm tarball only ships dist/.
+    mkdir -p src/utils src/modes src/core src/extensions/codemode
     echo 'import "../../dist/utils/image-resize-worker.js";' > src/utils/image-resize-worker.ts
+    echo 'import "../../../dist/extensions/codemode/worker.js";' > src/extensions/codemode/worker.ts
     ln -s ../../dist/modes/interactive src/modes/interactive
     ln -s ../../dist/core/export-html src/core/export-html
 
-    bun build --compile ./dist/bun/cli.js ./src/utils/image-resize-worker.ts --outfile dist/pi
+    # Unlike upstream, autoload package.json: extension dependencies that use
+    # main/exports do not resolve otherwise (earendil-works/pi#9817).
+    bun build --compile \
+      --no-compile-autoload-bunfig \
+      --compile-autoload-package-json \
+      ./dist/bun/cli.js \
+      ./src/utils/image-resize-worker.ts \
+      ./src/extensions/codemode/worker.ts \
+      --outfile dist/pi
   '';
 
   postInstall =

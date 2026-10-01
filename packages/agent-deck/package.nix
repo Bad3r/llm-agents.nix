@@ -8,21 +8,22 @@
   versionCheckHomeHook,
   git,
   lsof,
+  procps,
   tmux,
 }:
 
 buildGoModule rec {
   pname = "agent-deck";
-  version = "1.16.16";
+  version = "1.16.22";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     tag = "v${version}";
-    hash = "sha256-+0T8ZJP+7W+QOT1dgVVmg46CCzM1O1UIg1+4CL8pMPE=";
+    hash = "sha256-dBY0Jnhy+6l2a1Rfe1OvT9jVM7nhyXTo0+yXKY0DeeQ=";
   };
 
-  vendorHash = "sha256-ZIBWsEa6IpoW66/kd40UNihBrbo5yjCsRIQatCbt4q8=";
+  vendorHash = "sha256-AChAtXMmFDfJzlqnUpgkyD1KCmLGxkPZtKsD0+Tnt7E=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -45,6 +46,7 @@ buildGoModule rec {
           "TestWaitForFreshOutput_UniquePeerStillReads" # timing-sensitive
           "TestHealthRemoteExecJSONParity" # needs ssh client
           "TestRecallSearch_FederatedMergesAndLabels" # sqlite "database is locked" under parallel tests
+          "TestIssue2388_CapabilitiesCarryProbe" # resets PATH to /usr/bin:/bin, losing cat
         ]
         ++ lib.optionals stdenv.hostPlatform.isDarwin [
           # lsof on live processes is denied by the sandbox
@@ -67,6 +69,7 @@ buildGoModule rec {
 
   nativeCheckInputs = [
     lsof
+    procps
     tmux
   ];
 
