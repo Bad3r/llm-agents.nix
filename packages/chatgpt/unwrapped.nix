@@ -176,21 +176,6 @@ stdenv.mkDerivation {
         # See patch-asar.py for the NixOS-specific source patches.
         python3 ${./patch-asar.py} "$out/lib/chatgpt/resources/app.asar"
 
-        # Host Qt plugins can use a different private ABI than our Qt shims.
-        # Let each shim discover plugins from its own Qt installation.
-        wrapProgram "$out/lib/chatgpt/ChatGPT" \
-          "''${gappsWrapperArgs[@]}" \
-          --unset QT_PLUGIN_PATH \
-          --unset QT_QPA_PLATFORM_PLUGIN_PATH \
-          --prefix PATH : ${
-            lib.makeBinPath [
-              bubblewrap
-              coreutils
-              gitMinimal
-              xdg-utils
-            ]
-          }
-
         runHook postInstall
       ''
     else
@@ -202,6 +187,24 @@ stdenv.mkDerivation {
 
         runHook postInstall
       '';
+
+  # gappsWrapperArgs is only populated by wrapGAppsHook3 after installPhase.
+  preFixup = lib.optionalString isLinux ''
+    # Host Qt plugins can use a different private ABI than our Qt shims.
+    # Let each shim discover plugins from its own Qt installation.
+    wrapProgram "$out/lib/chatgpt/ChatGPT" \
+      "''${gappsWrapperArgs[@]}" \
+      --unset QT_PLUGIN_PATH \
+      --unset QT_QPA_PLATFORM_PLUGIN_PATH \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          bubblewrap
+          coreutils
+          gitMinimal
+          xdg-utils
+        ]
+      }
+  '';
 
   postFixup = lib.optionalString isLinux ''
     patchelf --add-rpath ${lib.makeLibraryPath [ qt5.qtbase ]} \

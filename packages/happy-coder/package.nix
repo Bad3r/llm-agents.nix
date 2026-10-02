@@ -91,11 +91,14 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s ${lib.getExe difftastic} $out/lib/happy/tools/unpacked/difft
 
     mkdir -p $out/bin
+    # happy ignores a PATH `claude` that resolves to an extensionless script
+    # (every Nix-wrapped claude-code), but trusts HAPPY_CLAUDE_PATH as given.
     for bin in happy happy-mcp; do
       makeWrapper ${nodejs}/bin/node $out/bin/$bin \
         --add-flags --no-warnings \
         --add-flags --no-deprecation \
         --add-flags $out/lib/happy/bin/$bin.mjs \
+        --run 'export HAPPY_CLAUDE_PATH="''${HAPPY_CLAUDE_PATH:-$(command -v claude || true)}"' \
         --prefix PATH : ${
           lib.makeBinPath [
             nodejs

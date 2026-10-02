@@ -3,12 +3,12 @@
   stdenv,
   fetchFromGitHub,
   installShellFiles,
-  makeWrapper,
   rustPlatform,
   pkg-config,
   lld,
   openssl,
   bubblewrap,
+  ripgrep,
   libcap,
   versionCheckHook,
   callPackage,
@@ -54,6 +54,16 @@ let
         inherit hash;
       };
 
+  packageManifest = builtins.toJSON {
+    layoutVersion = 1;
+    inherit version;
+    target = stdenv.hostPlatform.rust.rustcTarget;
+    variant = "codex";
+    entrypoint = "bin/codex";
+    resourcesDir = "codex-resources";
+    pathDir = "codex-path";
+  };
+
 in
 rustPlatform.buildRustPackage (
   {
@@ -70,7 +80,6 @@ rustPlatform.buildRustPackage (
 
     nativeBuildInputs = [
       installShellFiles
-      makeWrapper
       pkg-config
     ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
@@ -93,12 +102,19 @@ rustPlatform.buildRustPackage (
       NIX_CFLAGS_LINK = "-fuse-ld=${lib.getExe' lld "ld64.lld"}";
     };
 
+    # The daemon would copy the whole package (~550 MB) into ~/.codex and let
+    # upstream's updater replace it. Run it from the store instead.
+    patches = [ ./daemon-nix-store.patch ];
+
     # The future returned by `connectors::list_connectors` nests deeply
     # enough that computing its layout exceeds rustc's default query depth
     # limit of 128 ("queries overflow the depth limit"). Raise the limit for
     # this crate, as rustc's diagnostic suggests and as upstream already does
     # for app-server, exec and tui.
     postPatch = ''
+      substituteInPlace app-server-daemon/src/prepare_install.rs \
+        --subst-var-by storeDir ${builtins.storeDir} \
+        --subst-var out
       if ! grep -q 'recursion_limit' chatgpt/src/lib.rs; then
         substituteInPlace chatgpt/src/lib.rs \
           --replace-fail 'pub mod apply_command;' \
@@ -108,16 +124,20 @@ rustPlatform.buildRustPackage (
 
     inherit preBuild;
 
-    # codex looks for codex-resources/bwrap and codex-code-mode-host next to
-    # its own executable, so the real binaries live together in libexec/.
-    postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-      mkdir -p $out/libexec/codex/bin $out/libexec/codex/codex-resources
-      ln -s ${lib.getExe bubblewrap} $out/libexec/codex/codex-resources/bwrap
+    # The daemon refuses to start unless it finds upstream's package layout
+    # around its executable (#9887).
+    postFixup = ''
+      mkdir -p $out/libexec/codex/{bin,codex-path,codex-resources}
       mv $out/bin/codex $out/bin/codex-code-mode-host $out/bin/logs_client \
         $out/libexec/codex/bin/
+      ln -s ${lib.getExe ripgrep} $out/libexec/codex/codex-path/rg
+      printf '%s\n' ${lib.escapeShellArg packageManifest} \
+        > $out/libexec/codex/codex-package.json
 
-      makeWrapper $out/libexec/codex/bin/codex $out/bin/codex \
-        --prefix PATH : ${lib.makeBinPath [ bubblewrap ]}
+      ${lib.optionalString stdenv.hostPlatform.isLinux ''
+        ln -s ${lib.getExe bubblewrap} $out/libexec/codex/codex-resources/bwrap
+      ''}
+      ln -s ../libexec/codex/bin/codex $out/bin/codex
       ln -s ../libexec/codex/bin/codex-code-mode-host $out/bin/codex-code-mode-host
       ln -s ../libexec/codex/bin/logs_client $out/bin/logs_client
     '';
