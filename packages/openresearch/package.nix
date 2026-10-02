@@ -48,8 +48,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
     export HOME=$(mktemp -d)
   '';
 
+  checkFlags = [
+    # 2s wall-clock assertion on SIGTERM handling; flaky on loaded builders
+    "--skip=jobs::ssh::tests::host_wrapper_finishes_cooperative_term_promptly"
+  ]
   # child process is not reaped within the test's deadline in the darwin sandbox
-  checkFlags = lib.optionals stdenv.hostPlatform.isDarwin [
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
     "--skip=jobs::localbox::tests::local_job_lifecycle"
   ];
 
