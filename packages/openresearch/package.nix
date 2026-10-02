@@ -39,6 +39,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '#!/bin/sh' '#!${bash}/bin/sh'
     substituteInPlace src/commands/up.rs \
       --replace-fail '"sh",' '"${bash}/bin/sh",'
+    # The fake ssh in these tests calls cat, which the sandbox lacks in /bin.
+    substituteInPlace tests/compute_cli.rs \
+      --replace-fail '{}:/usr/bin:/bin"' '{}:${coreutils}/bin"'
   '';
 
   preCheck = ''
