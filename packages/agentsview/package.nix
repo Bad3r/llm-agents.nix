@@ -2,7 +2,7 @@
   lib,
   stdenv,
   flake,
-  buildGoModule,
+  buildGo127Module,
   buildNpmPackage,
   cacert,
   fetchFromGitHub,
@@ -78,7 +78,7 @@ let
   };
 in
 
-buildGoModule {
+buildGo127Module {
   pname = "agentsview";
   inherit version src vendorHash;
 

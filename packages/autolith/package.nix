@@ -17,7 +17,26 @@ let
   };
 
   # Vendored copy of upstream's nix/package.nix, refreshed by update.py.
-  upstream = import ./upstream-package.nix { inherit pkgs src; };
+  upstream = import ./upstream-package.nix {
+    inherit src;
+    pkgs = pkgs // {
+      inherit sbcl;
+    };
+  };
+
+  # Empty entries are meaningful in ASDF's search paths, but makeBinaryWrapper
+  # rejects them for --prefix.
+  sbcl = pkgs.sbcl // {
+    withPackages =
+      f:
+      (pkgs.sbcl.withPackages f).overrideAttrs (old: {
+        installPhase =
+          lib.replaceStrings
+            [ "--prefix CL_SOURCE_REGISTRY :" "--prefix ASDF_OUTPUT_TRANSLATIONS :" ]
+            [ "--set CL_SOURCE_REGISTRY" "--set ASDF_OUTPUT_TRANSLATIONS" ]
+            old.installPhase;
+      });
+  };
 in
 upstream.overrideAttrs (old: {
   name = "autolith-${version}";

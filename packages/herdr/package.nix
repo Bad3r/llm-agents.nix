@@ -73,6 +73,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
     substituteInPlace src/platform/linux.rs \
       --replace-fail 'let mut cmd = command("notify-send");' \
         'let mut cmd = command("${libnotify}/bin/notify-send");'
+
+    # Bundled Zig runtimes cause overlapping FDEs with ld.bfd 2.46.
+    substituteInPlace vendor/libghostty-vt/src/build/GhosttyLibVt.zig \
+      --replace-fail 'lib.bundle_compiler_rt = true;' 'lib.bundle_compiler_rt = false;' \
+      --replace-fail 'lib.bundle_ubsan_rt = true;' 'lib.bundle_ubsan_rt = false;'
   '';
 
   preBuild = ''

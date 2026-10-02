@@ -108,6 +108,14 @@ stdenv.mkDerivation {
   strictDeps = true;
   __structuredAttrs = true;
 
+  # Public production identifiers, also embedded in upstream release builds.
+  # loadRepoEnv supplies the corresponding VITE_* values for the web frontend.
+  env = {
+    T3CODE_RELAY_URL = "https://relay.t3.codes";
+    T3CODE_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsudDMuY29kZXMk";
+    T3CODE_CLERK_CLI_OAUTH_CLIENT_ID = "hzxSgY2cH10sDU2r";
+  };
+
   pnpmDeps = fetchPnpmDeps {
     inherit
       pnpm
@@ -222,6 +230,11 @@ stdenv.mkDerivation {
     ln -s \
       "$out/libexec/t3code/apps/server/dist/resource-monitor/${platformKey}/t3-resource-monitor" \
       "$desktop/libexec/t3code/apps/desktop/prod-resources/resource-monitor/t3-resource-monitor"
+
+    ${lib.optionalString stdenv.hostPlatform.isLinux ''
+      install -Dm755 native/browser-secret/build/${stdenv.hostPlatform.node.arch}/t3-browser-secret \
+        "$desktop/libexec/t3code/apps/desktop/prod-resources/browser-secret/t3-browser-secret"
+    ''}
 
     find "$out/libexec/t3code" "$desktop/libexec/t3code" -xtype l -delete
 
