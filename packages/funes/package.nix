@@ -25,10 +25,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # carries the dev label, which `funes --version` then reports.
     sed -i -E 's/^version = "[^"]*"$/version = "${finalAttrs.version}"/' Cargo.toml
 
-    # lance-linalg's AVX-512 VNNI kernels do not compile with the rustc this
-    # repo builds against; the AVX2 ones are left in place. See the patch.
-    # fetchCargoVendor unpacks the crates.io crates under source-registry-0/ in
-    # the build root, which unpackPhase cd's out of before postPatch runs.
+    # The vendored crates live in the build root, outside the unpacked source.
     patch -p1 -d "$NIX_BUILD_TOP/$(stripHash "$cargoDeps")/source-registry-0" < ${./drop-lance-avx512-vnni.patch}
   '';
 

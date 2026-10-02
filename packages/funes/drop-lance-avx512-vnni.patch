@@ -1,25 +1,9 @@
-Drop lance-linalg's AVX-512 VNNI kernels: they do not compile with this
-repo's rustc.
+Drop lance-linalg 11.0.0's AVX-512 VNNI kernels.
 
-nixpkgs builds rustc against an LLVM whose vpdpwssd.512 / vpdpbusd.512
-intrinsic signatures disagree with the declarations stdarch ships in this
-Rust release, so the three lance-linalg 11.0.0 kernels that call them fail
-with:
-
-  error: intrinsic signature mismatch for `llvm.x86.avx512.vpdpwssd.512`:
-  expected signature `<16 x i32> (<16 x i32>, <16 x i32>, <16 x i32>)`,
-  found `<16 x i32> (<16 x i32>, <32 x i16>, <32 x i16>)`
-
-Upstream's release binaries come from the rustup toolchain, which bundles the
-LLVM those declarations were written for and compiles them fine; this package
-takes the repo's rustPlatform, which pins no per-package toolchain.
-
-Only the kernels go: the AVX2 ones stay, the scalar reference and the tests
-that compare against it are untouched, so results do not change. What is lost
-is the 64-element-per-iteration AVX-512 kernel on CPUs that have VNNI.
-
-Applies to the vendored lance-linalg 11.0.0 (funes pins `lance-linalg
-= "=11.0.0"`). Regenerate when that pin moves.
+nixpkgs' rustc links an LLVM whose vpdpwssd.512 / vpdpbusd.512 signatures
+disagree with stdarch's declarations, so these kernels fail with
+"intrinsic signature mismatch". The AVX2 and scalar paths stay, so results
+are unchanged. Regenerate when the `lance-linalg = "=11.0.0"` pin moves.
 
 --- a/lance-linalg-11.0.0/src/distance/cosine_u8.rs
 +++ b/lance-linalg-11.0.0/src/distance/cosine_u8.rs
