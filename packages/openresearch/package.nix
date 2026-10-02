@@ -48,6 +48,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
     export HOME=$(mktemp -d)
   '';
 
+  # child process is not reaped within the test's deadline in the darwin sandbox
+  checkFlags = lib.optionals stdenv.hostPlatform.isDarwin [
+    "--skip=jobs::localbox::tests::local_job_lifecycle"
+  ];
+
   dontUseCargoParallelTests = true; # ETXTBSY: tests write+exec scripts
 
   nativeCheckInputs = [
