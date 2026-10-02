@@ -17,13 +17,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "mcporter";
-  version = "0.14.1";
+  version = "0.14.2";
 
   src = fetchFromGitHub {
     owner = "openclaw";
     repo = "mcporter";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-yqpOv+xSTHYDNIj0+A13/IRp72G5YYuLRSiSaSNrBuY=";
+    hash = "sha256-0Wvt/SEvz4MFiGEZ+y7GrV+yW75WCEk/cZjgLnVBttM=";
   };
 
   # Upstream's lockfile was generated before the pnpm.overrides entry for vite
@@ -41,7 +41,7 @@ stdenv.mkDerivation (finalAttrs: {
       postPatch
       ;
     inherit pnpm;
-    hash = "sha256-BEoMAvQiMXIaXErC8os3KhQWPYKkW9eeE1SKlFUYGck=";
+    hash = "sha256-IkjJjI+x0bpn8Wlkw1Q7TTChttMk+GcgybdJthinoc8=";
     fetcherVersion = 3;
   };
 
@@ -67,6 +67,9 @@ stdenv.mkDerivation (finalAttrs: {
 
     # Prune dev dependencies to reduce closure size
     pnpm prune --prod
+    # With upstream's hoisted node linker prune keeps the .bin links of the
+    # removed dev tools.
+    find node_modules -xtype l -delete
 
     cp -r dist $out/lib/mcporter/
     cp -r node_modules $out/lib/mcporter/

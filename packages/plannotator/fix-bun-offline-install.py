@@ -37,6 +37,7 @@ HOISTED = {
 # them avoids needless offline manifest lookups.
 UNUSED = {
     "@opencode-ai/plugin",
+    "@opencode/plugin",
     "glimpseui",
 }
 

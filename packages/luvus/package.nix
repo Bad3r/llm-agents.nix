@@ -8,6 +8,7 @@
   pkg-config,
   curl,
   git,
+  python3,
   gh,
   openssh,
   bashInteractive,
@@ -34,16 +35,16 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "luvus";
-  version = "0.14.2";
+  version = "0.14.3";
 
   src = fetchFromGitHub {
     owner = "RizRiyz";
     repo = "luvus";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-QhiPA1oV/WRgPrAeR+PlbFxKfquMkyKsjjPLLRzPiDw=";
+    hash = "sha256-Y1OC+LJhU+hJJ4q1wuFHXpV7hbVtvtfJITegtwAevUQ=";
   };
 
-  cargoHash = "sha256-yqfN+zngeryaPxKbVW4UihOvdjHw/toXBAX7yEbr6MY=";
+  cargoHash = "sha256-Aps3N1GaEgr70xr4IkXXe8Tb8h1RmaIphwrqGBj8Enk=";
 
   nativeBuildInputs = [
     makeWrapper
@@ -58,6 +59,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeCheckInputs = [
     curl
     git
+    # the fake worktree provider in the tests parses its request with python
+    python3
   ];
 
   # flaky: spawn real PTYs/processes and race under load
@@ -73,6 +76,14 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=app::settings::tests::enter_routes_an_installed_theme_through_removal"
     # opens the git dashboard on the build dir, which is not a repository
     "--skip=app::diff::tests::dashboard_diff_click_opens_a_tab_then_reuses_it"
+    "--skip=app::input::tests::a_key_that_dismisses_the_bar_overflow_never_repeats_into_the_view"
+    # runs /usr/bin/env, which does not exist in the sandbox
+    "--skip=orch::worker::tests::direct_launch_delivers_a_multiline_briefing_beyond_canonical_tty_limits"
+    "--skip=integration::tests::hook_script_reports_claude_but_never_a_devin_host"
+    # the pane's real shell prints its `bash-5.3$ ` prompt into the screen the
+    # tests fill, shifting the expected match columns and counts
+    "--skip=app::input::tests::pane_search_word_highlight_does_not_use_global_flash"
+    "--skip=app::search::tests::legacy_exact_search_uses_shared_folding_and_original_byte_columns"
     # copies /bin/sleep, which does not exist in the sandbox
     "--skip=platform::tests::unix_stoppable_pid_accepts_a_luvus_executable_with_arguments"
     # the reopened App does not read the persisted toggle back in the sandbox
