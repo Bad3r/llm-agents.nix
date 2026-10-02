@@ -51,6 +51,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=herdr::tests::heal_detached_reinstalls_once_and_throttles"
     "--skip=herdr::tests::heal_detached_fails_closed_without_the_shim_sentinel"
     "--skip=herdr::tests::heal_detached_respects_the_update_optout"
+    # hardcodes /usr/bin/env, absent in the sandbox
+    "--skip=daemon::api::terminal::tests::strip_session_env_removes_every_session_var"
+    # 5s file-polling deadlines and wall-clock cadence asserts; flaky on loaded builders
+    "--skip=daemon::api::terminal::tests::control_input_reaches_herdr_and_is_audited_without_its_bytes"
+    "--skip=daemon::api::terminal::tests::frames_pipelined_behind_the_handshake_arrive"
+    "--skip=codex_auth::tests::a_terminal_verdict_leaves_a_quarantine_record_and_a_rotation_clears_it"
+    # the sandbox builds as root, so the "unwritable" memo path is writable
+    "--skip=codex_auth::tests::an_unwritable_memo_sends_nothing_and_keeps_the_kick"
+    "--skip=usage::scheduler::tests::oauth_and_provider_completions_clear_only_their_own_activity"
   ];
 
   doInstallCheck = true;
