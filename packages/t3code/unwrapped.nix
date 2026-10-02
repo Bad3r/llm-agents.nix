@@ -203,9 +203,8 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p "$out/libexec/t3code/apps/server"
-    cp -r --no-preserve=mode node_modules "$out/libexec/t3code/"
-    cp -r --no-preserve=mode apps/server/{node_modules,dist} "$out/libexec/t3code/apps/server/"
+    # Deploy isolated production graphs instead of the whole workspace store.
+    pnpm --filter t3 deploy --prod --offline "$out/libexec/t3code/apps/server"
 
     mkdir -p "$out/libexec/t3code/apps/server/dist/resource-monitor/${platformKey}"
     install -Dm755 ${resourceMonitor}/bin/t3-resource-monitor \
@@ -215,15 +214,12 @@ stdenv.mkDerivation {
     makeWrapper ${lib.getExe nodejs_24} "$out/bin/t3" \
       --add-flags "$out/libexec/t3code/apps/server/dist/bin.mjs"
 
-    mkdir -p "$desktop/libexec/t3code/apps/desktop"
-    cp -r --no-preserve=mode \
-      apps/desktop/{package.json,node_modules,dist-electron} \
-      "$desktop/libexec/t3code/apps/desktop/"
+    pnpm --filter @t3tools/desktop deploy --prod --offline "$desktop/libexec/t3code/apps/desktop"
+    cp -r --no-preserve=mode apps/desktop/dist-electron "$desktop/libexec/t3code/apps/desktop/"
     mkdir -p "$desktop/libexec/t3code/apps/desktop/prod-resources"
     install -Dm444 ${desktopIcon} \
       "$desktop/libexec/t3code/apps/desktop/prod-resources/icon.png"
 
-    ln -s "$out/libexec/t3code/node_modules" "$desktop/libexec/t3code/node_modules"
     ln -s "$out/libexec/t3code/apps/server" "$desktop/libexec/t3code/apps/server"
 
     mkdir -p "$desktop/libexec/t3code/apps/desktop/prod-resources/resource-monitor"
