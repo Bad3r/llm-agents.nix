@@ -39,11 +39,23 @@ rustPlatform.buildRustPackage (finalAttrs: {
       --replace-fail '#!/bin/sh' '#!${bash}/bin/sh'
     substituteInPlace src/commands/up.rs \
       --replace-fail '"sh",' '"${bash}/bin/sh",'
+    # The fake ssh in these tests calls cat, which the sandbox lacks in /bin.
+    substituteInPlace tests/compute_cli.rs \
+      --replace-fail '{}:/usr/bin:/bin"' '{}:${coreutils}/bin"'
   '';
 
   preCheck = ''
     export HOME=$(mktemp -d)
   '';
+
+  checkFlags = [
+    # 2s wall-clock assertion on SIGTERM handling; flaky on loaded builders
+    "--skip=jobs::ssh::tests::host_wrapper_finishes_cooperative_term_promptly"
+  ]
+  # child process is not reaped within the test's deadline in the darwin sandbox
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    "--skip=jobs::localbox::tests::local_job_lifecycle"
+  ];
 
   dontUseCargoParallelTests = true; # ETXTBSY: tests write+exec scripts
 
