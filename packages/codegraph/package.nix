@@ -9,16 +9,16 @@
 buildNpmPackage rec {
   npmDepsFetcherVersion = 2;
   pname = "codegraph";
-  version = "1.6.1";
+  version = "1.6.2";
 
   src = fetchFromGitHub {
     owner = "colbymchenry";
     repo = "codegraph";
     tag = "v${version}";
-    hash = "sha256-Aqr4kSrB3Sg870hDHx96RueORQOzy+rpYrFfAPbt20w=";
+    hash = "sha256-G/rBBP1dk1JB17Y4+xubUlPd3iDU2oKLuoiaxZh6Lnw=";
   };
 
-  npmDepsHash = "sha256-wx8tXn5k6kIRYvfreFQPa4HLKgI8vH+6p+QffXQXBbA=";
+  npmDepsHash = "sha256-QA28P/ek+55IO4AkZFVm8sd8uyxjKlUuCFnF6XFLTzA=";
   makeCacheWritable = true;
 
   # build:ui runs the ui workspace through a nested `npm run`, where the root
