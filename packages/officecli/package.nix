@@ -4,6 +4,7 @@
   buildDotnetModule,
   dotnetCorePackages,
   fetchFromGitHub,
+  installAgentSkills,
   versionCheckHook,
 }:
 
@@ -24,8 +25,19 @@ buildDotnetModule rec {
   executables = [ "officecli" ];
   nugetDeps = ./deps.json;
 
+  nativeBuildInputs = [ installAgentSkills ];
+  dontInstallAgentSkills = true;
+
+  postInstall = ''
+    installSkill skills/officecli
+  '';
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
+
+  postInstallCheck = ''
+    test -f "$out/share/skills/officecli/officecli/SKILL.md"
+  '';
 
   passthru.category = "Utilities";
 
