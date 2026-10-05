@@ -5,6 +5,7 @@
   rustPlatform,
   fetchFromGitHub,
   makeWrapper,
+  installAgentSkills,
   mkUpdater,
   bash,
   coreutils,
@@ -32,7 +33,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     inherit (hashes) hash;
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    makeWrapper
+    installAgentSkills
+  ];
+
+  # Export the CLI guide, not the agent-specific runtime skill collection.
+  dontInstallAgentSkills = true;
 
   postPatch = ''
     substituteInPlace $(grep -rl '#!/bin/sh' src) \
@@ -70,6 +77,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
   ];
 
   postInstall = ''
+    # The guide lives at the source root; stage it to avoid copying the build tree.
+    skillDir=$(mktemp -d)
+    mkdir -p "$skillDir/openresearch-cli"
+    cp SKILL.md "$skillDir/openresearch-cli/SKILL.md"
+    installSkill "$skillDir/openresearch-cli"
+
     wrapProgram $out/bin/orx \
       --prefix PATH : ${
         lib.makeBinPath (
@@ -93,6 +106,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
     versionCheckHook
     versionCheckHomeHook
   ];
+
+  postInstallCheck = ''
+    test -f $out/share/skills/openresearch/openresearch-cli/SKILL.md
+    test "$(find "$out/share/skills/openresearch" -type f | wc -l)" -eq 1
+  '';
 
   passthru = {
     category = "Workflow & Project Management";
