@@ -3,6 +3,7 @@
   fetchFromGitHub,
   flake,
   rustPlatform,
+  installAgentSkills,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -28,11 +29,23 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # CoreML acquisition tests fail in Nix sandbox.
   doCheck = false;
 
+  nativeBuildInputs = [ installAgentSkills ];
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
   ];
+
+  # The plugin tree contains another copy of the same skill.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill skills/ctx
+  '';
+
+  postInstallCheck = ''
+    test -f "$out/share/skills/ctx/ctx/SKILL.md"
+  '';
 
   passthru.category = "Utilities";
 
