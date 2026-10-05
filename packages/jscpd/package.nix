@@ -2,6 +2,7 @@
   lib,
   rustPlatform,
   fetchFromGitHub,
+  installAgentSkills,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -26,6 +27,23 @@ rustPlatform.buildRustPackage rec {
     "jscpd"
   ];
 
+  nativeBuildInputs = [ installAgentSkills ];
+  dontInstallAgentSkills = true;
+
+  postInstall = ''
+    # The Rust source root excludes the sibling skills in the full source tree.
+    # Keep their directory names so relative links between skills still work.
+    for skill in jscpd dry-refactoring codebase-refactoring compare-codebases code-migration; do
+      installSkill "${src}/skills/$skill"
+      substituteInPlace "$out/share/skills/jscpd/$skill/SKILL.md" \
+        --replace-fail 'npx jscpd' 'jscpd'
+    done
+
+    # This inline command is wrapped across two Markdown source lines upstream.
+    substituteInPlace "$out/share/skills/jscpd/codebase-refactoring/SKILL.md" \
+      --replace-fail $'npx\njscpd --dashboard' 'jscpd --dashboard'
+  '';
+
   # Workspace tests exercise fixtures outside the rust/ source root.
   doCheck = false;
 
@@ -34,6 +52,16 @@ rustPlatform.buildRustPackage rec {
     versionCheckHook
     versionCheckHomeHook
   ];
+
+  postInstallCheck = ''
+    for skill in jscpd dry-refactoring codebase-refactoring compare-codebases code-migration; do
+      test -f "$out/share/skills/jscpd/$skill/SKILL.md"
+      if grep -F 'npx jscpd' "$out/share/skills/jscpd/$skill/SKILL.md"; then
+        echo "Unexpected npm invocation in $skill" >&2
+        exit 1
+      fi
+    done
+  '';
 
   passthru.category = "Code Review";
 
