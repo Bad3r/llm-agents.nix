@@ -5,6 +5,7 @@
   bun,
   bun2nixLib,
   makeWrapper,
+  installAgentSkills,
   mkUpdater,
   versionCheckHook,
 }:
@@ -27,6 +28,7 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [
     bun2nixLib.hook
     makeWrapper
+    installAgentSkills
   ];
 
   bunDeps = bun2nixLib.fetchBunDeps {
@@ -60,8 +62,19 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
+  # Export the CLI guide and its references without running the HOME installer.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill skills/agent-slack
+  '';
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
+  postInstallCheck = ''
+    test -f "$out/share/skills/agent-slack/agent-slack/SKILL.md"
+    test -f "$out/share/skills/agent-slack/agent-slack/references/targets.md"
+    test -f "$out/share/skills/agent-slack/agent-slack/references/output.md"
+  '';
 
   passthru.category = "Utilities";
   passthru.updater = mkUpdater {
