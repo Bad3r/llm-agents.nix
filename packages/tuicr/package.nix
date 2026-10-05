@@ -4,6 +4,8 @@
   rustPlatform,
   pkg-config,
   libgit2,
+  bash,
+  installAgentSkills,
   versionCheckHook,
   flake,
 }:
@@ -22,16 +24,39 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   nativeBuildInputs = [
     pkg-config
+    installAgentSkills
   ];
 
   buildInputs = [
+    bash
     libgit2
   ];
 
   doCheck = false;
 
+  # Keep the helper beside its wrappers; optional multiplexers remain on PATH.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill skills/tuicr
+    patchShebangs --host "$out/share/skills/tuicr/tuicr"/tuicr-wrapper*.sh
+  '';
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [ versionCheckHook ];
+
+  postInstallCheck = ''
+    skillDir="$out/share/skills/tuicr/tuicr"
+    test -f "$skillDir/SKILL.md"
+    test -f "$skillDir/_tuicr-common.sh"
+    test ! -x "$skillDir/_tuicr-common.sh"
+    for script in tuicr-wrapper{,-cmux,-zellij,-herdr}.sh; do
+      test -x "$skillDir/$script"
+      grep -Eq '^#!/nix/store/[^ ]+/bin/bash$' "$skillDir/$script"
+      grep -Fq "$script" "$skillDir/SKILL.md"
+      grep -Fq '/_tuicr-common.sh"' "$skillDir/$script"
+      "$skillDir/$script" --help > /dev/null
+    done
+  '';
 
   passthru.category = "Code Review";
 
