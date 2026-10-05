@@ -3,6 +3,7 @@
   stdenv,
   flake,
   fetchFromGitHub,
+  installAgentSkills,
   rustPlatform,
   zig,
   xcbuild,
@@ -40,6 +41,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   nativeBuildInputs = [
     zig
     installShellFiles
+    installAgentSkills
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     # zig's macOS SDK detection shells out to xcode-select/xcrun; xcbuild
@@ -92,6 +94,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # sandbox.
   doCheck = false;
 
+  dontInstallAgentSkills = true;
+
   postInstall =
     lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
       installShellCompletion --cmd herdr \
@@ -102,6 +106,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # Ship the per-agent hook/plugin sources so users can wire them up
     # declaratively (e.g. home-manager) instead of running `herdr integrate`.
     + ''
+      installSkill skills/herdr
       install -d "$out/share/herdr"
       cp -r src/integration/assets "$out/share/herdr/integrations"
       find "$out/share/herdr/integrations" -name '*.test.ts' -delete
@@ -112,6 +117,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
     versionCheckHook
     versionCheckHomeHook
   ];
+
+  postInstallCheck = ''
+    test -f "$out/share/skills/herdr/herdr/SKILL.md"
+  '';
 
   passthru.category = "Workflow & Project Management";
 
