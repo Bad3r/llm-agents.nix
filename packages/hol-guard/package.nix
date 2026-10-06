@@ -35,6 +35,7 @@ python3.pkgs.buildPythonApplication rec {
     regex
     requests
     rich
+    tomlkit
   ];
 
   pythonRelaxDeps = true;
