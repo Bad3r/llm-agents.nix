@@ -1,0 +1,85 @@
+From d1819dda0a22cfb16cb9987150c43c6d611a7eb4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Thalheim?= <joerg@thalheim.io>
+Date: Tue, 6 Oct 2026 11:15:02 +0200
+Subject: [PATCH] daemon: report unknown status when the service manager cannot
+ be inspected
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+launchctl print gui/<uid>/... fails with exit code 125 when the calling
+session has no per-user launchd domain, and systemctl --user show fails
+without a user bus (sandboxed builds, plain SSH sessions). Doctor should
+degrade to loaded=unknown instead of erroring.
+
+Signed-off-by: Jörg Thalheim <joerg@thalheim.io>
+---
+ src/daemon/service.rs         |  9 ++++++---
+ src/daemon/service/systemd.rs | 23 ++++++++++++-----------
+ 2 files changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/src/daemon/service.rs b/src/daemon/service.rs
+index 8b8d043..97ab189 100644
+--- a/src/daemon/service.rs
++++ b/src/daemon/service.rs
+@@ -299,12 +299,15 @@ fn status_with_runner(runner: &impl LaunchctlRunner) -> Result<ServiceStatus> {
+     let program_matches_current = program
+         .as_ref()
+         .map(|program| paths_resolve_to_same_file(program, &current_executable));
+-    let runtime = service_runtime(runner, &spec)?;
++    // Report "unknown" instead of failing when launchctl cannot inspect
++    // the GUI domain (e.g. sandboxed builds or SSH sessions without a
++    // per-user launchd domain).
++    let runtime = service_runtime(runner, &spec).ok();
+     Ok(ServiceStatus {
+         platform_supported: true,
+         installed: spec.plist_path.exists(),
+-        loaded: Some(runtime.loaded),
+-        running: runtime.running,
++        loaded: runtime.map(|r| r.loaded),
++        running: runtime.and_then(|r| r.running),
+         service_path: spec.plist_path,
+         program,
+         current_executable,
+diff --git a/src/daemon/service/systemd.rs b/src/daemon/service/systemd.rs
+index d47f083..c8526a1 100644
+--- a/src/daemon/service/systemd.rs
++++ b/src/daemon/service/systemd.rs
+@@ -148,22 +148,23 @@ pub(super) fn status_with_runner(
+         "--property=LoadState",
+         "--property=ActiveState",
+     ];
+-    let output = runner.run(&args)?;
+-    if !output.status.success() {
+-        return Err(systemctl_failure(&args, &output));
+-    }
+-    let text = String::from_utf8_lossy(&output.stdout);
++    // Report "unknown" instead of failing when systemctl cannot reach a user
++    // manager (e.g. sandboxed builds or sessions without a user bus).
++    let output = runner.run(&args).ok().filter(|o| o.status.success());
+     let property = |name: &str| {
+-        text.lines()
+-            .find_map(|line| line.strip_prefix(name)?.strip_prefix('='))
+-            .unwrap_or_default()
+-            .to_string()
++        output.as_ref().map(|output| {
++            String::from_utf8_lossy(&output.stdout)
++                .lines()
++                .find_map(|line| line.strip_prefix(name)?.strip_prefix('='))
++                .unwrap_or_default()
++                .to_string()
++        })
+     };
+     Ok(ServiceStatus {
+         platform_supported: true,
+         installed: spec.unit_path.exists(),
+-        loaded: Some(property("LoadState") == "loaded"),
+-        running: Some(property("ActiveState") == "active"),
++        loaded: property("LoadState").map(|state| state == "loaded"),
++        running: property("ActiveState").map(|state| state == "active"),
+         service_path: spec.unit_path.clone(),
+         program,
+         current_executable,
+-- 
+2.55.0
+
