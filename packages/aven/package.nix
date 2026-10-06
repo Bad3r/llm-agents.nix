@@ -26,7 +26,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
   # invocation (and thus its tests) error out. Degrade to "unknown" instead.
-  patches = [ ./daemon-status-unknown-without-gui-domain.patch ];
+  patches = [ ./daemon-status-unknown-without-service-manager.patch ];
 
   # Some tests infer the project key from the checkout directory name
   # ("aven" -> "AVN"), but Nix unpacks into "source".
