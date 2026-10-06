@@ -89,6 +89,7 @@ python3.pkgs.buildPythonApplication rec {
     signxml
     terminaltexteffects
     textual
+    tzdata
     uvicorn
     watchdog
     websockets
