@@ -15,7 +15,7 @@ buildNpmPackage (finalAttrs: {
     owner = "yeachan-heo";
     repo = "oh-my-claudecode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-rqkzf0yWmY8dUTDnNXXZRUvpyiUOgFqnY8aW3CBUbH4=";
+    hash = "sha256-Zv7pDWeyWopVuEYgPqhQozICqX3rJ1EeCUddtjDgxL4=";
   };
 
   npmDepsHash = "sha256-Ycg42qGuHnNRAHhu0Ez2qD/u+zV905jflbvVHuoeTSY=";
