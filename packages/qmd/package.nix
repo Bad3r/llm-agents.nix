@@ -6,6 +6,7 @@
   bun2nixLib,
   bun,
   makeWrapper,
+  installAgentSkills,
   sqlite,
   formatelf,
   flake,
@@ -41,6 +42,7 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     bun2nixLib.hook
     makeWrapper
+    installAgentSkills
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ]
   ++ lib.optionals effectiveCudaSupport [ autoAddDriverRunpath ];
@@ -141,9 +143,18 @@ stdenv.mkDerivation {
       runHook postInstall
     '';
 
+  # Only export the user-facing skill, not the upstream release workflow.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill skills/qmd
+  '';
+
   doInstallCheck = true;
   installCheckPhase = ''
     runHook preInstallCheck
+    test -f $out/share/skills/qmd/qmd/SKILL.md
+    test -f $out/share/skills/qmd/qmd/references/mcp-setup.md
+    test ! -e $out/share/skills/qmd/release
     # Test --help works
     HOME=$(mktemp -d) $out/bin/qmd --help | grep -q "Usage:"
     # Test actual database initialization (requires sqlite extension loading)

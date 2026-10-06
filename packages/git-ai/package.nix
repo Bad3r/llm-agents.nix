@@ -5,6 +5,7 @@
   fetchFromGitHub,
   git,
   perl,
+  installAgentSkills,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -22,7 +23,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-/a2YpqhN5hbrFJTcehEPkFH9Jsinqf4sYTRiN+OTqp4=";
 
-  nativeBuildInputs = [ perl ];
+  nativeBuildInputs = [
+    perl
+    installAgentSkills
+  ];
 
   postPatch = ''
     substituteInPlace src/config.rs \
@@ -50,6 +54,20 @@ rustPlatform.buildRustPackage (finalAttrs: {
     versionCheckHomeHook
   ];
   versionCheckProgramArg = "version";
+
+  # Export the supported user workflows explicitly.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill skills/ask
+    installSkill skills/git-ai-search
+    installSkill skills/prompt-analysis
+  '';
+
+  postInstallCheck = ''
+    test -f "$out/share/skills/git-ai/ask/SKILL.md"
+    test -f "$out/share/skills/git-ai/git-ai-search/SKILL.md"
+    test -f "$out/share/skills/git-ai/prompt-analysis/SKILL.md"
+  '';
 
   passthru.category = "Utilities";
 
