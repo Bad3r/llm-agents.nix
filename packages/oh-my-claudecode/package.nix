@@ -9,13 +9,13 @@
 buildNpmPackage (finalAttrs: {
   npmDepsFetcherVersion = 2;
   pname = "oh-my-claudecode";
-  version = "5.6.1";
+  version = "5.6.2";
 
   src = fetchFromGitHub {
     owner = "yeachan-heo";
     repo = "oh-my-claudecode";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-LVIWWa0ubl5h8afDM9e8UlQU48Lv89QI6p5JOmVUDQ8=";
+    hash = "sha256-rqkzf0yWmY8dUTDnNXXZRUvpyiUOgFqnY8aW3CBUbH4=";
   };
 
   npmDepsHash = "sha256-Ycg42qGuHnNRAHhu0Ez2qD/u+zV905jflbvVHuoeTSY=";
