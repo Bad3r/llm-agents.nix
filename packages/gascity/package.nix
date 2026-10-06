@@ -19,16 +19,16 @@ assert lib.versionAtLeast dolt.version "2.1.0";
 
 (buildGoModule.override { go = go-bin; }) rec {
   pname = "gascity";
-  version = "1.4.2";
+  version = "1.5.0";
 
   src = fetchFromGitHub {
     owner = "gastownhall";
     repo = "gascity";
     tag = "v${version}";
-    hash = "sha256-cHKj7wvd2DjRXhCXoTqYPGB38yQqKYzZ9FCePdMJE3s=";
+    hash = "sha256-le/Cit409xz8VaNwB+MlloxTv7slHGXKEhP3cXbeExw=";
   };
 
-  vendorHash = "sha256-1fzO7fhQgUTCdsjrmk0dY4XswdeTYoGrAKMwTEuTGIY=";
+  vendorHash = "sha256-+9G0t52oA+nj8uDCoryUwWQioFgx/m2QvJcwYzmNFUs=";
 
   env.CGO_ENABLED = "0";
 
