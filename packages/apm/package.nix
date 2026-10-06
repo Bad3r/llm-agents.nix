@@ -3,6 +3,7 @@
   python3,
   fetchFromGitHub,
   fetchPypi,
+  installAgentSkills,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -116,12 +117,25 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
 
   pythonImportsCheck = [ "apm_cli" ];
 
+  nativeBuildInputs = [ installAgentSkills ];
+
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
   ];
   versionCheckProgramArg = [ "--version" ];
+
+  # The usage guide is hidden under .apm; exclude templates and test fixtures.
+  dontInstallAgentSkills = true;
+  postInstall = ''
+    installSkill packages/apm-guide/.apm/skills/apm-usage
+  '';
+
+  postInstallCheck = ''
+    test -f "$out/share/skills/apm/apm-usage/SKILL.md"
+    test -f "$out/share/skills/apm/apm-usage/commands.md"
+  '';
 
   passthru.category = "Utilities";
 
