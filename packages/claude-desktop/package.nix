@@ -221,6 +221,7 @@ let
       nspr
       nss
       pango
+      pipewire
       systemdLibs
     ];
 
