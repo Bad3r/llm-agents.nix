@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""Length-preserving edit to the JS payload embedded in the cortex binary:
-default --auto-update to false.
-"""
+"""Default --auto-update to false in the JS payload embedded in the cortex binary."""
 
 import sys
 from pathlib import Path
