@@ -54,13 +54,13 @@
 
 let
   pname = "kandev";
-  version = "0.96.0";
+  version = "0.97.0";
 
   src = fetchFromGitHub {
     owner = "kdlbs";
     repo = "kandev";
     tag = "v${version}";
-    hash = "sha256-RqyV4wcgyW3OFrdvIBOq5HiWPPofLah2pNEWvpCrvos=";
+    hash = "sha256-MRSDjcdE//vK6kOXs5d9pZmcosuhUcSoXu9W2XZrwfI=";
   };
 
   runtimeTools = [
@@ -151,7 +151,7 @@ let
         ;
       inherit pnpm;
       fetcherVersion = 4;
-      hash = "sha256-iTiFkIuKNim7/edbr9PUlM4MsC+/DW/IzCGN2AjLScM=";
+      hash = "sha256-40CjdyJSiev3NLUHVc90ZmtwzUBq3P6gQU0fPKc9LPM=";
     };
 
     nativeBuildInputs = [
@@ -178,7 +178,7 @@ buildGoModule (_finalAttrs: {
   inherit pname version src;
 
   modRoot = "apps/backend";
-  vendorHash = "sha256-/SwR/yZcQ4wiRj+Wiz5nSzmozHKv++gbeYJmJlD6168=";
+  vendorHash = "sha256-gN6cTaNwSKT0cx6dBey5vcqxxu1ADBKkzG5aQ3Gni/8=";
   # Keep the vendor FOD independent of our source patch so nix-update can
   # compute vendorHash even when the patch needs a rebase.
   overrideModAttrs = _: _: {
@@ -205,6 +205,11 @@ buildGoModule (_finalAttrs: {
     # Install-script tests run sh with a fake curl first on an FHS PATH.
     substituteInPlace apps/backend/internal/agent/agents/{devin,goose,muse}_acp_test.go \
       --replace-fail '":/usr/bin:/bin"' '":" + os.Getenv("PATH")'
+
+    # The auth setup script runs under an empty env; nix's bash has no default PATH.
+    substituteInPlace apps/backend/internal/agent/agents/claude_acp_test.go \
+      --replace-fail '"CLAUDE_CODE_OAUTH_TOKEN=test-token",' \
+        '"CLAUDE_CODE_OAUTH_TOKEN=test-token", "PATH=" + os.Getenv("PATH"),'
   '';
 
   preBuild = ''

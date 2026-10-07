@@ -8,16 +8,16 @@
 
 (buildGoModule.override { go = go_1_27; }) rec {
   pname = "unreal-agent";
-  version = "0.2.0";
+  version = "0.3.1";
 
   src = fetchFromGitHub {
     owner = "unreallabsai";
     repo = "unreal-agent";
     tag = "v${version}";
-    hash = "sha256-fNGDRmDAPpBuOmea62Q7e2F3BVChnnrWnxwDsqalzyM=";
+    hash = "sha256-VlHbwr9wg5Z4xvjsYmluT189HCgEUBcqhe5jxTEY9CQ=";
   };
 
-  vendorHash = "sha256-JnIySSral40U188nsO+7zt/4404bAGQIXNiMz+/Fbyo=";
+  vendorHash = "sha256-B7sXtnSGKwwfJuLujb9+/PH8FY8Hzk/uiI5vuJedWKI=";
 
   subPackages = [ "cmd/unreal-agent-runner" ];
 
