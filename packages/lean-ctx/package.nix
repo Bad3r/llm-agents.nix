@@ -17,7 +17,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "yvgude";
     repo = "lean-ctx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-p5Q9PpquDMg/hFDQiQL2ZPHQnhWHC77GeLCzMiurNvI=";
+    hash = "sha256-zTe5Ol49BepUpVBMaJSg6RMQNPr7NnVBcMgBUaRIvYQ=";
   };
 
   cargoRoot = "rust";
