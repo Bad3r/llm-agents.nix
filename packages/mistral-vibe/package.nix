@@ -196,6 +196,7 @@ python.pkgs.buildPythonApplication {
     agent-client-protocol
     anyio
     cachetools
+    croniter
     cryptography
     gitpython
     giturlparse
