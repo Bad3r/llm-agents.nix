@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation rec {
   pname = "ccstatusline";
-  version = "2.2.30";
+  version = "2.2.32";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/ccstatusline/-/ccstatusline-${version}.tgz";
-    hash = "sha256-cfdVpzNb0sa/qYiv/VH3EvNAsxCZDVOG44VVaZQ+vNk=";
+    hash = "sha256-mz7dVziadgxDdF+BjlITkeVu4MoVSc29xN3nuDiSqD8=";
   };
 
   nativeBuildInputs = [ nodejs ];
