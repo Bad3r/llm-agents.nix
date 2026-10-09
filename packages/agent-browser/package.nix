@@ -14,7 +14,7 @@
 
 let
   pname = "agent-browser";
-  version = "0.38.2";
+  version = "0.39.0";
 
   # Node 24's worker_threads teardown double-closes file descriptors
   # (Environment::RunCleanup closing an fd number that the OS has already
@@ -36,7 +36,7 @@ let
     # Upstream has a branch and a tag both named v<version>, so the plain
     # archive URL is ambiguous ("multiple possibilities"). Pin the tag ref.
     tag = "v${version}";
-    hash = "sha256-PNIQvTMYqcu8hS1TOiXJtVEYTmFJdRv1nu0T5nG3MlE=";
+    hash = "sha256-8Og2ruMaY+ObT9WiYqCyoXAcwZ/6t2g6SeU3+wF15ck=";
   };
 
   dashboard = stdenv.mkDerivation {
@@ -57,7 +57,7 @@ let
       pname = "${pname}-dashboard";
       inherit version src pnpm;
       pnpmWorkspaces = [ "dashboard" ];
-      hash = "sha256-X9kDzM6/LqBMMHhR9KEw+M2xH3yUJu2y4o26WLjNdAE=";
+      hash = "sha256-iaZzDTeRzz3NocNNypzsHfJthyhVT2EA7wNnu4kbY30=";
       fetcherVersion = 4;
     };
 
@@ -91,7 +91,7 @@ rustPlatform.buildRustPackage {
 
   sourceRoot = "source/cli";
 
-  cargoHash = "sha256-RaIiFKYBt00kqodNoz3NlC7qnko+buvYB7w7mB1cHI8=";
+  cargoHash = "sha256-Axpnef0CrrFcYBvfNxPYUZ4hxaP9rfpqUI8GSL49bu4=";
 
   nativeBuildInputs = lib.optional stdenv.hostPlatform.isLinux makeBinaryWrapper;
   buildInputs = lib.optional stdenv.hostPlatform.isLinux chromium;
