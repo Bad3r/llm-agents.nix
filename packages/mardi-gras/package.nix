@@ -10,16 +10,16 @@
 
 buildGoModule.override { go = go-bin; } rec {
   pname = "mardi-gras";
-  version = "0.34.0";
+  version = "0.36.0";
 
   src = fetchFromGitHub {
     owner = "quietpublish";
     repo = "mardi-gras";
     tag = "v${version}";
-    hash = "sha256-LUC+SgjAcXK3di8HEU0jjFaQJNJdWB41whi+JAsawZ4=";
+    hash = "sha256-X5tchU4Mq4yfpSAOk30mkyvp19HRKnZ8IrwmByysjRE=";
   };
 
-  vendorHash = "sha256-Ji7ij19/4akUex2gabqrnWFQlr+XvDlHKVg8FxZQ97A=";
+  vendorHash = "sha256-odLTQpKlRXb13SD1VhUxhNf7kJaAnuSwhFCzTCMMTmQ=";
 
   subPackages = [ "cmd/mg" ];
 
