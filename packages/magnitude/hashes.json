@@ -1,0 +1,12 @@
+{
+  "version": "0.2.7",
+  "revision": 57,
+  "desktop": {
+    "x86_64-linux": "sha256-sMCDi7eUKXMsCyhiG9XwN2g7rSKZBC5x8fZZASr33AM=",
+    "aarch64-linux": "sha256-9VEG8/C+9APFhneA1oD+TVNrYYz1npGho3UkEqCQql0="
+  },
+  "inference": {
+    "x86_64-linux": "sha256-pUQ7v85VLdM9LocIaK23rDODOglh8QslKytPBaRG3s0=",
+    "aarch64-linux": "sha256-mqgDZi5e67RBU233YGqk2m+4ltgJAp78MIJzK88DyzM="
+  }
+}

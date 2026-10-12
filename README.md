@@ -1796,6 +1796,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>magnitude</strong> - Local inference engine for agents that tunes its kernels to the host hardware</summary>
+
+- **Source**: binary
+- **License**: Apache-2.0 / unfree
+- **Homepage**: https://magnitude.dev
+- **Usage**: `nix run github:numtide/llm-agents.nix#magnitude -- --help`
+- **Nix**: [packages/magnitude/package.nix](packages/magnitude/package.nix)
+
+</details>
+<details>
 <summary><strong>mcporter</strong> - TypeScript runtime and CLI for the Model Context Protocol</summary>
 
 - **Source**: source
