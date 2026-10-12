@@ -10,16 +10,16 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "ck";
-  version = "0.7.11";
+  version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "BeaconBay";
     repo = "ck";
     tag = version;
-    hash = "sha256-YZ5zswjTvst6Ee5arJPKzz9BDIIXf/pHuQ6QB+qZ9kc=";
+    hash = "sha256-VI8nqIAlcynSHvs5BbXg5numYaa4NwppvLhv1gbN9yk=";
   };
 
-  cargoHash = "sha256-sv7wTFN5eA7HWOE+syDGLtwcV/pvUmqyO8Cb0n5ldgE=";
+  cargoHash = "sha256-lVE8D1EEj2r7ZmAJPlALsstr41rMzIQr/C8ZCr4Um44=";
 
   nativeBuildInputs = [ pkg-config ];
 
