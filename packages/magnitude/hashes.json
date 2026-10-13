@@ -1,12 +1,12 @@
 {
-  "version": "0.2.7",
-  "revision": 57,
+  "version": "0.2.8",
+  "revision": 58,
   "desktop": {
-    "x86_64-linux": "sha256-sMCDi7eUKXMsCyhiG9XwN2g7rSKZBC5x8fZZASr33AM=",
-    "aarch64-linux": "sha256-9VEG8/C+9APFhneA1oD+TVNrYYz1npGho3UkEqCQql0="
+    "x86_64-linux": "sha256-Dh+0AMV/RNcuxH/8f/DTjxgco13UhbB4ecAvMK6+mV4=",
+    "aarch64-linux": "sha256-TaaaW8xm3f4mculCk3bzxRUc7xe3CvUehiOrpL79tUw="
   },
   "inference": {
-    "x86_64-linux": "sha256-pUQ7v85VLdM9LocIaK23rDODOglh8QslKytPBaRG3s0=",
-    "aarch64-linux": "sha256-mqgDZi5e67RBU233YGqk2m+4ltgJAp78MIJzK88DyzM="
+    "x86_64-linux": "sha256-NXkglumUVWiDeGC7vg3Yc5iVbADnRrbxSNfzvhYsA1o=",
+    "aarch64-linux": "sha256-0EKwbvq0kACiZYLgIykvdZssn1HSfNN+yEHh9k7ebpo="
   }
 }
