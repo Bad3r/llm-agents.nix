@@ -189,11 +189,6 @@ inputs."nixpkgs".lib.extend (
         githubId = 13460388;
         name = "Hobr";
       };
-      mnixry = {
-        github = "mnixry";
-        githubId = 32300164;
-        name = "Mix";
-      };
       iainlane = {
         github = "iainlane";
         githubId = 321014;
@@ -308,6 +303,11 @@ inputs."nixpkgs".lib.extend (
         github = "74k1";
         githubId = 49000471;
         name = "Tim";
+      };
+      xqliu = {
+        github = "xqliu";
+        githubId = 22554;
+        name = "Lawrence Liu";
       };
     };
   }

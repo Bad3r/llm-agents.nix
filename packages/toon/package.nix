@@ -7,14 +7,14 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "toon-format";
-  version = "0.6.1";
+  version = "0.7.0";
 
   src = fetchCrate {
     inherit pname version;
-    hash = "sha256-oeMhG8j8c078c1Gc0VQNTC+c+fV7pUw9DRiNDVVx6OY=";
+    hash = "sha256-jB2gkLp/TMvgPz4izo8ZL7yd2utAdtCsNWB8I8GYv04=";
   };
 
-  cargoHash = "sha256-Juwju7TSY3RGzkbT1L1EbpTv+eRDODE+8JU1FSO72Q0=";
+  cargoHash = "sha256-j+UijiWYMLWeo3CM6J3q2PqEZRjHfG59JhdNAo3J/rA=";
 
   cargoBuildFlags = [
     "--features"

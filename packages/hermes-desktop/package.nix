@@ -8,7 +8,6 @@
   hermes-agent,
   makeWrapper,
   xcbuild,
-  icnsify,
   copyDesktopItems,
   makeDesktopItem,
   git,
@@ -28,7 +27,6 @@ let
   # supplies Electron separately. Keep the intentional major bump explicit and
   # rebuild node-pty against the runtime we actually ship.
   electron = electron_42;
-  desktopVersion = "0.17.6";
 
   isLinux = stdenv.hostPlatform.isLinux;
   isDarwin = stdenv.hostPlatform.isDarwin;
@@ -66,8 +64,7 @@ let
 in
 buildNpmPackage {
   pname = "hermes-desktop";
-  version = desktopVersion;
-  inherit (hermes-agent) src;
+  inherit (hermes-agent) version src;
 
   # Desktop, TUI and web share one root package-lock.json. Reuse the FOD that
   # hermes-agent's frontend already fetched rather than storing the same npm
@@ -96,26 +93,17 @@ buildNpmPackage {
   ++ lib.optionals isDarwin [
     file
     xcbuild
-    icnsify
     darwin.autoSignDarwinBinariesHook
   ];
 
   buildPhase = ''
     runHook preBuild
 
-    upstream_desktop_version=$(node -p "require('./apps/desktop/package.json').version")
-    if [[ "$upstream_desktop_version" != ${lib.escapeShellArg desktopVersion} ]]; then
-      echo "error: upstream Desktop version is $upstream_desktop_version, expected ${desktopVersion}" >&2
-      echo "Update desktopVersion and re-check the package layout." >&2
-      exit 1
-    fi
-
     upstream_electron_manifest=$(node -p "require('./apps/desktop/package.json').devDependencies.electron")
-    upstream_electron_builder=$(node -p "require('./apps/desktop/package.json').build.electronVersion")
     upstream_electron_lock=$(node -p "(p => (p['apps/desktop/node_modules/electron'] ?? p['node_modules/electron']).version)(require('./package-lock.json').packages)")
-    if [[ "$upstream_electron_manifest" != 40.10.2 || "$upstream_electron_builder" != 40.10.2 || "$upstream_electron_lock" != 40.10.2 ]]; then
+    if [[ "$upstream_electron_manifest" != 40.10.2 || "$upstream_electron_lock" != 40.10.2 ]]; then
       echo "error: upstream Electron pins changed from the reviewed 40.10.2" >&2
-      echo "manifest=$upstream_electron_manifest builder=$upstream_electron_builder lock=$upstream_electron_lock" >&2
+      echo "manifest=$upstream_electron_manifest lock=$upstream_electron_lock" >&2
       echo "Re-check Electron compatibility and update this package deliberately." >&2
       exit 1
     fi
@@ -131,35 +119,7 @@ buildNpmPackage {
 
     mkdir -p apps/desktop/build
 
-    ${lib.optionalString isLinux ''
-      # External Electron points process.resourcesPath at its own installation.
-      # Redirect only the Hermes install-stamp lookup to packaged resources.
-      substituteInPlace apps/desktop/electron/main.ts \
-        --replace-fail \
-          "process.resourcesPath ? path.join(process.resourcesPath, 'install-stamp.json') : null," \
-          "process.env.HERMES_DESKTOP_RESOURCES_DIR ? path.join(process.env.HERMES_DESKTOP_RESOURCES_DIR, 'install-stamp.json') : null,"
-    ''}
-
     pushd apps/desktop
-
-    # Vite empties dist/, so build the renderer before adding the Electron
-    # main/preload bundles and staged native dependencies.
-    npm exec -- tsc -b
-    npm exec -- vite build
-    node scripts/bundle-electron-main.mjs
-
-    ${lib.optionalString isDarwin ''
-      # Finder does not run the command-line wrapper and supplies only a small
-      # PATH. Bake Nix defaults into the main bundle while still allowing an
-      # explicit backend override from the launch environment.
-      {
-        printf '%s\n' \
-          'process.env.HERMES_DESKTOP_HERMES ||= ${builtins.toJSON hermesExecutable};' \
-          'process.env.PATH = ${builtins.toJSON runtimePath} + (process.env.PATH ? ":" + process.env.PATH : "");'
-        cat dist/electron-main.mjs
-      } > dist/electron-main.mjs.nix
-      mv dist/electron-main.mjs.nix dist/electron-main.mjs
-    ''}
 
     # Published prebuilds target other Node/Electron ABIs and are not usable on
     # NixOS. Force a native build using the headers for the Electron derivation
@@ -182,21 +142,29 @@ buildNpmPackage {
     # Darwin spawn-helper remain in Release/.
     rm -rf ../../node_modules/node-pty/build/Release/{.deps,node-addon-api,obj.target}
 
-    node scripts/stage-native-deps.mjs ${targetPlatform} ${targetArch}
-    rm -rf dist/node_modules/node-pty/build/Release/{.deps,node-addon-api,obj.target}
+    node scripts/stage-native-deps.mjs \
+      --out "$TMPDIR/native-deps" --platform ${targetPlatform} --arch ${targetArch}
+    node ../../scripts/build/desktop.mjs \
+      --source "$PWD/../.." --out "$PWD/dist" --icons "$PWD/../.." \
+      --stamp ${hermes-agent.installStamp} --native-deps "$TMPDIR/native-deps" \
+      --platform ${targetPlatform} --typecheck
 
     ${lib.optionalString isDarwin ''
-      # electron-builder's extraResources are required at runtime. The source
-      # tarball has no .git metadata, so provide the same deterministic stamp
-      # used by the Linux installation.
-      cat > build/install-stamp.json <<'EOF'
-      {"schemaVersion":1,"commit":"0000000000000000000000000000000000000000","branch":"main","dirty":false,"source":"nix"}
-      EOF
+      # Finder does not run the command-line wrapper and supplies only a small
+      # PATH. Bake Nix defaults into the main bundle while still allowing an
+      # explicit backend override from the launch environment.
+      {
+        printf '%s\n' \
+          'process.env.HERMES_DESKTOP_HERMES ||= ${builtins.toJSON hermesExecutable};' \
+          'process.env.PATH = ${builtins.toJSON runtimePath} + (process.env.PATH ? ":" + process.env.PATH : "");'
+        cat dist/electron-main.mjs
+      } > dist/electron-main.mjs.nix
+      mv dist/electron-main.mjs.nix dist/electron-main.mjs
+    ''}
 
-      # Upstream's icon.icns is actually a PNG with the wrong extension.
-      # Convert the source PNG up front so electron-builder neither packages an
-      # invalid icon nor downloads its icon-conversion toolset in the sandbox.
-      icnsify assets/icon.png --output assets/icon.icns
+    ${lib.optionalString isDarwin ''
+      # electron-builder's extraResources are required at runtime.
+      cp ${hermes-agent.installStamp} build/install-stamp.json
 
       # electron-builder mutates Electron.app while applying the Hermes bundle
       # identity, so copy nixpkgs' pinned dist to a writable build directory.
@@ -208,16 +176,15 @@ buildNpmPackage {
       chmod -R u+w electron-dist
       export CSC_IDENTITY_AUTO_DISCOVERY=false
 
-      # Fail closed if bundling gains another external, then remove source-only
-      # dependencies. Returning false from beforeBuild marks node_modules as
-      # externally handled while avoiding electron-builder 26's cycle-unsafe
-      # workspace collector.
-      node ${./prepare-packaging.mjs} .
-
-      node scripts/run-electron-builder.mjs \
+      # Upstream's run-electron-builder.mjs downloads Electron first.
+      HERMES_PREPARED_NATIVE_DEPS="$TMPDIR/native-deps" \
+      node ../../node_modules/electron-builder/cli.js \
+        --config electron-builder.config.cjs \
+        --publish never \
         -c.electronDist="$PWD/electron-dist" \
         -c.electronVersion=${electron.version} \
-        -c.mac.identity=null \
+        -c.extraMetadata.version=${hermes-agent.version} \
+        -c.mac.sign=null \
         -c.mac.notarize=false \
         --dir --mac --arm64
     ''}
@@ -230,8 +197,6 @@ buildNpmPackage {
   doCheck = true;
   checkPhase = ''
     runHook preCheck
-
-    npm run postbuild --workspace apps/desktop
 
     app=apps/desktop/dist
     test -f "$app/index.html"
@@ -257,18 +222,19 @@ buildNpmPackage {
       appDir=$out/share/hermes-desktop
       mkdir -p "$appDir" $out/bin
       cp -r apps/desktop/dist "$appDir/"
-      cp apps/desktop/package.json "$appDir/"
+      # The sources only carry a 0.0.0 placeholder version.
+      substitute apps/desktop/package.json "$appDir/package.json" \
+        --replace-fail '"version": "0.0.0"' '"version": "${hermes-agent.version}"'
 
-      # fetchFromGitHub has no .git directory. Use upstream's documented
-      # non-git fallback rather than inventing a revision bootstrap may fetch.
-      cat > "$appDir/install-stamp.json" <<EOF
-      {"schemaVersion":1,"commit":"0000000000000000000000000000000000000000","branch":"main","dirty":false,"source":"nix"}
-      EOF
+      cp ${hermes-agent.installStamp} "$appDir/install-stamp.json"
+
+      # External Electron points process.resourcesPath at its own installation.
+      substituteInPlace "$appDir/dist/electron-main.mjs" \
+        --replace-fail process.resourcesPath "'$appDir'"
 
       makeWrapper ${lib.getExe electron} $out/bin/hermes-desktop \
         --add-flags "$appDir" \
         --set HERMES_DESKTOP_HERMES ${lib.escapeShellArg hermesExecutable} \
-        --set HERMES_DESKTOP_RESOURCES_DIR "$appDir" \
         --set ELECTRON_IS_DEV 0 \
         --prefix PATH : ${runtimePath} \
         --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
@@ -331,9 +297,8 @@ buildNpmPackage {
       test -f "$appDir/dist/electron-main.mjs"
       test -f "$appDir/dist/electron-preload.js"
       test -f "$appDir/install-stamp.json"
-      test "$(node -p "require('$appDir/package.json').version")" = ${lib.escapeShellArg desktopVersion}
+      test "$(node -p "require('$appDir/package.json').version")" = ${hermes-agent.version}
       grep -q HERMES_DESKTOP_HERMES $out/bin/hermes-desktop
-      grep -q HERMES_DESKTOP_RESOURCES_DIR $out/bin/hermes-desktop
       grep -q ${lib.escapeShellArg hermesExecutable} $out/bin/hermes-desktop
 
       pty_node=$(find "$ptyRoot" -name '*.node' -print -quit)
@@ -393,8 +358,7 @@ buildNpmPackage {
 
   passthru = {
     category = "AI Assistants";
-    agentVersion = hermes-agent.version;
-    inherit desktopVersion electron;
+    inherit electron;
   };
 
   meta = with lib; {

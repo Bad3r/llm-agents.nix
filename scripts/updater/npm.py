@@ -14,7 +14,7 @@ from updater.http import fetch_json
 
 
 def _can_prefetch_npm_lockfile(lockfile: Path) -> bool:
-    """Return whether the lockfile has enough metadata for Nix prefetching."""
+    """Return whether Nix can prefetch the lockfile and npm ci accepts it."""
     data: dict[str, Any] = json.loads(lockfile.read_text())
     packages = data.get("packages", {})
     if not isinstance(packages, dict):
@@ -23,6 +23,13 @@ def _can_prefetch_npm_lockfile(lockfile: Path) -> bool:
     for package_path, package_data in packages.items():
         if package_path == "" or not isinstance(package_data, dict):
             continue
+
+        # npm ci ignores entries whose parent is not installed and then reports
+        # the lockfile as out of sync with package.json.
+        parent, separator, _ = package_path.rpartition("/node_modules/")
+        if separator and parent not in packages:
+            print(f"Skipping npm-shrinkwrap.json; {package_path} has no parent entry")
+            return False
 
         resolved = package_data.get("resolved")
         if not isinstance(resolved, str) or resolved.startswith("git+"):

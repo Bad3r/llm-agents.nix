@@ -18,6 +18,12 @@
   ],
 }:
 
+let
+  providerBinPath = lib.makeBinPath providerPackages;
+  pathPrefixFlag = lib.optionalString (
+    providerBinPath != ""
+  ) "--prefix PATH : ${lib.escapeShellArg providerBinPath}";
+in
 stdenvNoCC.mkDerivation {
   pname = "t3code";
   inherit (t3code-unwrapped) version;
@@ -38,12 +44,12 @@ stdenvNoCC.mkDerivation {
     mkdir -p "$out/bin" "$desktop/bin"
 
     makeWrapper ${t3code-unwrapped}/bin/t3 "$out/bin/t3" \
-      --prefix PATH : ${lib.escapeShellArg (lib.makeBinPath providerPackages)}
+      ${pathPrefixFlag}
     ln -s ${t3code-unwrapped}/share "$out/share"
 
     makeWrapper ${t3code-unwrapped.desktop}/bin/t3code-desktop \
       "$desktop/bin/t3code-desktop" \
-      --prefix PATH : ${lib.escapeShellArg (lib.makeBinPath providerPackages)} \
+      ${pathPrefixFlag} \
       --inherit-argv0
     ln -s ${t3code-unwrapped.desktop}/share "$desktop/share"
 

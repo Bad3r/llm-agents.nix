@@ -31,6 +31,7 @@ REPO = "hermes-agent"
 NEMO_RELAY_OWNER = "NVIDIA"
 NEMO_RELAY_REPO = "NeMo-Relay"
 STABLE_VERSION_RE = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+PACKAGE_NIX = Path(__file__).parent / "package.nix"
 
 
 NEMO_RELAY_REQ_RE = re.compile(r"nemo-relay\s*([<>=!,.\d\s]+)")
@@ -99,6 +100,22 @@ def update_nemo_relay(agent_version: str) -> None:
     )
 
 
+def update_rev(agent_version: str) -> None:
+    """Pin the commit of the release tag, which nix-update does not touch."""
+    commit: Any = fetch_json(
+        f"https://api.github.com/repos/{OWNER}/{REPO}/commits/v{agent_version}"
+    )
+    text, count = re.subn(
+        r'^(  rev = ")[0-9a-f]{40}',
+        rf"\g<1>{commit['sha']}",
+        PACKAGE_NIX.read_text(),
+        flags=re.MULTILINE,
+    )
+    if count != 1:
+        sys.exit(f"expected one rev in {PACKAGE_NIX}, found {count}")
+    PACKAGE_NIX.write_text(text)
+
+
 def main() -> None:
     """Update the agent to the latest stable release."""
     current = nix_eval(".#hermes-agent.version")
@@ -119,6 +136,7 @@ def main() -> None:
             check=True,
         )
         current = latest
+        update_rev(current)
 
     update_nemo_relay(current)
 

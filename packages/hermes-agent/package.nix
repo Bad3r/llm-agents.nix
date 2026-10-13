@@ -10,6 +10,7 @@
   nodejs,
   olm,
   versionCheckHook,
+  writeText,
   versionCheckHomeHook,
 }:
 
@@ -19,20 +20,20 @@ let
   # Version is kept in range of hermes' pyproject constraint by update.py.
   nemo-relay = python3.pkgs.buildPythonPackage rec {
     pname = "nemo-relay";
-    version = "0.8.4";
+    version = "0.10.0";
     pyproject = true;
 
     src = fetchFromGitHub {
       owner = "NVIDIA";
       repo = "NeMo-Relay";
       tag = version;
-      hash = "sha256-5jGFu+DNb1zlCkejY9IPFXkJH1BbY48aNrQhdKisCyg=";
+      hash = "sha256-wTAxH2eMw/sjv2eXlswHkatw5RATV1HsiKPnhWy3iOw=";
     };
 
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit src;
       name = "nemo-relay-${version}";
-      hash = "sha256-M8FZngHmCN7fns6yXKInAUCT21T1k2q54VChG7MUzAk=";
+      hash = "sha256-OZIbgbvFIwHOsBWnpXUtgMlrCRrP/VRBbRMFI84I704=";
     };
 
     nativeBuildInputs =
@@ -95,6 +96,99 @@ let
       license = licenses.mit;
       sourceProvenance = with sourceTypes; [ fromSource ];
       platforms = platforms.unix;
+    };
+  };
+
+  cdp-use = python3.pkgs.buildPythonPackage rec {
+    pname = "cdp-use";
+    version = "1.4.5";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "cdp_use";
+      inherit version;
+      hash = "sha256-DaOjLfRjNqA/9aIrxrxELNfS8tUKEY/UhW8p039tJqA=";
+    };
+
+    build-system = [ python3.pkgs.hatchling ];
+
+    dependencies = with python3.pkgs; [
+      httpx
+      typing-extensions
+      websockets
+    ];
+
+    pythonImportsCheck = [ "cdp_use" ];
+
+    meta = with lib; {
+      description = "Type-safe Python client for the Chrome DevTools Protocol";
+      homepage = "https://github.com/browser-use/cdp-use";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
+
+  fetch-use = python3.pkgs.buildPythonPackage rec {
+    pname = "fetch-use";
+    version = "0.4.0";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "fetch_use";
+      inherit version;
+      hash = "sha256-lRGYfUkH7G2sUB4h1mlG0QCY9mtdIbwqukGJzYG6GJo=";
+    };
+
+    build-system = [ python3.pkgs.hatchling ];
+
+    pythonImportsCheck = [ "fetch_use" ];
+
+    meta = with lib; {
+      description = "Python client for the Browser Use fetch API";
+      homepage = "https://github.com/browser-use/fetch-use";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
+    };
+  };
+
+  browser-harness = python3.pkgs.buildPythonPackage rec {
+    pname = "browser-harness";
+    version = "0.1.13";
+    pyproject = true;
+
+    src = fetchPypi {
+      pname = "browser_harness";
+      inherit version;
+      hash = "sha256-KE3FR6BCwwn+r9mp9KdLKoZRt5Y+o6xssvLWSIn2qPM=";
+    };
+
+    build-system = [ python3.pkgs.setuptools ];
+
+    # Upstream pins setuptools==84.0.0 in build-system.requires.
+    pypaBuildFlags = [ "--skip-dependency-check" ];
+
+    dependencies = [
+      cdp-use
+      fetch-use
+      python3.pkgs.pillow
+      python3.pkgs.websockets
+    ];
+
+    pythonRelaxDeps = [
+      "pillow"
+      "websockets"
+    ];
+
+    pythonImportsCheck = [ "browser_harness" ];
+
+    meta = with lib; {
+      description = "Harness that lets agents drive a browser over CDP";
+      homepage = "https://github.com/browser-use/browser-harness";
+      license = licenses.mit;
+      sourceProvenance = with sourceTypes; [ fromSource ];
+      platforms = platforms.all;
     };
   };
 
@@ -172,13 +266,15 @@ let
     };
   };
 
-  version = "2026.9.24";
+  version = "0.21.7";
+  # The commit of the tag. Hermes ignores an install stamp without one.
+  rev = "71d34bad1045610252eda02ee79549436896e784";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-m0kg8DGrAxR6xMG+f1w7z7Ml9vIBbIm8/pC7H6wPInk=";
+    hash = "sha256-kgY4Z6HekfVj+Hv+NRBzsAZFCmKBaqybaNGsat0n1JE=";
     # contributors/emails/ holds paths differing only in case; they collapse
     # on case-insensitive stores (APFS) so the NAR hash diverges between
     # Linux and darwin. Unused at build/runtime. Upstream:
@@ -196,7 +292,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-94Kho+M7PcZPT+GgJHxcwFDnIwTrzd7UYFeHkvm1VO8=";
+    npmDepsHash = "sha256-eFfl+DAj5h0ih5fly9NKaNt2iGZxHs7SuESzZgsQlDw=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
@@ -212,7 +308,7 @@ let
     buildPhase = ''
       runHook preBuild
       npm run build --workspace ui-tui
-      npm run build --workspace web -- --outDir "$TMPDIR/web-dist"
+      node scripts/build/web.mjs --source "$PWD" --icons "$PWD" --out "$TMPDIR/web-dist"
       runHook postBuild
     '';
 
@@ -241,8 +337,9 @@ let
       tenacity
       pathspec
       pillow
-      pyyaml
       ruamel-yaml
+      tomli-w
+      truststore
       requests
       jinja2
       pydantic
@@ -257,9 +354,10 @@ let
       mcp
       # Tools
       exa-py
-      firecrawl-py'
+      firecrawl-py
       parallel-web
       fal-client
+      browser-harness
       # Text-to-speech
       edge-tts
       # Skills Hub
@@ -283,14 +381,6 @@ let
       knownVulnerabilities = [ ];
     };
   });
-
-  # nixpkgs' firecrawl-py 2.8.0 builds from the firecrawl monorepo tag v2.8.0,
-  # whose python-sdk pyproject declares a different SDK version, so the new
-  # pythonMetadataCheckPhase fails. Skip the check until nixpkgs fixes the
-  # version mismatch.
-  firecrawl-py' = python3.pkgs.firecrawl-py.overridePythonAttrs {
-    dontCheckPythonMetadata = true;
-  };
 
   # pyramid dropped its pkg_resources shim on python 3.14, so slack-bolt's
   # pyramid adapter tests fail at collection with ModuleNotFoundError.
@@ -384,6 +474,22 @@ let
   # PTY path copies wrapper env into a nested Node subprocess, which then
   # resolves the gateway import root from HERMES_PYTHON_SRC_ROOT.
   pythonEnv = python3.withPackages (_: hermesDeps);
+
+  installStamp = writeText "install-stamp.json" (
+    builtins.toJSON {
+      schemaVersion = 2;
+      commit = rev;
+      baseVersion = version;
+      displayVersion = version;
+      distance = 0;
+      dirty = false;
+      source = "nix";
+      distribution = "nix";
+      updateMechanism = "external";
+      # Desktop: use an external Hermes instead of a bundled one.
+      payload = "bootstrap";
+    }
+  );
 in
 python3.pkgs.buildPythonApplication {
   pname = "hermes-agent";
@@ -394,18 +500,18 @@ python3.pkgs.buildPythonApplication {
     setuptools
   ];
 
-  # lazy_deps._is_satisfied enforces exact PyPI pins and tries to pip install
-  # into the read-only store on any drift, silently disabling the feature
-  # (e.g. nixpkgs aiosqlite 0.21.0 vs hermes pin 0.22.1 disabled matrix).
-  # The closure already provides every dep, so presence is sufficient.
-  # Slash workers re-exec sys.executable, which is the bare interpreter
-  # without Hermes' dependencies under Nix. Use the wrapper-provided env.
+  # These re-exec sys.executable, which is the bare interpreter without Hermes'
+  # dependencies under Nix. Use the wrapper-provided env.
   postPatch = ''
     substituteInPlace tui_gateway/server.py \
       --replace-fail 'argv = [sys.executable, "-m", "tui_gateway.slash_worker"' \
         'argv = [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "tui_gateway.slash_worker"'
-    substituteInPlace tools/lazy_deps.py \
-      --replace-fail 'Version(installed) in SpecifierSet(spec_tail)' 'True'
+    substituteInPlace tools/browser_use_cli.py \
+      --replace-fail 'return [sys.executable, "-m", "browser_harness.run"]' \
+        'return [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "browser_harness.run"]'
+    substituteInPlace hermes_cli/doctor_platform.py \
+      --replace-fail '[sys.executable, "-c", "import hermes_cli.web_server"]' \
+        '[os.environ.get("HERMES_PYTHON", sys.executable), "-c", "import hermes_cli.web_server"]'
   '';
 
   # setup.py refuses to build wheels/sdists unless it knows this is a Nix
@@ -460,6 +566,8 @@ python3.pkgs.buildPythonApplication {
     cp -r ${src}/skills $out/share/hermes/skills
     cp -r ${src}/optional-skills $out/share/hermes/optional-skills
     cp -r ${src}/plugins $out/share/hermes/plugins
+    # The sources only carry a 0.0.0 placeholder version.
+    cp ${installStamp} $out/${python3.sitePackages}/install-stamp.json
   '';
 
   pythonRelaxDeps = [
@@ -484,6 +592,9 @@ python3.pkgs.buildPythonApplication {
     "exa-py"
   ];
 
+  # Only used by upstream's icon generator, which is not installed.
+  pythonRemoveDeps = [ "resvg-py" ];
+
   pythonImportsCheck = [
     "hermes_cli"
     "hermes_cli.dashboard_auth"
@@ -498,6 +609,7 @@ python3.pkgs.buildPythonApplication {
     # relay_runtime imports this lazily and silently degrades to a noop
     # runtime when missing, so assert it imports.
     "nemo_relay"
+    "browser_harness"
   ];
 
   doInstallCheck = true;
@@ -524,7 +636,7 @@ python3.pkgs.buildPythonApplication {
     ${pythonEnv}/bin/python3 -c 'import dotenv, tenacity, openai'
     # Slash workers run HERMES_PYTHON with PYTHONPATH=HERMES_PYTHON_SRC_ROOT.
     PYTHONPATH="$out/${python3.sitePackages}" \
-      ${pythonEnv}/bin/python3 -c 'import tui_gateway.slash_worker, yaml'
+      ${pythonEnv}/bin/python3 -c 'import tui_gateway.slash_worker, ruamel.yaml'
     # #7725: DaemonThreadPoolExecutor mirrors CPython ThreadPoolExecutor
     # internals; assert submit() actually executes work on this Python.
     PYTHONPATH="$out/${python3.sitePackages}" \
@@ -538,7 +650,7 @@ python3.pkgs.buildPythonApplication {
 
   passthru = {
     category = "AI Assistants";
-    inherit hermes-frontend nemo-relay;
+    inherit hermes-frontend nemo-relay installStamp;
   };
 
   meta = with lib; {
@@ -552,7 +664,10 @@ python3.pkgs.buildPythonApplication {
       "aarch64-linux"
       "aarch64-darwin"
     ];
-    maintainers = with flake.lib.maintainers; [ aliez-ren ];
+    maintainers = with flake.lib.maintainers; [
+      aliez-ren
+      mulatta
+    ];
     mainProgram = "hermes";
   };
 }

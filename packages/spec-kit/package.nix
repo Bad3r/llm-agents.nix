@@ -4,16 +4,81 @@
   fetchFromGitHub,
 }:
 
+let
+  # nixpkgs still ships mcp 1.x, which lacks the MCPServer API spec-kit uses.
+  # 2.2.0 is the newest release that accepts the httpx2 from nixpkgs.
+  mcpVersion = "2.2.0";
+  mcpSrc = fetchFromGitHub {
+    owner = "modelcontextprotocol";
+    repo = "python-sdk";
+    tag = "v${mcpVersion}";
+    hash = "sha256-nnpNXnQiFSGx5KQBDXHCOH0wE3cznlmI6s7vtchcj3A=";
+  };
+  mcpMeta = python3.pkgs.mcp.meta // {
+    changelog = "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v${mcpVersion}";
+  };
+
+  mcp-types = python3.pkgs.buildPythonPackage {
+    pname = "mcp-types";
+    version = mcpVersion;
+    src = mcpSrc;
+    sourceRoot = "${mcpSrc.name}/src/mcp-types";
+    pyproject = true;
+    build-system = with python3.pkgs; [
+      hatchling
+      uv-dynamic-versioning
+    ];
+    dependencies = with python3.pkgs; [
+      pydantic
+      typing-extensions
+    ];
+    pythonImportsCheck = [ "mcp_types" ];
+    meta = mcpMeta // {
+      description = "Model Context Protocol wire types";
+    };
+  };
+
+  mcp = python3.pkgs.buildPythonPackage {
+    pname = "mcp";
+    version = mcpVersion;
+    src = mcpSrc;
+    pyproject = true;
+    build-system = with python3.pkgs; [
+      hatchling
+      uv-dynamic-versioning
+    ];
+    dependencies =
+      with python3.pkgs;
+      [
+        anyio
+        httpx2
+        jsonschema
+        mcp-types
+        opentelemetry-api
+        pydantic
+        pyjwt
+        python-multipart
+        sse-starlette
+        starlette
+        typing-extensions
+        typing-inspection
+        uvicorn
+      ]
+      ++ pyjwt.optional-dependencies.crypto;
+    pythonImportsCheck = [ "mcp.server" ];
+    meta = mcpMeta;
+  };
+in
 python3.pkgs.buildPythonApplication rec {
   pname = "spec-kit";
-  version = "1.1.0";
+  version = "1.1.3";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "github";
     repo = "spec-kit";
     tag = "v${version}";
-    hash = "sha256-NbHdMup6YmVI/rfnTo7AJeoXN9TTnrQrS8L8U1Hw5uM=";
+    hash = "sha256-LJdDAcgcZfT85GFutVwKHoPTQ4f1hJP7DeFUUbM5PC0=";
   };
 
   build-system = with python3.pkgs; [
@@ -32,6 +97,8 @@ python3.pkgs.buildPythonApplication rec {
     packaging
     pathspec
     json5
+    mcp # the let binding above, not python3.pkgs.mcp
+    pydantic
   ];
 
   pythonImportsCheck = [ "specify_cli" ];

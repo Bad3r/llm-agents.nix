@@ -66,9 +66,28 @@ def _latest_git_tag(url: str) -> str:
     return max(versions, key=cmp_to_key(compare_versions))
 
 
+def _json_pointer(doc: object, pointer: str) -> str:
+    """Return the string that a JSON Pointer (RFC 6901) selects in ``doc``."""
+    if not pointer.startswith("/"):
+        msg = f"JSON pointer {pointer!r} must start with '/'"
+        raise ValueError(msg)
+    for raw in pointer.split("/")[1:]:
+        token = raw.replace("~1", "/").replace("~0", "~")
+        if isinstance(doc, list):
+            doc = doc[int(token)]
+        elif isinstance(doc, dict):
+            doc = doc[token]
+        else:
+            doc = None
+    if not isinstance(doc, str):
+        msg = f"JSON pointer {pointer!r} does not select a string"
+        raise TypeError(msg)
+    return doc
+
+
 def _version_getter(source: dict[str, Any]) -> Callable[[], str]:
     """Build the ``fetch_latest`` callable for a versionSource type."""
-    from .http import fetch_text  # noqa: PLC0415 -- keep http import lazy
+    from .http import fetch_json, fetch_text  # noqa: PLC0415 -- keep http import lazy
 
     source_type = source["type"]
     if source_type == "github":
@@ -83,6 +102,8 @@ def _version_getter(source: dict[str, Any]) -> Callable[[], str]:
         if regex:
             return lambda: fetch_version_from_text(url, regex)
         return lambda: fetch_text(url).strip()
+    if source_type == "json":
+        return lambda: _json_pointer(fetch_json(source["url"]), source["pointer"])
     if source_type == "git-tags":
         url = source["url"]
         return lambda: _latest_git_tag(url)

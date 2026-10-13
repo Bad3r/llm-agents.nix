@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
+  jq,
   mkUpdater,
   nodejs,
   runCommand,
@@ -13,7 +14,7 @@ let
   versionData = lib.importJSON ./hashes.json;
   version = versionData.version;
   # Create a source with package-lock.json included
-  srcWithLock = runCommand "letta-code-src-with-lock" { } ''
+  srcWithLock = runCommand "letta-code-src-with-lock" { nativeBuildInputs = [ jq ]; } ''
     mkdir -p $out
     tar -xzf ${
       fetchurl {
@@ -21,6 +22,12 @@ let
         hash = versionData.sourceHash;
       }
     } -C $out --strip-components=1
+    # Upstream's shrinkwrap is out of sync with package.json, and npm would
+    # prefer it over our lockfile.
+    rm -f $out/npm-shrinkwrap.json
+    # Already built, so the lockfile only covers production dependencies.
+    jq 'del(.devDependencies)' $out/package.json > $out/package.json.tmp
+    mv $out/package.json.tmp $out/package.json
     cp ${./package-lock.json} $out/package-lock.json
   '';
 in
@@ -57,6 +64,7 @@ buildNpmPackage rec {
   passthru.updater = mkUpdater {
     kind = "npm";
     purl = "pkg:npm/%40letta-ai/letta-code";
+    stripDevDependencies = true;
     lockfileEnv = {
       NPM_CONFIG_LEGACY_PEER_DEPS = "true";
     };

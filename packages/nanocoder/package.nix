@@ -3,7 +3,7 @@
   buildNpmPackage,
   fetchFromGitHub,
   fetchPnpmDeps,
-  pnpm,
+  pnpm_11,
   pnpmConfigHook,
   versionCheckHook,
 }:
@@ -22,12 +22,12 @@ buildNpmPackage rec {
   npmDeps = null;
   pnpmDeps = fetchPnpmDeps {
     inherit pname version src;
-    inherit pnpm;
+    pnpm = pnpm_11;
     fetcherVersion = 4;
-    hash = "sha256-s4McqD6nEDk8ZOVVd1gSzjUfJZaPAIGIJ4jqouHOtTE=";
+    hash = "sha256-rbexn42rVI5xkr7NLzfRv+1NqpIpUNnTMqX2+el3ovk=";
   };
 
-  nativeBuildInputs = [ pnpm ];
+  nativeBuildInputs = [ pnpm_11 ];
   npmConfigHook = pnpmConfigHook;
 
   doInstallCheck = true;

@@ -23,6 +23,7 @@ DEP_SECTIONS = [
 # root workspace lets Bun resolve them directly from the bun2nix cache.
 HOISTED = {
     "@joplin/turndown-plugin-gfm",
+    "@modelcontextprotocol/server",
     "@pierre/diffs",
     "@plannotator/webtui",
     "chokidar",
@@ -31,13 +32,16 @@ HOISTED = {
     "turndown",
     "typescript",
     "uqr",
+    "zod",
 }
 
-# Dependencies from workspaces that are not built for this package.  Removing
-# them avoids needless offline manifest lookups.
+# Dependencies of tests and of workspaces that are not built for this package.
+# Removing them avoids needless offline manifest lookups.
 UNUSED = {
+    "@modelcontextprotocol/client",
     "@opencode-ai/plugin",
     "@opencode/plugin",
+    "fast-check",
     "glimpseui",
 }
 
@@ -65,13 +69,13 @@ def _hoist_deps(data: dict, resolved: dict[str, str]) -> bool:
     return changed
 
 
-def _remove_workspace_deps(data: dict) -> bool:
+def _remove_deps(data: dict, names: set[str]) -> bool:
     changed = False
     for section in DEP_SECTIONS:
         deps = data.get(section)
         if not isinstance(deps, dict):
             continue
-        for name in sorted(HOISTED | UNUSED):
+        for name in sorted(names):
             if name in deps:
                 del deps[name]
                 changed = True
@@ -104,11 +108,11 @@ def patch_package_json_files(resolved: dict[str, str]) -> None:
             continue
 
         data = json.loads(package_json.read_text())
-        changed = (
-            _hoist_deps(data, resolved)
-            if package_json == root_package
-            else _remove_workspace_deps(data)
-        )
+        if package_json == root_package:
+            changed = _remove_deps(data, UNUSED)
+            changed = _hoist_deps(data, resolved) or changed
+        else:
+            changed = _remove_deps(data, HOISTED | UNUSED)
         changed = _exactify_ranges(data, resolved) or changed
 
         if changed:

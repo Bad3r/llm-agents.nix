@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from updater import http
-from updater.run import _latest_git_tag, _version_getter, run
+from updater.run import _json_pointer, _latest_git_tag, _version_getter, run
 
 PKG = Path("packages/example")
 
@@ -135,11 +135,23 @@ class TestRun(unittest.TestCase):
             {"type": "npm", "package": "@x/y", "tag": "next"},
             {"type": "text", "url": "https://x/v", "regex": r"v(\d+)"},
             {"type": "text", "url": "https://x/v"},  # no regex -> plain body
+            {"type": "json", "url": "https://x/latest.json", "pointer": "/version"},
             {"type": "git-tags", "url": "https://gitea/api/.../tags"},
         ):
             self.assertTrue(callable(_version_getter(source)))
         with self.assertRaises(ValueError):
             _version_getter({"type": "bogus"})
+
+    def test_json_pointer(self) -> None:
+        feed = {"version": "3", "stable": {"linux": {"version": "2"}}, "a/b": "1"}
+        self.assertEqual(_json_pointer(feed, "/stable/linux/version"), "2")
+        self.assertEqual(_json_pointer(feed, "/a~1b"), "1")
+        self.assertEqual(_json_pointer([{"tag_name": "4"}], "/0/tag_name"), "4")
+        for not_a_string in ("/stable", "/version/extra"):
+            with self.assertRaises(TypeError):
+                _json_pointer(feed, not_a_string)
+        with self.assertRaises(ValueError):
+            _json_pointer(feed, "version")
 
     def test_git_tags_picks_highest_stripping_v(self) -> None:
         # Patch fetch_json; the getter imports it lazily from updater.http.

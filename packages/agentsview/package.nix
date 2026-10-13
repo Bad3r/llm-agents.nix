@@ -11,6 +11,7 @@
   prefetch-npm-deps,
   versionCheckHook,
   makeBinaryWrapper,
+  jq,
   unpinGoModVersionHook,
   sqlite,
 }:
@@ -84,6 +85,7 @@ buildGo127Module {
 
   nativeBuildInputs = [
     makeBinaryWrapper
+    jq
     unpinGoModVersionHook
   ];
 
@@ -127,18 +129,22 @@ buildGo127Module {
     # the binary can produce a usable file. The installer writes under $HOME
     # and accepts no other destination, hence the staging home.
     #
-    # `skills list` reports one row per harness, with the columns HARNESS,
-    # LEVEL, STATE and PATH, so a harness added upstream needs no change here.
+    # `skills list --json` reports one row per installed file, so a harness or
+    # an artifact added upstream needs no change here. The human table gained
+    # a column in 0.45.0 and broke a column-based parse. Each file keeps its
+    # path below <home>/.<harness>/<kind>/.
     (
       export HOME="$NIX_BUILD_TOP/agentsview-skills-home"
 
       "$out/bin/agentsview" skills install
 
-      "$out/bin/agentsview" skills list \
-        | awk 'NR > 1 { print $1, $4 }' \
+      "$out/bin/agentsview" skills list --json \
+        | jq -r '.[]? | "\(.harness) \(.path)"' \
         | while read -r harness path; do
-            mkdir -p "$out/share/agentsview/skills/$harness"
-            cp -r "$(dirname "$path")" "$out/share/agentsview/skills/$harness/"
+            rel=''${path#"$HOME"/}
+            rel=''${rel#*/}
+            rel=''${rel#*/}
+            install -Dm644 "$path" "$out/share/agentsview/skills/$harness/$rel"
           done
 
       if [ ! -d "$out/share/agentsview/skills" ]; then

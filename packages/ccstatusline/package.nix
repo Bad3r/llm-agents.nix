@@ -3,6 +3,7 @@
   stdenv,
   fetchzip,
   nodejs,
+  versionCheckHook,
   flake,
 }:
 
@@ -20,17 +21,23 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
 
-    # The npm package already contains built files
-    mkdir -p $out/bin
-    cp $src/dist/ccstatusline.js $out/bin/ccstatusline
-    chmod +x $out/bin/ccstatusline
+    # The npm package already contains built files. dist/ is code-split, so
+    # keep the whole package together for the entry file's chunk imports.
+    mkdir -p $out/libexec/ccstatusline $out/bin
+    cp -r --no-preserve=mode $src/. $out/libexec/ccstatusline/
+    chmod +x $out/libexec/ccstatusline/dist/ccstatusline.js
 
     # Replace the shebang with the correct node path
-    substituteInPlace $out/bin/ccstatusline \
-      --replace-quiet "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+    substituteInPlace $out/libexec/ccstatusline/dist/ccstatusline.js \
+      --replace-fail "#!/usr/bin/env node" "#!${nodejs}/bin/node"
+
+    ln -s $out/libexec/ccstatusline/dist/ccstatusline.js $out/bin/ccstatusline
 
     runHook postInstall
   '';
+
+  doInstallCheck = true;
+  nativeInstallCheckInputs = [ versionCheckHook ];
 
   passthru.category = "Claude Code Ecosystem";
 

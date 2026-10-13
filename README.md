@@ -341,6 +341,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>maki</strong> - Efficient AI coding agent extendable by neovim-like Lua plugins</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://maki.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#maki -- --help`
+- **Nix**: [packages/maki/package.nix](packages/maki/package.nix)
+
+</details>
+<details>
 <summary><strong>mimo-code</strong> - Open-source AI coding agent with cross-session memory</summary>
 
 - **Source**: binary
@@ -358,6 +368,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/MiniMax-AI/minimax-code
 - **Usage**: `nix run github:numtide/llm-agents.nix#minimax-code -- --help`
 - **Nix**: [packages/minimax-code/package.nix](packages/minimax-code/package.nix)
+
+</details>
+<details>
+<summary><strong>mirasim</strong> - The team workspace for coding agents</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://mirasim.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#mirasim -- --help`
+- **Nix**: [packages/mirasim/package.nix](packages/mirasim/package.nix)
 
 </details>
 <details>
@@ -879,6 +899,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Nix**: [packages/codex-acp/package.nix](packages/codex-acp/package.nix)
 
 </details>
+<details>
+<summary><strong>pi-acp</strong> - ACP adapter for the pi coding agent</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/svkozak/pi-acp
+- **Usage**: `nix run github:numtide/llm-agents.nix#pi-acp -- --help`
+- **Nix**: [packages/pi-acp/package.nix](packages/pi-acp/package.nix)
+
+</details>
 
 ### Usage Analytics
 
@@ -1177,6 +1207,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>orbi-cli</strong> - Run the Pi coding agent on labeled GitHub issues and merge the reviewed pull requests</summary>
+
+- **Source**: source
+- **License**: AGPL-3.0-only
+- **Homepage**: https://orbi.build
+- **Usage**: `nix run github:numtide/llm-agents.nix#orbi-cli -- --help`
+- **Nix**: [packages/orbi-cli/package.nix](packages/orbi-cli/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -1224,6 +1264,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/marcus/td
 - **Usage**: `nix run github:numtide/llm-agents.nix#td -- --help`
 - **Nix**: [packages/td/package.nix](packages/td/package.nix)
+
+</details>
+<details>
+<summary><strong>treehouse</strong> - Reusable isolated worktree manager for AI agent sessions</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/kunchenguid/treehouse
+- **Usage**: `nix run github:numtide/llm-agents.nix#treehouse -- --help`
+- **Nix**: [packages/treehouse/package.nix](packages/treehouse/package.nix)
 
 </details>
 <details>
@@ -1327,6 +1377,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://jscpd.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#jscpd -- --help`
 - **Nix**: [packages/jscpd/package.nix](packages/jscpd/package.nix)
+
+</details>
+<details>
+<summary><strong>no-mistakes</strong> - Agent-driven Git push gate and validation pipeline</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/kunchenguid/no-mistakes
+- **Usage**: `nix run github:numtide/llm-agents.nix#no-mistakes -- --help`
+- **Nix**: [packages/no-mistakes/package.nix](packages/no-mistakes/package.nix)
 
 </details>
 <details>
@@ -1803,6 +1863,15 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://magnitude.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#magnitude -- --help`
 - **Nix**: [packages/magnitude/package.nix](packages/magnitude/package.nix)
+</details>
+<details>
+<summary><strong>mcp-remote</strong> - Connect MCP clients that only support local (stdio) servers to a remote MCP server</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/punkpeye/mcp-remote
+- **Usage**: `nix run github:numtide/llm-agents.nix#mcp-remote -- --help`
+- **Nix**: [packages/mcp-remote/package.nix](packages/mcp-remote/package.nix)
 
 </details>
 <details>

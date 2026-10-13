@@ -46,9 +46,9 @@ stdenv.mkDerivation {
     // {
       # All releases with binaries are prereleases, /releases/latest skips them.
       versionSource = {
-        type = "text";
+        type = "json";
         url = "https://api.github.com/repos/microsoft/tui-test/releases?per_page=1";
-        regex = ''"tag_name": *"([^"]+)"'';
+        pointer = "/0/tag_name";
       };
     }
   );

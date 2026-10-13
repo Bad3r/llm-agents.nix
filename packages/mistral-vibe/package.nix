@@ -265,9 +265,9 @@ python.pkgs.buildPythonApplication {
     updater = mkUpdater {
       kind = "platform";
       versionSource = {
-        type = "text";
+        type = "json";
         url = "https://pypi.org/pypi/mistral-vibe/json";
-        regex = ''"info":\{.*?"version":"([^"]+)"'';
+        pointer = "/info/version";
       };
       urlTemplate = wheelUrl;
       platforms = wheelPlatforms;
