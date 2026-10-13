@@ -15,5 +15,6 @@ pkgs.runCommand "updater-tests-check"
     export HOME=$TMPDIR
     export PYTHONDONTWRITEBYTECODE=1
     python3 -m unittest discover -s updater -p '*_test.py' -t . -v
+    PYTHONPATH=$PWD python3 -m unittest discover -s ${flake}/.github/ci -p '*_test.py' -v
     touch $out
   ''

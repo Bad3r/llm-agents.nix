@@ -81,7 +81,9 @@ jobs:
       - name: Stash CI scripts
         # Copy the CI scripts out before the updater runs, so a malicious
         # update.py cannot rewrite the script that later holds the App token.
-        run: cp -r .github/ci "$RUNNER_TEMP/ci"
+        run: |
+          cp -r .github/ci "$RUNNER_TEMP/ci"
+          cp -r scripts/updater "$RUNNER_TEMP/ci/updater"
       - name: Prepare update branch
         # Reuse the existing update/* branch (if any) so manual fixups on
         # the open PR carry into the work tree. Rebase it onto main.

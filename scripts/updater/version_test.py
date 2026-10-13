@@ -32,6 +32,16 @@ class TestCompareVersions(unittest.TestCase):
     def test_release_beats_prerelease(self) -> None:
         self.assertEqual(compare_versions("1.0.0", "1.0.0-beta"), 1)
 
+    def test_numeric_suffix_is_a_later_revision(self) -> None:
+        self.assertEqual(compare_versions("2026.7.1", "2026.7.1-2"), -1)
+        self.assertEqual(compare_versions("2026.7.1-2", "2026.7.1-10"), -1)
+        self.assertEqual(compare_versions("2026.7.1-2", "2026.7.2"), -1)
+
+    def test_prerelease_counters_compare_numerically(self) -> None:
+        self.assertEqual(compare_versions("0.0.1-alpha.8", "0.0.1-alpha.10"), -1)
+        self.assertEqual(compare_versions("5.0.0-beta.86", "5.0.0-rc.1"), -1)
+        self.assertEqual(compare_versions("1.0.0-alpha", "1.0.0-alpha.1"), -1)
+
     def test_should_update(self) -> None:
         self.assertTrue(should_update("1.0.0", "1.0.1"))
         self.assertFalse(should_update("1.0.1", "1.0.0"))

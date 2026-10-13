@@ -14,6 +14,11 @@ inputs."nixpkgs".lib.extend (
     };
 
     maintainers = prev.maintainers // {
+      wanderer = {
+        github = "wanderer";
+        githubId = 158211;
+        name = "Martin Becze";
+      };
       RestartDK = {
         github = "RestartDK";
         githubId = 58006998;
@@ -308,6 +313,11 @@ inputs."nixpkgs".lib.extend (
         github = "xqliu";
         githubId = 22554;
         name = "Lawrence Liu";
+      };
+      YuXiangggg = {
+        github = "YuXiangggg";
+        githubId = 101375747;
+        name = "YuXiangggg";
       };
     };
   }

@@ -75,7 +75,19 @@ def parse_version(v: str) -> tuple[list[int], str]:
         # Fallback to lexicographic if not numeric
         numeric = []
 
+    # "2026.7.1-2" is the second revision of 2026.7.1, not a prerelease of it.
+    if numeric and suffix.isdigit():
+        return ([*numeric, int(suffix)], "")
+
     return (numeric, suffix)
+
+
+def _suffix_key(suffix: str) -> list[tuple[int, int, str]]:
+    """Order dot-separated identifiers like semver: numbers by value, before words."""
+    return [
+        (0, int(part), "") if part.isdigit() else (1, 0, part)
+        for part in suffix.split(".")
+    ]
 
 
 def compare_versions(v1: str, v2: str) -> int:
@@ -108,7 +120,7 @@ def compare_versions(v1: str, v2: str) -> int:
         if n1 > n2:
             return 1
 
-    # Numeric parts are equal, compare suffix lexicographically
+    # Numeric parts are equal, compare the suffix
     # No suffix is considered "greater" than having a suffix (1.0.0 > 1.0.0-beta)
     if v1_suffix == v2_suffix:
         return 0
@@ -116,7 +128,7 @@ def compare_versions(v1: str, v2: str) -> int:
         return 1
     if not v2_suffix:
         return -1
-    return -1 if v1_suffix < v2_suffix else 1
+    return -1 if _suffix_key(v1_suffix) < _suffix_key(v2_suffix) else 1
 
 
 def should_update(current: str, latest: str) -> bool:

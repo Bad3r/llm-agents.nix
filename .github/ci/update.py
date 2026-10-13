@@ -16,6 +16,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from updater.version import compare_versions
+
 from lib import UpdateType, nix_eval_raw, run, write_output
 
 log = logging.getLogger(__name__)
@@ -178,8 +180,27 @@ def run_package_updater(name: str) -> None:
         )
 
 
+def refuse_downgrade(name: str, old_version: str, new_version: str) -> None:
+    """Exit if an updater moved the package backwards.
+
+    nix-update takes the highest version its source lists, even if that is older
+    than the packaged one. GitHub's release list has omitted recent releases.
+    """
+    if compare_versions(new_version, old_version) < 0:
+        log.error(
+            "::error::Refusing to downgrade %s from %s to %s",
+            name,
+            old_version,
+            new_version,
+        )
+        sys.exit(1)
+
+
 def update_package(name: str) -> None:
     """Update a package and its companions."""
+    attr = f".#packages.x86_64-linux.{name}"
+    old_version = nix_eval_raw(f"{attr}.version") or "unknown"
+
     run_package_updater(name)
     for companion in load_companions(name):
         run_package_updater(companion)
@@ -189,9 +210,11 @@ def update_package(name: str) -> None:
         write_output("updated", "false")
         return
 
-    attr = f".#packages.x86_64-linux.{name}"
     new_version = nix_eval_raw(f"{attr}.version") or "unknown"
     log.info("New version: %s", new_version)
+    # A follow_pointer package tracks upstream's pointer down as well.
+    if nix_eval_raw(f"{attr}.updater.versionPolicy") != "follow_pointer":
+        refuse_downgrade(name, old_version, new_version)
 
     changelog = nix_eval_raw(f"{attr}.meta.changelog") or ""
     if not changelog:

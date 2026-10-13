@@ -52,6 +52,9 @@ ignore = [
 ".github/ci/lib.py" = [
   "INP001",
 ] # shared module for standalone CI scripts, not a package
+".github/ci/update_test.py" = [
+  "INP001",
+] # imports the standalone CI scripts, not a package
 "*_test.py" = [
   "D101",   # test classes are self-documenting
   "D102",   # test methods are self-documenting

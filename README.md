@@ -120,6 +120,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>codebuddy-code</strong> - Tencent's AI coding agent for the terminal</summary>
+
+- **Source**: binary
+- **License**: MIT
+- **Homepage**: https://www.codebuddy.ai/cli
+- **Usage**: `nix run github:numtide/llm-agents.nix#codebuddy-code -- --help`
+- **Nix**: [packages/codebuddy-code/package.nix](packages/codebuddy-code/package.nix)
+
+</details>
+<details>
 <summary><strong>codex</strong> - OpenAI Codex CLI - a coding agent that runs locally on your computer</summary>
 
 - **Source**: source
@@ -724,6 +734,26 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>hindsight</strong> - Agent memory server that learns from past interactions</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vectorize-io/hindsight
+- **Usage**: `nix run github:numtide/llm-agents.nix#hindsight -- --help`
+- **Nix**: [packages/hindsight/package.nix](packages/hindsight/package.nix)
+
+</details>
+<details>
+<summary><strong>hindsight-control-plane</strong> - Web UI for the Hindsight agent memory server</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vectorize-io/hindsight
+- **Usage**: `nix run github:numtide/llm-agents.nix#hindsight-control-plane -- --help`
+- **Nix**: [packages/hindsight-control-plane/package.nix](packages/hindsight-control-plane/package.nix)
+
+</details>
+<details>
 <summary><strong>ironclaw</strong> - Secure personal AI assistant that protects your data and expands its capabilities on the fly</summary>
 
 - **Source**: source
@@ -781,16 +811,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://paperclip.ing
 - **Usage**: `nix run github:numtide/llm-agents.nix#paperclip -- --help`
 - **Nix**: [packages/paperclip/package.nix](packages/paperclip/package.nix)
-
-</details>
-<details>
-<summary><strong>picoclaw</strong> - Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://picoclaw.io
-- **Usage**: `nix run github:numtide/llm-agents.nix#picoclaw -- --help`
-- **Nix**: [packages/picoclaw/package.nix](packages/picoclaw/package.nix)
 
 </details>
 <details>

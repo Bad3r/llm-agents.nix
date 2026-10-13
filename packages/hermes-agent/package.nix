@@ -375,7 +375,7 @@ let
   # ship every extra nixpkgs has. Not yet packaged: honcho, daytona, dingtalk,
   # feishu.
   # libolm is marked insecure in nixpkgs but mautrix[encryption] needs it for
-  # Matrix E2EE. Same trade-off as picoclaw.
+  # Matrix E2EE.
   clearedOlm = olm.overrideAttrs (old: {
     meta = old.meta // {
       knownVulnerabilities = [ ];

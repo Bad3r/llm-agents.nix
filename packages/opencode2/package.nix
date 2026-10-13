@@ -6,6 +6,7 @@
   formatelf,
   ripgrep,
   wayland,
+  libxcb,
   platformSource,
   versionCheckHook,
   versionCheckHomeHook,
@@ -34,14 +35,15 @@ stdenv.mkDerivation {
   nativeBuildInputs = [ makeWrapper ] ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
   # The native addons embedded in the Bun executable cannot be patched: the
-  # file watcher needs libstdc++ and OpenTUI dlopen()s libwayland-client for
-  # clipboard images. Unlike DT_RUNPATH, the executable's DT_RPATH also applies
-  # to lookups made by the libraries it loads.
+  # file watcher needs libstdc++ and OpenTUI dlopen()s libwayland-client and
+  # libxcb for the clipboard. Unlike DT_RUNPATH, the executable's DT_RPATH also
+  # applies to lookups made by the libraries it loads.
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
     formatelf --force-rpath --set-rpath ${
       lib.makeLibraryPath [
         stdenv.cc.cc.lib
         wayland
+        libxcb
       ]
     } $out/bin/.opencode2-wrapped
   '';
