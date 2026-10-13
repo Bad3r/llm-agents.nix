@@ -46,6 +46,7 @@
   libayatana-appindicator,
   libXcursor,
   pipewire,
+  util-linux,
   vulkan-loader,
   wayland,
   xdg-utils,
@@ -169,9 +170,8 @@ stdenv.mkDerivation {
     cp -a desktop/usr/share/{applications,icons} $out/share/
     cp -a inference $out/lib/magnitude-inference
 
-    # launch execs /usr/lib/magnitude-desktop/magnitude, and chrome-sandbox
-    # needs setuid root, which a store path can never have.
-    rm $out/lib/magnitude-desktop/{launch,chrome-sandbox}
+    # chrome-sandbox needs setuid root, which a store path can never have.
+    rm $out/lib/magnitude-desktop/chrome-sandbox
     # Without these the app and `magnitude serve` report updates as
     # unavailable instead of downloading debs they cannot install.
     rm $out/lib/magnitude-desktop/resources/update-{configuration,package,trust}.json
@@ -182,7 +182,11 @@ stdenv.mkDerivation {
     makeWrapper $out/lib/magnitude-desktop/resources/magnitude $out/bin/magnitude \
       --set-default MAGNITUDE_ICN_PATH $out/lib/magnitude-inference/installation.json
 
-    makeWrapper $out/lib/magnitude-desktop/magnitude $out/bin/magnitude-desktop \
+    # The app exits 1 unless it inherits launch's shared flock on that lock as fd 9.
+    substituteInPlace $out/lib/magnitude-desktop/launch \
+      --replace-fail /usr/lib/magnitude-desktop/magnitude $out/lib/magnitude-desktop/magnitude \
+      --replace-fail 'flock -s' '${lib.getExe' util-linux "flock"} -s'
+    makeWrapper $out/lib/magnitude-desktop/launch $out/bin/magnitude-desktop \
       --set-default MAGNITUDE_ICN_PATH $out/lib/magnitude-inference/installation.json \
       --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
       --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ libglvnd ]}" \
@@ -219,6 +223,15 @@ stdenv.mkDerivation {
     versionCheckHook
     versionCheckHomeHook
   ];
+  # The sandbox has no installation.lock, so the launch gate must refuse with 75.
+  postInstallCheck = ''
+    if [ ! -e /var/lib/magnitude-desktop/installation.lock ]; then
+      status=0
+      $out/bin/magnitude-desktop 2>launch.err || status=$?
+      test "$status" -eq 75
+      grep -q 'package-manager repair' launch.err
+    fi
+  '';
 
   passthru = {
     category = "Utilities";
