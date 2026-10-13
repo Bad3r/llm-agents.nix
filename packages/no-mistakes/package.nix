@@ -2,6 +2,8 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  installShellFiles,
+  stdenv,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -28,6 +30,15 @@ buildGoModule rec {
     "-w"
     "-X github.com/kunchenguid/no-mistakes/internal/buildinfo.Version=v${version}"
   ];
+
+  nativeBuildInputs = [ installShellFiles ];
+
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    installShellCompletion --cmd no-mistakes \
+      --bash <($out/bin/no-mistakes completion bash) \
+      --fish <($out/bin/no-mistakes completion fish) \
+      --zsh <($out/bin/no-mistakes completion zsh)
+  '';
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [

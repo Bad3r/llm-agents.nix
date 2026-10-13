@@ -1703,16 +1703,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>openskills</strong> - Universal skills loader for AI coding agents - install and load Anthropic SKILL.md format skills in any agent</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/numman-ali/openskills
-- **Usage**: `nix run github:numtide/llm-agents.nix#openskills -- --help`
-- **Nix**: [packages/openskills/package.nix](packages/openskills/package.nix)
-
-</details>
-<details>
 <summary><strong>skills</strong> - The open agent skills tool for installing and managing skills across AI coding agents</summary>
 
 - **Source**: source

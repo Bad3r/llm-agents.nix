@@ -112,7 +112,7 @@ Available categories (in display order):
 - **Usage Analytics** - Usage tracking and analysis tools (ccusage and variants)
 - **Workflow & Project Management** - Project/spec management tools (backlog-md, beads, openspec, spec-kit)
 - **Code Review** - Code review tools (coderabbit-cli, tuicr)
-- **Utilities** - Other useful tools (coding-agent-search, handy, happy-coder, openskills)
+- **Utilities** - Other useful tools (coding-agent-search, handy, happy-coder)
 
 #### Custom Maintainers
 
