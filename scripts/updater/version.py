@@ -8,17 +8,23 @@ from .http import fetch_json, fetch_text
 from .nix import run_command
 
 
-def fetch_github_latest_release(owner: str, repo: str) -> str:
+def fetch_github_latest_release(
+    owner: str, repo: str, *, tag_pattern: str | None = None
+) -> str:
     """Fetch the latest release version from GitHub.
 
     Args:
         owner: Repository owner
         repo: Repository name
+        tag_pattern: If set, return the newest stable release whose tag fully
+            matches this regex instead of the one GitHub marks as latest.
 
     Returns:
         Latest release version (without 'v' prefix)
 
     """
+    if tag_pattern is not None:
+        return _latest_matching_release(owner, repo, tag_pattern)
     url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
     data = fetch_json(url)
     if not isinstance(data, dict):
@@ -26,6 +32,22 @@ def fetch_github_latest_release(owner: str, repo: str) -> str:
         raise TypeError(msg)
     tag = cast("str", data["tag_name"])
     return _strip_v_prefix(tag)
+
+
+def _latest_matching_release(owner: str, repo: str, tag_pattern: str) -> str:
+    url = f"https://api.github.com/repos/{owner}/{repo}/releases?per_page=100"
+    releases = fetch_json(url)
+    if not isinstance(releases, list):
+        msg = f"Expected list from GitHub API, got {type(releases)}"
+        raise TypeError(msg)
+    pattern = re.compile(tag_pattern)
+    for release in releases:
+        tag = cast("str", release["tag_name"])
+        if release["draft"] or release["prerelease"] or not pattern.fullmatch(tag):
+            continue
+        return _strip_v_prefix(tag)
+    msg = f"No stable release of {owner}/{repo} matches {tag_pattern!r}"
+    raise ValueError(msg)
 
 
 def fetch_npm_version(package: str, *, tag: str = "latest") -> str:

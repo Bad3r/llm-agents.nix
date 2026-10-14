@@ -63,6 +63,20 @@ class TestFetchGithubLatestRelease(unittest.TestCase):
         with patch("updater.version.fetch_json", return_value={"tag_name": "v1.2.3"}):
             self.assertEqual(fetch_github_latest_release("owner", "repo"), "1.2.3")
 
+    def test_tag_pattern_skips_calver_and_prereleases(self) -> None:
+        releases = [
+            {"tag_name": "v2026.10.1", "draft": False, "prerelease": False},
+            {"tag_name": "v0.23.0-rc1", "draft": False, "prerelease": True},
+            {"tag_name": "v0.22.0", "draft": False, "prerelease": False},
+        ]
+        with patch("updater.version.fetch_json", return_value=releases):
+            self.assertEqual(
+                fetch_github_latest_release(
+                    "owner", "repo", tag_pattern=r"v\d{1,3}\.\d+\.\d+"
+                ),
+                "0.22.0",
+            )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

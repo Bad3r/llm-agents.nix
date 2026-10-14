@@ -23,6 +23,7 @@ DEP_SECTIONS = [
 # root workspace lets Bun resolve them directly from the bun2nix cache.
 HOISTED = {
     "@joplin/turndown-plugin-gfm",
+    "@modelcontextprotocol/client",
     "@modelcontextprotocol/server",
     "@pierre/diffs",
     "@plannotator/webtui",
@@ -38,7 +39,6 @@ HOISTED = {
 # Dependencies of tests and of workspaces that are not built for this package.
 # Removing them avoids needless offline manifest lookups.
 UNUSED = {
-    "@modelcontextprotocol/client",
     "@opencode-ai/plugin",
     "@opencode/plugin",
     "fast-check",
@@ -61,12 +61,10 @@ def locked_versions(lock: str) -> dict[str, str]:
 
 def _hoist_deps(data: dict, resolved: dict[str, str]) -> bool:
     deps = data.setdefault("dependencies", {})
-    changed = False
-    for name in sorted(HOISTED):
-        if name in resolved and deps.get(name) != resolved[name]:
-            deps[name] = resolved[name]
-            changed = True
-    return changed
+    hoisted = sorted(HOISTED & resolved.keys())
+    for name in hoisted:
+        deps[name] = resolved[name]
+    return bool(hoisted)
 
 
 def _remove_deps(data: dict, names: set[str]) -> bool:
@@ -101,18 +99,14 @@ def _exactify_ranges(data: dict, resolved: dict[str, str]) -> bool:
 
 def patch_package_json_files(resolved: dict[str, str]) -> None:
     """Hoist/remove problematic deps and exactify range specs."""
-    root_package = Path("package.json")
-
     for package_json in Path().glob("**/package.json"):
         if "node_modules" in package_json.parts:
             continue
 
         data = json.loads(package_json.read_text())
-        if package_json == root_package:
-            changed = _remove_deps(data, UNUSED)
+        changed = _remove_deps(data, HOISTED | UNUSED)
+        if package_json == Path("package.json"):
             changed = _hoist_deps(data, resolved) or changed
-        else:
-            changed = _remove_deps(data, HOISTED | UNUSED)
         changed = _exactify_ranges(data, resolved) or changed
 
         if changed:

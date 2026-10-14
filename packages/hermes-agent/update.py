@@ -31,6 +31,8 @@ REPO = "hermes-agent"
 NEMO_RELAY_OWNER = "NVIDIA"
 NEMO_RELAY_REPO = "NeMo-Relay"
 STABLE_VERSION_RE = re.compile(r"[0-9]+\.[0-9]+\.[0-9]+")
+# Calendar tags (v2026.M.D) outrank semver, so require a short major.
+AGENT_TAG_RE = r"v\d{1,3}\.\d+\.\d+"
 PACKAGE_NIX = Path(__file__).parent / "package.nix"
 
 
@@ -119,7 +121,7 @@ def update_rev(agent_version: str) -> None:
 def main() -> None:
     """Update the agent to the latest stable release."""
     current = nix_eval(".#hermes-agent.version")
-    latest = fetch_github_latest_release(OWNER, REPO)
+    latest = fetch_github_latest_release(OWNER, REPO, tag_pattern=AGENT_TAG_RE)
     print(f"Current: {current}, Latest stable: {latest}")
 
     if should_update(current, latest):
