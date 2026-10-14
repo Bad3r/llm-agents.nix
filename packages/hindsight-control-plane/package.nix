@@ -14,7 +14,7 @@ buildNpmPackage {
   inherit (hindsight) version src;
 
   npmDepsFetcherVersion = 2;
-  npmDepsHash = "sha256-zFFjja7RPZXRMun2I9fzp4iEBE0MRmCg/eoKEV02lT8=";
+  npmDepsHash = "sha256-gXi6HtCsIktIeXQUcRcymXEWwR19nzPmP/bi3r0Xz1s=";
 
   nativeBuildInputs = [ makeWrapper ];
 

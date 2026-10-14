@@ -71,13 +71,13 @@ let
 in
 python3Packages.buildPythonApplication rec {
   pname = "hindsight";
-  version = "0.10.1";
+  version = "1.0.0";
 
   src = fetchFromGitHub {
     owner = "vectorize-io";
     repo = "hindsight";
     tag = "v${version}";
-    hash = "sha256-/qafCyuk4Vrum19AoNRtbTo+eBGP90XzNdH/LBHO4Ig=";
+    hash = "sha256-gfrWtZcEUGVSzmwhlkwav4fv1Gz2ulj3LlWzYWNrWQ0=";
   };
 
   sourceRoot = "${src.name}/hindsight-api-slim";

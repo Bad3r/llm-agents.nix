@@ -18,7 +18,7 @@ jobs:
           # Need history to compute merge-base against the base branch.
           fetch-depth: 0
       - name: Setup Nix
-        uses: cachix/install-nix-action@v31
+        uses: NixOS/nix-installer-action@main
       - name: Check new packages declare maintainers
         run: |
           python3 .github/ci/check_maintainers.py \

@@ -8,16 +8,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "rtk";
-  version = "0.52.0";
+  version = "1.0.0";
 
   src = fetchFromGitHub {
     owner = "rtk-ai";
     repo = "rtk";
     tag = "v${version}";
-    hash = "sha256-ULOYRrTgImleg9ifUn3h/3O8PqIp4bkMzi+A2FJk7Bg=";
+    hash = "sha256-2MPcWWhJYMcafA+NYKj5novvBsHzcC0+U4Qm7CXSGAA=";
   };
 
-  cargoHash = "sha256-jheJlkrlYH+FsWeNrpwXWnNPaGLOY44f0HFxlZ8c3oY=";
+  cargoHash = "sha256-n3wpRG/wrL7XtJzWPrizb72aKW7j6j8SJcPno5vv+94=";
 
   nativeBuildInputs = [ makeWrapper ];
 
