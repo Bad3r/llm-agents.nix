@@ -83,6 +83,7 @@ buildNpmPackage {
     # main/exports do not resolve otherwise (earendil-works/pi#9817).
     bun build --compile \
       --no-compile-autoload-bunfig \
+      --no-compile-autoload-dotenv \
       --compile-autoload-package-json \
       ./dist/bun/cli.js \
       ./src/utils/image-resize-worker.ts \
