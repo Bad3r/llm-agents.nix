@@ -5,6 +5,7 @@
   fetchurlTemplate,
   versionCheckHook,
   codesignCheckHook,
+  mkCodesignCheck,
   mkUpdater,
 }:
 
@@ -35,6 +36,7 @@ let
       name = "muse-${version}-${platform}";
       hash = versionData.hashes.${system};
     };
+  teamId = "V9WTTPBFK9";
 in
 stdenvNoCC.mkDerivation {
   pname = "muse-code";
@@ -53,12 +55,16 @@ stdenvNoCC.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "V9WTTPBFK9";
-  codesignSources = [ (srcFor "aarch64-darwin") ];
+  ]
+  ++ lib.optionals stdenvNoCC.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "muse-code";
+    inherit teamId;
+    srcs = [ (srcFor "aarch64-darwin") ];
+  };
   passthru.updater = mkUpdater {
     kind = "manifest-checksums";
     versionSource = {

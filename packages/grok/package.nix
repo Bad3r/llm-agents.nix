@@ -9,6 +9,7 @@
   versionCheckHook,
   versionCheckHomeHook,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 let
@@ -23,6 +24,7 @@ let
     urlTemplate = "https://storage.googleapis.com/grok-build-public-artifacts/cli/grok-{version}-{platform}";
   };
   inherit (source) version;
+  teamId = "5Y6N3AJ54S";
 in
 stdenv.mkDerivation {
   inherit pname version;
@@ -72,10 +74,9 @@ stdenv.mkDerivation {
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "5Y6N3AJ54S";
-  codesignSources = source.darwinSrcs;
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
   postInstallCheck = ''
     grep -q GROK_DISABLE_AUTOUPDATER $out/libexec/grok/grok-launcher
     grep -q GROK_DISABLE_AUTOUPDATER $out/libexec/grok/agent-launcher
@@ -84,6 +85,11 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = pname;
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
   passthru.updater = mkUpdater (
     source.updater
     // {

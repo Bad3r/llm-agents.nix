@@ -5,6 +5,7 @@
   mkUpdater,
   unzip,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 # Unmodified upstream bun to be used as `bun build --compile --target` runtime.
@@ -23,6 +24,7 @@ let
     urlTemplate = "https://github.com/oven-sh/bun/releases/download/bun-v{version}/bun-{platform}.zip";
   };
   target = "bun-${triples.${stdenvNoCC.hostPlatform.system}}-v${source.version}";
+  teamId = "7FRXF46ZSN";
 in
 stdenvNoCC.mkDerivation {
   pname = "bun-bin";
@@ -33,9 +35,8 @@ stdenvNoCC.mkDerivation {
   dontFixup = true;
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ codesignCheckHook ];
-  codesignTeamId = "7FRXF46ZSN";
-  codesignSources = source.darwinSrcs;
+  nativeInstallCheckInputs = lib.optionals stdenvNoCC.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   installPhase = ''
     runHook preInstall
@@ -47,6 +48,11 @@ stdenvNoCC.mkDerivation {
     hideFromDocs = true;
     # Copy share/bun-bin/* into $BUN_INSTALL_CACHE_DIR and pass --target.
     inherit target;
+    tests.codesign = mkCodesignCheck {
+      name = "bun-bin";
+      inherit teamId;
+      srcs = source.darwinSrcs;
+    };
     updater = mkUpdater (
       source.updater
       // {

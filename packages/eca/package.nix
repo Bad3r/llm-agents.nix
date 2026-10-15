@@ -4,11 +4,14 @@
   wrapBuddy,
   versionCheckHomeHook,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 let
   hashes = builtins.fromJSON (builtins.readFile ./hashes.json);
   version = hashes.version;
+
+  teamId = "762737A9Q2";
 
   darwinSrc = pkgs.fetchurl {
     url = "https://github.com/editor-code-assistant/eca/releases/download/${version}/eca-native-macos-aarch64.zip";
@@ -47,10 +50,9 @@ let
       nativeInstallCheckInputs = [
         pkgs.versionCheckHook
         versionCheckHomeHook
-        codesignCheckHook
-      ];
-      codesignTeamId = "762737A9Q2";
-      codesignSources = [ darwinSrc ];
+      ]
+      ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+      codesignTeamId = teamId;
 
       unpackPhase = ''
         runHook preUnpack
@@ -71,6 +73,11 @@ let
       '';
 
       passthru.category = "AI Coding Agents";
+      passthru.tests.codesign = mkCodesignCheck {
+        name = "eca";
+        inherit teamId;
+        srcs = [ darwinSrc ];
+      };
 
       meta = with pkgs.lib; {
         description = "Editor Code Assistant (ECA) - AI pair programming capabilities agnostic of editor";

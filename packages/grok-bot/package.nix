@@ -10,6 +10,7 @@
   makeDesktopItem,
   unzip,
   codesignCheckHook,
+  mkCodesignCheck,
 
   # Directly linked (DT_NEEDED); formatelf/autoPatchelf resolves these from
   # buildInputs and fails the build if any are missing.
@@ -75,7 +76,7 @@ let
 
   src = srcFor platform;
 
-  codesignTeamId = "DCNK4UB866";
+  teamId = "DCNK4UB866";
 
   desktopItem = makeDesktopItem {
     name = "grok-bot";
@@ -94,7 +95,14 @@ let
     ];
   };
 
-  passthru.category = "AI Assistants";
+  passthru = {
+    category = "AI Assistants";
+    tests.codesign = mkCodesignCheck {
+      name = pname;
+      inherit teamId;
+      srcs = [ (srcFor "aarch64-darwin") ];
+    };
+  };
 
   meta = with lib; {
     description = "Grok Bot desktop agent — AI teammates that finish the work";
@@ -125,20 +133,11 @@ let
     # Prebuilt Electron — stripping buys nothing and corrupts the binary.
     dontStrip = true;
 
-    # unzip: codesignCheckHook unpacks the darwin zip on Linux too.
     nativeBuildInputs = [
       formatelf
       copyDesktopItems
       makeWrapper
-      unzip
     ];
-
-    # Linux-only update CI never builds the darwin derivation, so pin the
-    # darwin zip's publisher here as well.
-    doInstallCheck = true;
-    nativeInstallCheckInputs = [ codesignCheckHook ];
-    inherit codesignTeamId;
-    codesignSources = [ (srcFor "aarch64-darwin") ];
 
     buildInputs = [
       adwaita-icon-theme
@@ -250,7 +249,7 @@ let
 
     doInstallCheck = true;
     nativeInstallCheckInputs = [ codesignCheckHook ];
-    inherit codesignTeamId;
+    codesignTeamId = teamId;
 
     installPhase = ''
       runHook preInstall

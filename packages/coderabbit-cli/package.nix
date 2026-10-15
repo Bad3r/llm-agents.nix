@@ -10,6 +10,7 @@
   versionCheckHook,
   versionCheckHomeHook,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 let
@@ -22,6 +23,7 @@ let
     };
     urlTemplate = "https://cli.coderabbit.ai/releases/{version}/coderabbit-{platform}.zip";
   };
+  teamId = "47UZS55279";
 in
 stdenv.mkDerivation {
   pname = "coderabbit-cli";
@@ -50,13 +52,17 @@ stdenv.mkDerivation {
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
-    codesignCheckHook
-  ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
   versionCheckProgramArg = [ "--version" ];
-  codesignTeamId = "47UZS55279";
-  codesignSources = source.darwinSrcs;
+  codesignTeamId = teamId;
 
   passthru.category = "Code Review";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "coderabbit-cli";
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
   passthru.updater = mkUpdater (
     source.updater
     // {

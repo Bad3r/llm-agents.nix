@@ -11,6 +11,7 @@
   makeDesktopItem,
   undmg,
   codesignCheckHook,
+  mkCodesignCheck,
 
   alsa-lib,
   at-spi2-atk,
@@ -74,6 +75,7 @@ let
     };
     urlTemplate = "https://cdn-zcode.z.ai/zcode/electron/releases/{version}/{dir}/ZCode-{version}-{file}";
   };
+  teamId = "8A5X4JJ39T";
 
   desktopItem = makeDesktopItem {
     name = "zcode";
@@ -92,20 +94,17 @@ stdenvNoCC.mkDerivation {
   pname = "zcode";
   inherit (source) version src;
 
-  # undmg on Linux too: codesignCheckHook unpacks the darwin dmg there.
-  nativeBuildInputs = [
-    undmg
-  ]
-  ++ lib.optionals isLinux [
-    formatelf
-    copyDesktopItems
-    makeWrapper
-  ];
+  nativeBuildInputs =
+    lib.optionals stdenvNoCC.hostPlatform.isDarwin [ undmg ]
+    ++ lib.optionals isLinux [
+      formatelf
+      copyDesktopItems
+      makeWrapper
+    ];
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ codesignCheckHook ];
-  codesignTeamId = "8A5X4JJ39T";
-  codesignSources = source.darwinSrcs;
+  nativeInstallCheckInputs = lib.optionals stdenvNoCC.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   buildInputs = lib.optionals isLinux [
     adwaita-icon-theme
@@ -200,6 +199,11 @@ stdenvNoCC.mkDerivation {
 
   passthru = {
     category = "AI Coding Agents";
+    tests.codesign = mkCodesignCheck {
+      name = "zcode";
+      inherit teamId;
+      srcs = source.darwinSrcs;
+    };
 
     updater = mkUpdater (
       source.updater

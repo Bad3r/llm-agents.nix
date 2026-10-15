@@ -195,36 +195,11 @@ stdenv.mkDerivation {
 
 ### Code Signature Check Hook
 
-Upstream macOS binaries that ship with a Developer ID signature can be pinned to
-their publisher. `codesignCheckHook` fails the build unless every Mach-O in the
-outputs and in `codesignSources` is signed by `codesignTeamId` with a certificate
-that chains to Apple's root CA. It runs on Linux too, so pass the darwin
-artifacts through `codesignSources`; `platformSource` exposes them as
-`darwinSrcs`. Keep `dontStrip = true`: stripping invalidates the signature.
-
-```nix
-{
-  platformSource,
-  versionCheckHook,
-  codesignCheckHook,
-  # ...
-}:
-stdenv.mkDerivation {
-  # ...
-  dontStrip = true;
-  doInstallCheck = true;
-  nativeInstallCheckInputs = [
-    versionCheckHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "433DLLA855";
-  codesignSources = source.darwinSrcs;
-}
-```
-
-Find the team ID with `rcodesign print-signature-info <binary>` (`team_name`).
-Ad-hoc or linker-signed binaries (most bun-compiled tools) carry no publisher
-and cannot use the hook.
+Pin signed macOS binaries to their publisher: add `codesignCheckHook` and
+`codesignTeamId` on darwin, and `passthru.tests.codesign` via `mkCodesignCheck`
+for the darwin artifacts on every host (see `packages/grok`). Keep
+`dontStrip = true`. Find the team ID with `rcodesign print-signature-info`.
+Ad-hoc signed binaries (most bun-compiled tools) cannot use it.
 
 ## Linting with ast-grep
 

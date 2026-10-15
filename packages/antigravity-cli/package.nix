@@ -7,6 +7,7 @@
   versionCheckHook,
   versionCheckHomeHook,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 let
@@ -21,6 +22,7 @@ let
       url = urls.${system} or (throw "Unsupported system: ${system}");
       hash = hashes.${system} or (throw "Unsupported system: ${system}");
     };
+  teamId = "EQHXZ8M8AV";
 in
 stdenv.mkDerivation {
   pname = "antigravity-cli";
@@ -49,11 +51,12 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHomeHook
-    codesignCheckHook
   ]
-  ++ lib.optionals (!stdenv.hostPlatform.isLinux) [ versionCheckHook ];
-  codesignTeamId = "EQHXZ8M8AV";
-  codesignSources = [ (srcFor "aarch64-darwin") ];
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    codesignCheckHook
+    versionCheckHook
+  ];
+  codesignTeamId = teamId;
 
   installCheckPhase = lib.optionalString stdenv.hostPlatform.isLinux ''
     runHook preInstallCheck
@@ -64,6 +67,11 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "antigravity-cli";
+    inherit teamId;
+    srcs = [ (srcFor "aarch64-darwin") ];
+  };
 
   meta = with lib; {
     description = "CLI for Google Antigravity, an agentic development platform";

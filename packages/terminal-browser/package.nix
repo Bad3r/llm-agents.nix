@@ -8,6 +8,7 @@
   libarchive,
   versionCheckHook,
   codesignCheckHook,
+  mkCodesignCheck,
 
   # DT_NEEDED by the bundled Electron and the pixel.node engine.
   alsa-lib,
@@ -59,6 +60,7 @@ let
     };
     urlTemplate = "https://github.com/zenbu-labs/terminal-browser/releases/download/v{version}/terminal-browser-{platform}.tar.gz";
   };
+  teamId = "7YBC6H852Y";
 in
 stdenv.mkDerivation {
   pname = "terminal-browser";
@@ -139,15 +141,17 @@ stdenv.mkDerivation {
   dontStrip = true;
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [
-    codesignCheckHook
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ versionCheckHook ];
-  codesignTeamId = "7YBC6H852Y";
-  codesignSources = source.darwinSrcs;
+  nativeInstallCheckInputs =
+    if stdenv.hostPlatform.isDarwin then [ codesignCheckHook ] else [ versionCheckHook ];
+  codesignTeamId = teamId;
   versionCheckProgramArg = "--version";
 
   passthru.category = "Utilities";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "terminal-browser";
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
   passthru.updater = mkUpdater (
     source.updater
     // {

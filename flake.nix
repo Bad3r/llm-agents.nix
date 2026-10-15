@@ -104,6 +104,7 @@
               # Validate a declarative passthru.updater config (see
               # scripts/updater/run.py); packages opt out of update.py with it.
               mkUpdater = import ./lib/mk-updater.nix { inherit (pkgs) lib; };
+              mkCodesignCheck = self.callPackage ./lib/mk-codesign-check.nix { };
               # `bun build --compile` copies the running bun binary into the
               # executable it produces, so bun ends up inside our outputs
               # rather than being a build tool we can leave to the consumer.
@@ -208,6 +209,9 @@
             import ./lib/check-package.nix { pkgs = pkgsFor.${system}; } name pkg
           )
         ) packages.${system}
+        // lib.mapAttrs' (name: pkg: lib.nameValuePair "codesign-${name}" pkg.passthru.tests.codesign) (
+          lib.filterAttrs (_name: pkg: (pkg.passthru.tests or { }) ? codesign) packages.${system}
+        )
         // lib.genAttrs checkNames (
           name:
           callWith {

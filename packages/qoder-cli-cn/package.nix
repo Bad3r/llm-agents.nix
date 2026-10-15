@@ -3,6 +3,7 @@
   fetchurl,
   flake,
   mkUpdater,
+  mkCodesignCheck,
   qoder-cli,
 }:
 
@@ -15,6 +16,7 @@ let
     fetchurl {
       inherit (platforms.${system} or (throw "Unsupported system: ${system}")) url hash;
     };
+  teamId = "9DFNGU9AK5";
 in
 # Same bun-compiled binary as qoder-cli, but built for the mainland China
 # service: separate release channel/CDN, binary name and account backend.
@@ -32,10 +34,14 @@ qoder-cli.overrideAttrs (old: {
     runHook postInstall
   '';
 
-  codesignTeamId = "9DFNGU9AK5";
-  codesignSources = [ (srcFor "aarch64-darwin") ];
+  codesignTeamId = teamId;
 
   passthru = old.passthru // {
+    tests.codesign = mkCodesignCheck {
+      name = "qoder-cli-cn";
+      inherit teamId;
+      srcs = [ (srcFor "aarch64-darwin") ];
+    };
     updater = mkUpdater {
       kind = "manifest";
       manifestUrl = "https://static.qoder.com.cn/qoder-cli-cn/channels/manifest.json";

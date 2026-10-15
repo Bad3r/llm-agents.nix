@@ -10,6 +10,7 @@
   makeDesktopItem,
   undmg,
   codesignCheckHook,
+  mkCodesignCheck,
 
   alsa-lib,
   at-spi2-atk,
@@ -74,6 +75,10 @@ let
   };
 
   inherit (stdenvNoCC.hostPlatform) isLinux;
+
+  # From `codesign -dv --verbose=4 OpenCode.app` on the upstream DMG:
+  # Developer ID Application: Anomaly Innovations, Inc. (5NZ4Q7NXJ4)
+  teamId = "5NZ4Q7NXJ4";
 in
 stdenvNoCC.mkDerivation {
   pname = "opencode2-desktop";
@@ -81,14 +86,13 @@ stdenvNoCC.mkDerivation {
 
   dontStrip = true;
 
-  nativeBuildInputs = [
-    undmg
-  ]
-  ++ lib.optionals isLinux [
-    formatelf
-    copyDesktopItems
-    makeWrapper
-  ];
+  nativeBuildInputs =
+    lib.optionals stdenvNoCC.hostPlatform.isDarwin [ undmg ]
+    ++ lib.optionals isLinux [
+      formatelf
+      copyDesktopItems
+      makeWrapper
+    ];
 
   buildInputs = lib.optionals isLinux [
     adwaita-icon-theme
@@ -182,13 +186,15 @@ stdenvNoCC.mkDerivation {
       '';
 
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ codesignCheckHook ];
-  # From `codesign -dv --verbose=4 OpenCode.app` on the upstream DMG:
-  # Developer ID Application: Anomaly Innovations, Inc. (5NZ4Q7NXJ4)
-  codesignTeamId = "5NZ4Q7NXJ4";
-  codesignSources = source.darwinSrcs;
+  nativeInstallCheckInputs = lib.optionals stdenvNoCC.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "opencode2-desktop";
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
 
   meta = with lib; {
     description = "OpenCode 2 desktop client";

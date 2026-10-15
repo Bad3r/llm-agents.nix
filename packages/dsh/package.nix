@@ -50,6 +50,15 @@ buildNpmPackage {
       $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-terminal-bash/lib/index.js \
       --replace-fail '"/bin/bash"' '"${lib.getExe bashInteractive}"'
 
+    # The addon decodes V8 machine code, which nixpkgs' Node breaks.
+    # --expose-internals makes plain require() work instead.
+    for f in index.js worker/profile-resolution-bootstrap.js; do
+      substituteInPlace \
+        $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/$f \
+        --replace-fail 'createRequire(import.meta.url)("node-addon-require-builtin")' \
+        '{ requireBuiltin: createRequire(import.meta.url) }'
+    done
+
     rm $out/bin/dsh
     makeWrapper ${lib.getExe nodejs} $out/bin/dsh \
       --argv0 dsh \

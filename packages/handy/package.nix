@@ -7,6 +7,7 @@
   dpkg,
   makeWrapper,
   codesignCheckHook,
+  mkCodesignCheck,
   makeDesktopItem,
   copyDesktopItems,
   # Runtime dependencies for Linux
@@ -26,6 +27,7 @@
 
 let
   pname = "handy";
+  teamId = "UWFLB4GC25";
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hashes;
 
@@ -155,11 +157,15 @@ stdenv.mkDerivation {
 
   # GUI-only Tauri app: no versionCheckHook, it would block starting the GUI.
   doInstallCheck = true;
-  nativeInstallCheckInputs = [ codesignCheckHook ];
-  codesignTeamId = "UWFLB4GC25";
-  codesignSources = [ srcs.aarch64-darwin ];
+  nativeInstallCheckInputs = lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "Voice & Transcription";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = pname;
+    inherit teamId;
+    srcs = [ srcs.aarch64-darwin ];
+  };
 
   meta = with lib; {
     description = "Fast and accurate local transcription app using AI models";

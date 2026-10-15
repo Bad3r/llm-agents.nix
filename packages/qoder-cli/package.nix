@@ -8,6 +8,7 @@
   versionCheckHook,
   versionCheckHomeHook,
   codesignCheckHook,
+  mkCodesignCheck,
 }:
 
 let
@@ -19,6 +20,7 @@ let
     fetchurl {
       inherit (platforms.${system} or (throw "Unsupported system: ${system}")) url hash;
     };
+  teamId = "T27K5A5ZWD";
 in
 stdenv.mkDerivation {
   pname = "qoder-cli";
@@ -45,12 +47,16 @@ stdenv.mkDerivation {
   nativeInstallCheckInputs = [
     versionCheckHook
     versionCheckHomeHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "T27K5A5ZWD";
-  codesignSources = [ (srcFor "aarch64-darwin") ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "qoder-cli";
+    inherit teamId;
+    srcs = [ (srcFor "aarch64-darwin") ];
+  };
   passthru.updater = mkUpdater {
     kind = "manifest";
     manifestUrl = "https://qoder-ide.oss-ap-southeast-1.aliyuncs.com/qodercli/channels/manifest.json";

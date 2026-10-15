@@ -1,0 +1,3 @@
+# The fork also publishes a rolling `nightly` tag; only track semver releases.
+--version-regex
+^v([0-9]+\.[0-9]+\.[0-9]+)$

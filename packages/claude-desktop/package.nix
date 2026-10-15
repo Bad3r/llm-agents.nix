@@ -10,6 +10,7 @@
   makeDesktopItem,
   unzip,
   codesignCheckHook,
+  mkCodesignCheck,
 
   # Directly linked (DT_NEEDED); autoPatchelfHook resolves these from
   # buildInputs and fails the build if any are missing.
@@ -146,8 +147,15 @@ let
       ln -s ${OVMF.firmware} ${OVMF.variables} $out/share/${dir}/
     '';
 
+  teamId = "Q6L2SF6YDW";
+
   passthru = {
     category = "AI Coding Agents";
+    tests.codesign = mkCodesignCheck {
+      name = pname;
+      inherit teamId;
+      srcs = [ (srcFor "aarch64-darwin") ];
+    };
   };
 
   meta = with lib; {
@@ -178,18 +186,11 @@ let
 
     src = srcFor platform;
 
-    # unzip: codesignCheckHook unpacks the darwin zip on Linux too.
     nativeBuildInputs = [
       formatelf
       copyDesktopItems
       makeWrapper
-      unzip
     ];
-
-    doInstallCheck = true;
-    nativeInstallCheckInputs = [ codesignCheckHook ];
-    codesignTeamId = "Q6L2SF6YDW";
-    codesignSources = [ (srcFor "aarch64-darwin") ];
 
     buildInputs = [
       adwaita-icon-theme
@@ -295,7 +296,7 @@ let
 
     doInstallCheck = true;
     nativeInstallCheckInputs = [ codesignCheckHook ];
-    codesignTeamId = "Q6L2SF6YDW";
+    codesignTeamId = teamId;
 
     installPhase = ''
       runHook preInstall

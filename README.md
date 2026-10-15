@@ -551,6 +551,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>pool</strong> - Poolside's coding agent</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://poolside.ai
+- **Usage**: `nix run github:numtide/llm-agents.nix#pool -- --help`
+- **Nix**: [packages/pool/package.nix](packages/pool/package.nix)
+
+</details>
+<details>
 <summary><strong>prime-agent</strong> - A self-improving RLM agent for coding workflows and long-running autonomous tasks.</summary>
 
 - **Source**: source
@@ -811,6 +821,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://paperclip.ing
 - **Usage**: `nix run github:numtide/llm-agents.nix#paperclip -- --help`
 - **Nix**: [packages/paperclip/package.nix](packages/paperclip/package.nix)
+
+</details>
+<details>
+<summary><strong>picoclaw</strong> - Tiny, fast, and deployable anywhere — automate the mundane, unleash your creativity</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://afjcjsbx.github.io/picoclaw/
+- **Usage**: `nix run github:numtide/llm-agents.nix#picoclaw -- --help`
+- **Nix**: [packages/picoclaw/package.nix](packages/picoclaw/package.nix)
 
 </details>
 <details>

@@ -7,6 +7,7 @@
   wrapBuddy,
   versionCheckHook,
   codesignCheckHook,
+  mkCodesignCheck,
   bubblewrap,
   socat,
   mkUpdater,
@@ -23,6 +24,7 @@ let
     };
     urlTemplate = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/{version}/{platform}/claude";
   };
+  teamId = "Q6L2SF6YDW";
 in
 stdenv.mkDerivation {
   pname = "claude-code";
@@ -77,12 +79,16 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "Q6L2SF6YDW";
-  codesignSources = source.darwinSrcs;
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "AI Coding Agents";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "claude-code";
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
   passthru.updater = mkUpdater {
     kind = "manifest-checksums";
     versionSource = {

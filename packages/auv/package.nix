@@ -10,6 +10,7 @@
   tesseract5,
   versionCheckHook,
   codesignCheckHook,
+  mkCodesignCheck,
   mkUpdater,
 }:
 
@@ -27,6 +28,7 @@ let
     };
     urlTemplate = "https://github.com/moeru-ai/auv/releases/download/v{version}/auv-{platform}.tar.gz";
   };
+  teamId = "433DLLA855";
 
   # The Linux release binaries are built on Ubuntu 24.04 against leptonica 1.82,
   # whose soname is `liblept.so.5`. nixpkgs ships leptonica 1.87, which renamed
@@ -81,12 +83,16 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
-    codesignCheckHook
-  ];
-  codesignTeamId = "433DLLA855";
-  codesignSources = source.darwinSrcs;
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
+  codesignTeamId = teamId;
 
   passthru.category = "Utilities";
+  passthru.tests.codesign = mkCodesignCheck {
+    name = "auv";
+    inherit teamId;
+    srcs = source.darwinSrcs;
+  };
   passthru.updater = mkUpdater (
     source.updater
     // {
