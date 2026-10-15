@@ -547,6 +547,9 @@ python3.pkgs.buildPythonApplication {
     "--set"
     "HERMES_BUNDLED_PLUGINS"
     "${placeholder "out"}/share/hermes/plugins"
+    "--set"
+    "HERMES_BUNDLED_LOCALES"
+    "${placeholder "out"}/share/hermes/locales"
     # Disable runtime pip installs; absent extras disable cleanly.
     "--set"
     "HERMES_DISABLE_LAZY_INSTALLS"
@@ -566,6 +569,7 @@ python3.pkgs.buildPythonApplication {
     cp -r ${src}/skills $out/share/hermes/skills
     cp -r ${src}/optional-skills $out/share/hermes/optional-skills
     cp -r ${src}/plugins $out/share/hermes/plugins
+    cp -r ${src}/locales $out/share/hermes/locales
     # The sources only carry a 0.0.0 placeholder version.
     cp ${installStamp} $out/${python3.sitePackages}/install-stamp.json
   '';
@@ -628,6 +632,8 @@ python3.pkgs.buildPythonApplication {
     grep -q HERMES_BUNDLED_SKILLS $out/bin/hermes
     grep -q HERMES_OPTIONAL_SKILLS $out/bin/hermes
     grep -q HERMES_BUNDLED_PLUGINS $out/bin/hermes
+    grep -q HERMES_BUNDLED_LOCALES $out/bin/hermes
+    test -f $out/share/hermes/locales/en.yaml
     test -f ${hermes-frontend}/lib/hermes-tui/dist/entry.js
     test -f ${hermes-frontend}/share/hermes-web/index.html
     test -d $out/share/hermes/skills

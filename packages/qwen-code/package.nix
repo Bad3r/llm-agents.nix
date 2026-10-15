@@ -3,6 +3,9 @@
   stdenv,
   buildNpmPackage,
   fetchFromGitHub,
+  fetchPnpmDeps,
+  pnpm_11,
+  pnpmConfigHook,
   git,
   ripgrep,
   pkg-config,
@@ -14,21 +17,28 @@
 }:
 
 buildNpmPackage (finalAttrs: {
-  npmDepsFetcherVersion = 2;
   pname = "qwen-code";
-  version = "0.21.2";
+  version = "0.25.1";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-biwaz3THYLrbEzG7HAcXmLALPUwO26OOJWrr27mpy3A=";
+    hash = "sha256-BEm9/J7GoskP4Uz1gayThPcnON2czQm5KzRLbdSodm0=";
   };
 
-  npmDepsHash = "sha256-e+KeXYq/SZ9ZVgMB8+eUNZsOtEKgZkKE0yIwlZgPpks=";
-  makeCacheWritable = true;
+  npmDeps = null;
+  pnpmDeps = fetchPnpmDeps {
+    inherit (finalAttrs) pname version src;
+    pnpm = pnpm_11;
+    fetcherVersion = 4;
+    hash = "sha256-CZcGdh3LOVGm9adJIJzBoQq8oRfKK37i/v0neb/io6o=";
+  };
+  npmConfigHook = pnpmConfigHook;
+  dontNpmPrune = true;
 
   nativeBuildInputs = [
+    pnpm_11
     pkg-config
     git
   ]
@@ -43,8 +53,17 @@ buildNpmPackage (finalAttrs: {
     libsecret
   ];
 
+  # corepack would download the pnpm version pinned upstream at build time.
+  postPatch = ''
+    substituteInPlace scripts/build.js --replace-fail "corepack pnpm" pnpm
+  '';
+
   buildPhase = ''
     runHook preBuild
+
+    # Upstream's postinstall applies patches/ink+*.patch, which adds the
+    # selection props the CLI uses. Install scripts are skipped here.
+    node_modules/.bin/patch-package
 
     # npmConfigHook only patches the root node_modules. Workspaces with
     # nested .bin (web-shell's vite) keep /usr/bin/env otherwise.
@@ -72,7 +91,7 @@ buildNpmPackage (finalAttrs: {
     cp scripts/cli-entry.js $out/share/qwen-code/cli-entry.js
     cp package.json $out/share/qwen-code/package.json
     # Install production dependencies only
-    npm prune --production
+    CI=true pnpm prune --prod --ignore-scripts
     cp -r node_modules $out/share/qwen-code/
     # Remove broken symlinks that cause issues in Nix environment
     find $out/share/qwen-code/node_modules -type l -delete || true

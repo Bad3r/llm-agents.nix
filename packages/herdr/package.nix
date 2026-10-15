@@ -17,16 +17,16 @@
 # crates/ghostty-vt/build.rs shells out to `zig build` to compile vendored libghostty-vt.
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr";
-  version = "0.9.4";
+  version = "0.9.5";
 
   src = fetchFromGitHub {
     owner = "herdrdev";
     repo = "herdr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-tbOVXxQCA/suZ+My71B5laNZhEpK46YLYUs7H8tdysY=";
+    hash = "sha256-N7e7oCKxeCoxek6UT8Lweq16rSsQQi34QMb7C2iNpm8=";
   };
 
-  cargoHash = "sha256-IPsukFZI+VARH2e4I3dNe6pD8f3NaC3WtLiylfl/qQA=";
+  cargoHash = "sha256-a6DgQodo+qa5yg/d+yMfsM9EUv2LQRFrqZgmwgVxggE=";
 
   # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
   # build offline.  fetchDeps is a fixed-output derivation, so this does not
