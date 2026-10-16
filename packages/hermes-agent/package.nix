@@ -20,20 +20,20 @@ let
   # Version is kept in range of hermes' pyproject constraint by update.py.
   nemo-relay = python3.pkgs.buildPythonPackage rec {
     pname = "nemo-relay";
-    version = "0.10.1";
+    version = "0.10.2";
     pyproject = true;
 
     src = fetchFromGitHub {
       owner = "NVIDIA";
       repo = "NeMo-Relay";
       tag = version;
-      hash = "sha256-gd/BquXRZ9n61tdvAEWpgay/KZgxaVjKsonY5KOAgWA=";
+      hash = "sha256-f57Y+bp8q3r9OvY6EVgOHNucW4mXip/Cb6ey99JhP/Y=";
     };
 
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit src;
       name = "nemo-relay-${version}";
-      hash = "sha256-TZ0j4Rbv8gumngaAo9/rjVCvXgzFZ/v8gRs2V5mhfHk=";
+      hash = "sha256-tu/Ug/o1qdBD635oA5J6WJjKaJKM6NsFrpmSNH5kasE=";
     };
 
     nativeBuildInputs =
@@ -266,15 +266,15 @@ let
     };
   };
 
-  version = "0.22.0";
+  version = "0.22.2";
   # The commit of the tag. Hermes ignores an install stamp without one.
-  rev = "e06df9c2eae6901f4c88f464e0ae6e753c0428b8";
+  rev = "d923a5eb487a17c0a68801bba9ef0f56c81040a8";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-unGGO3isUKbkhavLo8rv2kZKOjXRoZoc5a+mCORcH6Y=";
+    hash = "sha256-Zs5Jr2BZ89RHbyj2WX2y4hIh4Vuwz8mJvGJooWytCk4=";
     # contributors/emails/ holds paths differing only in case; they collapse
     # on case-insensitive stores (APFS) so the NAR hash diverges between
     # Linux and darwin. Unused at build/runtime. Upstream:
@@ -292,7 +292,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-eFfl+DAj5h0ih5fly9NKaNt2iGZxHs7SuESzZgsQlDw=";
+    npmDepsHash = "sha256-45CV8Qavo5UQlUfSQuWzhZK1Xicx9iW8dDDsDvAM2Dc=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.

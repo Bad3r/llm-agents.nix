@@ -15,6 +15,7 @@
   config,
   cudaSupport ? config.cudaSupport or false,
   cudaPackages ? { },
+  cudaPackages_12,
   vulkanSupport ? stdenv.hostPlatform.isLinux,
   vulkan-loader,
   autoAddDriverRunpath,
@@ -22,8 +23,22 @@
 let
   # CUDA only supported on x86_64-linux
   effectiveCudaSupport = cudaSupport && stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isx86_64;
+  hasCuda13Runtime = effectiveCudaSupport && lib.versionAtLeast cudaPackages.cuda_cudart.version "13";
+  # node-llama-cpp bundles both CUDA 13 and CUDA 12 fallback binaries. Keep
+  # both loadable when the consumer's default cudaPackages moves to CUDA 13.
+  cudaRuntimeLibraries = lib.optionals effectiveCudaSupport (
+    [
+      cudaPackages.cuda_cudart
+      cudaPackages.libcublas
+    ]
+    ++ lib.optionals hasCuda13Runtime [
+      cudaPackages_12.cuda_cudart
+      cudaPackages_12.libcublas
+    ]
+  );
   # Vulkan supported on all Linux
   effectiveVulkanSupport = vulkanSupport && stdenv.hostPlatform.isLinux;
+  vulkanRuntimeLibraries = lib.optionals effectiveVulkanSupport [ vulkan-loader ];
 
   versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
   inherit (versionData) version hash;
@@ -53,13 +68,8 @@ stdenv.mkDerivation {
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     stdenv.cc.cc.lib # For libgcc_s.so.1 and libstdc++.so.6
   ]
-  ++ lib.optionals effectiveCudaSupport [
-    cudaPackages.cuda_cudart
-    cudaPackages.libcublas
-  ]
-  ++ lib.optionals effectiveVulkanSupport [
-    vulkan-loader
-  ];
+  ++ cudaRuntimeLibraries
+  ++ vulkanRuntimeLibraries;
 
   bunDeps = bun2nixLib.fetchBunDeps {
     bunNix = ./bun.nix;
@@ -70,13 +80,17 @@ stdenv.mkDerivation {
     # musl (we use glibc)
     "libc.musl-x86_64.so.1"
     "libc.musl-aarch64.so.1"
-    # Prebuilt binaries target CUDA 13 but we provide CUDA 12 (ABI compatible)
-    # libcuda.so.1 comes from nvidia driver (autoAddDriverRunpath)
+  ]
+  # CUDA 12 configurations use the bundled fallback instead of CUDA 13 binaries.
+  ++ lib.optionals (!hasCuda13Runtime) [
     "libcudart.so.13"
     "libcublas.so.13"
+  ]
+  ++ [
+    # libcuda.so.1 comes from the NVIDIA driver (autoAddDriverRunpath).
     "libcuda.so.1"
   ]
-  # CUDA 12 libs — only ignore when CUDA is disabled (otherwise provided by cudaPackages)
+  # CUDA-enabled configurations always provide the CUDA 12 fallback libraries.
   ++ lib.optionals (!effectiveCudaSupport) [
     "libcudart.so.12"
     "libcublas.so.12"
@@ -100,16 +114,7 @@ stdenv.mkDerivation {
     let
       # Build LD_LIBRARY_PATH with all required libraries
       ldLibraryPath =
-        lib.makeLibraryPath (
-          [ sqlite.out ]
-          ++ lib.optionals effectiveCudaSupport [
-            cudaPackages.cuda_cudart
-            cudaPackages.libcublas
-          ]
-          ++ lib.optionals effectiveVulkanSupport [
-            vulkan-loader
-          ]
-        )
+        lib.makeLibraryPath ([ sqlite.out ] ++ cudaRuntimeLibraries ++ vulkanRuntimeLibraries)
         # Add NixOS driver path for libcuda.so.1 (loaded via dlopen at runtime)
         + lib.optionalString effectiveCudaSupport ":/run/opengl-driver/lib";
     in

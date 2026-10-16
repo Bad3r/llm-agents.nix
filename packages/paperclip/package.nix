@@ -8,6 +8,7 @@
   runCommand,
   versionCheckHook,
   versionCheckHomeHook,
+  writeText,
   flake,
 }:
 
@@ -25,6 +26,17 @@ let
     }/. $out/
     cp ${./package-lock.json} $out/package-lock.json
   '';
+
+  binaryJs = writeText "binary.js" ''
+    function getBinaries() {
+      return Promise.resolve({
+        postgres: "${postgresql_18}/bin/postgres",
+        initdb: "${postgresql_18}/bin/initdb",
+        pg_ctl: "${postgresql_18}/bin/pg_ctl",
+      });
+    }
+    export default getBinaries;
+  '';
 in
 buildNpmPackage {
   npmDepsFetcherVersion = 2;
@@ -41,31 +53,25 @@ buildNpmPackage {
   npmFlags = [ "--ignore-scripts" ];
   npmRebuildFlags = [ "--ignore-scripts" ];
 
-  # Replace the embedded PostgreSQL with the one from nixpkgs.
+  # Replace the embedded PostgreSQL with the one from nixpkgs. paperclipai
+  # bundles more than one copy of embedded-postgres; patch every one, since
+  # the platform binaries any unpatched copy imports are removed below.
   postInstall = ''
-        embedded=$(find $out/lib/node_modules -path '*/embedded-postgres/dist/binary.js' -print -quit)
-        test -n "$embedded"
-        cat > "$embedded" <<'EOF'
-    function getBinaries() {
-      return Promise.resolve({
-        postgres: "${postgresql_18}/bin/postgres",
-        initdb: "${postgresql_18}/bin/initdb",
-        pg_ctl: "${postgresql_18}/bin/pg_ctl",
-      });
-    }
-    export default getBinaries;
-    EOF
+    binaries=$(find $out/lib/node_modules -path '*/embedded-postgres/dist/binary.js')
+    test -n "$binaries"
+    while IFS= read -r embedded; do
+      install -m644 ${binaryJs} "$embedded"
 
-        # nixpkgs PostgreSQL defaults its unix socket to /run/postgresql, which
-        # unprivileged users cannot write to. Keep the socket in the data dir.
-        substituteInPlace "$(dirname "$embedded")/index.js" \
-          --replace-fail "...this.options.postgresFlags," \
-            "'-k', this.options.databaseDir, ...this.options.postgresFlags,"
+      # nixpkgs PostgreSQL defaults its unix socket to /run/postgresql, which
+      # unprivileged users cannot write to. Keep the socket in the data dir.
+      substituteInPlace "$(dirname "$embedded")/index.js" \
+        --replace-fail "...this.options.postgresFlags," \
+          "'-k', this.options.databaseDir, ...this.options.postgresFlags,"
+    done <<<"$binaries"
 
-        # Drop the now unused FHS-linked binaries.
-        while IFS= read -r scope; do
-          find "$scope" -mindepth 1 -maxdepth 1 ! -name symlink-reader -exec rm -rf {} +
-        done < <(find $out/lib/node_modules -path '*/node_modules/@embedded-postgres' -type d)
+    # Drop the now unused FHS-linked binaries.
+    find $out/lib/node_modules -path '*/node_modules/@embedded-postgres/*' -prune \
+      ! -name symlink-reader -exec rm -rf {} +
   '';
 
   doInstallCheck = true;
