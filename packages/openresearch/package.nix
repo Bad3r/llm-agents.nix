@@ -4,6 +4,7 @@
   stdenv,
   rustPlatform,
   fetchFromGitHub,
+  fetchpatch,
   makeWrapper,
   installAgentSkills,
   mkUpdater,
@@ -32,6 +33,19 @@ rustPlatform.buildRustPackage (finalAttrs: {
     tag = "v${finalAttrs.version}";
     inherit (hashes) hash;
   };
+
+  patches = [
+    # APFS rejects the non-UTF-8 fixture. Remove once a release includes upstream #678.
+    (fetchpatch {
+      url = "https://github.com/alphaXiv/OpenResearch/commit/e1f6a2cf600116b2526f5f7d517983f760992509.patch";
+      hash = "sha256-3f0TjrlCzHi43OArxYfAdnCM2A1gwVW4l8P+ZEOEQE0=";
+    })
+    # Pending upstream #698; remove once a release includes the readiness EINTR fix.
+    (fetchpatch {
+      url = "https://github.com/alphaXiv/OpenResearch/commit/f53d9b0e8956ab14cbc85314c7780d697e8f2009.patch";
+      hash = "sha256-MrfzGMAj6Gw4JMajr18wytL/J9WJrTRTvHZbUTtT6zc=";
+    })
+  ];
 
   nativeBuildInputs = [
     makeWrapper
