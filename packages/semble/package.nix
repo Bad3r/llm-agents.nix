@@ -17,12 +17,12 @@ let
 
   model2vec = python3.pkgs.buildPythonPackage rec {
     pname = "model2vec";
-    version = "0.8.1";
+    version = "0.10.0";
     pyproject = true;
 
     src = fetchPypi {
       inherit pname version;
-      hash = "sha256-mjXTX2pETkzsGfICfuEGxUllzSa3/UpPACtfPitnd/Q=";
+      hash = "sha256-RxGe8fkXtNp6ABC/EMWHySNjmmr06lHLLUJPwynQnS8=";
     };
 
     build-system = with python3.pkgs; [
@@ -33,12 +33,11 @@ let
     env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
     dependencies = with python3.pkgs; [
+      huggingface-hub
       jinja2
       joblib
       numpy
-      rich
       safetensors
-      setuptools
       tokenizers
       tqdm
     ];
@@ -149,14 +148,14 @@ let
 in
 python3.pkgs.buildPythonApplication rec {
   pname = "semble";
-  version = "0.6.2";
+  version = "0.7.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "MinishLab";
     repo = "semble";
     tag = "v${version}";
-    hash = "sha256-piUdFOTKGc/Nk8pHIP68VQOhpZMfXDCSV0OIkrD5SjA=";
+    hash = "sha256-1nCmCoao1YEy1NAslYQlgoCWgl5YQZX9oOID/Z1WdR8=";
   };
 
   build-system = with python3.pkgs; [
@@ -182,8 +181,9 @@ python3.pkgs.buildPythonApplication rec {
     tree-sitter
     semble-grammars
     orjson
+    tqdm
     # [mcp] extra:
-    mcp
+    mcp_2
   ];
 
   nativeBuildInputs = [ makeWrapper ];

@@ -338,6 +338,21 @@ else
 
     runScript = "claude-desktop";
 
+    # buildFHSEnv links only a fixed list of host /etc entries (no gitconfig,
+    # xdg, ...). Link every entry the env does not provide itself.
+    extraPreBwrapCmds = ''
+      host_etc_args() {
+        local i
+        for i in /etc/*; do
+          case " /etc/ld.so.conf /etc/ld.so.cache ''${etc_ignored[*]} ''${symlinks[*]} " in
+          *" $i "* | *" $i/"*) ;;
+          *) echo --symlink "/.host-etc/''${i#/etc/}" "$i" ;;
+          esac
+        done
+      }
+    '';
+    extraBwrapArgs = [ "$(host_etc_args)" ];
+
     extraInstallCommands = ''
       ln -s ${unwrapped}/share $out/share
     '';

@@ -501,16 +501,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>openfang</strong> - Open-source Agent OS built in Rust — CLI for the OpenFang platform</summary>
-
-- **Source**: source
-- **License**: MIT
-- **Homepage**: https://github.com/RightNow-AI/openfang
-- **Usage**: `nix run github:numtide/llm-agents.nix#openfang -- --help`
-- **Nix**: [packages/openfang/package.nix](packages/openfang/package.nix)
-
-</details>
-<details>
 <summary><strong>openhands-agent-canvas</strong> - Self-hosted web UI for running OpenHands, Claude Code, Codex and other ACP agents</summary>
 
 - **Source**: source
@@ -1317,16 +1307,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
-<summary><strong>vibe-kanban</strong> - Kanban board to orchestrate AI coding agents like Claude Code, Codex, and Gemini CLI</summary>
-
-- **Source**: source
-- **License**: Apache-2.0
-- **Homepage**: https://github.com/BloopAI/vibe-kanban
-- **Usage**: `nix run github:numtide/llm-agents.nix#vibe-kanban -- --help`
-- **Nix**: [packages/vibe-kanban/package.nix](packages/vibe-kanban/package.nix)
-
-</details>
-<details>
 <summary><strong>workmux</strong> - Git worktrees + tmux windows for zero-friction parallel dev</summary>
 
 - **Source**: source
@@ -1490,6 +1470,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://paseo.sh
 - **Usage**: `nix run github:numtide/llm-agents.nix#paseo-desktop -- --help`
 - **Nix**: [packages/paseo-desktop/package.nix](packages/paseo-desktop/package.nix)
+
+</details>
+<details>
+<summary><strong>tonguetyped</strong> - Local Linux dictation controlled from the terminal or a desktop-wide keyboard shortcut</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/cheerfulScumbag/tonguetyped
+- **Usage**: `nix run github:numtide/llm-agents.nix#tonguetyped -- --help`
+- **Nix**: [packages/tonguetyped/package.nix](packages/tonguetyped/package.nix)
 
 </details>
 <details>
@@ -1720,16 +1710,6 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/vercel-labs/skills
 - **Usage**: `nix run github:numtide/llm-agents.nix#skills -- --help`
 - **Nix**: [packages/skills/package.nix](packages/skills/package.nix)
-
-</details>
-<details>
-<summary><strong>skills-installer</strong> - Install agent skills across multiple AI coding clients</summary>
-
-- **Source**: bytecode
-- **License**: MIT
-- **Homepage**: https://github.com/Kamalnrf/claude-plugins
-- **Usage**: `nix run github:numtide/llm-agents.nix#skills-installer -- --help`
-- **Nix**: [packages/skills-installer/package.nix](packages/skills-installer/package.nix)
 
 </details>
 
