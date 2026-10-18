@@ -8,13 +8,13 @@
 }:
 
 let
-  version = "1.15.11";
+  version = "2.0.0";
 
   src = fetchFromGitHub {
     owner = "Willxup";
     repo = "cpa-usage-keeper";
     tag = "v${version}";
-    hash = "sha256-n0cw/9EAv7iTzXz5IezDMMENlScVXD42403W+Qy941c=";
+    hash = "sha256-ortUHv4vLRyeT36KE1ni582r6tFbpcA6gs3TAruIgXA=";
   };
 
   frontend = buildNpmPackage {
