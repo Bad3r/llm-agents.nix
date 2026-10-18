@@ -329,6 +329,11 @@ inputs."nixpkgs".lib.extend (
         githubId = 164391367;
         name = "cheerfulScumbag";
       };
+      YoanWai = {
+        github = "YoanWai";
+        githubId = 106609173;
+        name = "Yoan Wainmann";
+      };
     };
   }
 )

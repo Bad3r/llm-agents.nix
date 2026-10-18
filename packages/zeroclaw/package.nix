@@ -13,13 +13,13 @@
 }:
 let
   pname = "zeroclaw";
-  version = "0.8.5";
+  version = "0.8.6";
 
   src = fetchFromGitHub {
     owner = "zeroclaw-labs";
     repo = "zeroclaw";
     tag = "v${version}";
-    hash = "sha256-X+2hSmbGibS0LJDew+CnXpJFW2k7w3fj/D54XHqLLzI=";
+    hash = "sha256-6w2xwCeV4U957wiOt3B9iY+ayA90Q1YzdaSCXvEJNS4=";
   };
 
   # fetchNpmDeps needs package-lock.json at the source root.
@@ -31,7 +31,7 @@ in
 rustPlatform.buildRustPackage {
   inherit pname version src;
 
-  cargoHash = "sha256-a0tr5K6KReLRRN4X8sjJrriHy/n0LC7amlOHtM765eg=";
+  cargoHash = "sha256-jjxkRyFBfR2cEpSBoxwOwRL71TPSAzgyjiyx+Fr/RBc=";
 
   nativeBuildInputs = [
     nodejs

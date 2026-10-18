@@ -674,6 +674,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>antigravity-hub</strong> - Desktop environment for managing multiple autonomous agents across independent projects</summary>
+
+- **Source**: binary
+- **License**: unfree
+- **Homepage**: https://antigravity.google
+- **Usage**: `nix run github:numtide/llm-agents.nix#antigravity-hub -- --help`
+- **Nix**: [packages/antigravity-hub/package.nix](packages/antigravity-hub/package.nix)
+
+</details>
+<details>
 <summary><strong>autolith</strong> - Live, self-modifying Common Lisp AI agent</summary>
 
 - **Source**: source
@@ -1013,6 +1023,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/asheshgoplani/agent-deck
 - **Usage**: `nix run github:numtide/llm-agents.nix#agent-deck -- --help`
 - **Nix**: [packages/agent-deck/package.nix](packages/agent-deck/package.nix)
+
+</details>
+<details>
+<summary><strong>agent-manager</strong> - Terminal UI that runs coding-agent CLIs side by side, each in its own tmux session</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://agent-manager.dev
+- **Usage**: `nix run github:numtide/llm-agents.nix#agent-manager -- --help`
+- **Nix**: [packages/agent-manager/package.nix](packages/agent-manager/package.nix)
 
 </details>
 <details>
