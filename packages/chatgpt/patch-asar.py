@@ -49,8 +49,40 @@ def _copy_writable(m: re.Match[bytes]) -> bytes:
     )
 
 
+# The Local Work executor copies codex-app-tools to executor-plugins the same
+# way, so its .mcp.json rewrite and every later re-copy fail with EACCES and
+# the executor restarts every second. The win32 guard is dead on Linux and
+# gives up its bytes to the chmod.
+COPY_EXECUTOR_PLUGIN_WRITABLE = re.compile(
+    rb"await [\w$]+\.default\.cp\((?P<src>[\w$]+\.cwd),(?P<dst>[\w$]+),\{recursive:!0\}\),"
+    rb"process\.platform!==`win32`&&"
+)
+
+
+def _copy_executor_plugin_writable(m: re.Match[bytes]) -> bytes:
+    plugins = COPY_PLUGINS_WRITABLE.search(m.string)
+    if plugins is None:
+        sys.exit("COPY_EXECUTOR_PLUGIN_WRITABLE needs the COPY_PLUGINS_WRITABLE exec")
+    exec_ = plugins["exec"]
+    return (
+        b"await "
+        + exec_
+        + b"(`cp`,[`-r`,"
+        + m["src"]
+        + b"+`/.`,"
+        + m["dst"]
+        + b"]),await "
+        + exec_
+        + b"(`chmod`,[`-R`,`u+w`,"
+        + m["dst"]
+        + b"]),"
+    )
+
+
 PATCHES: list[tuple[re.Pattern[bytes], Callable[[re.Match[bytes]], bytes]]] = [
     SKIP_PROCESS_REPORT,
+    # Runs before COPY_PLUGINS_WRITABLE rewrites the function it reads exec from.
+    (COPY_EXECUTOR_PLUGIN_WRITABLE, _copy_executor_plugin_writable),
     (COPY_PLUGINS_WRITABLE, _copy_writable),
 ]
 
