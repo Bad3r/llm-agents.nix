@@ -19,13 +19,13 @@ Signed-off-by: Jörg Thalheim <joerg@thalheim.io>
  2 files changed, 18 insertions(+), 14 deletions(-)
 
 diff --git a/src/daemon/service.rs b/src/daemon/service.rs
-index 8b8d043..97ab189 100644
+index 56853fc..06d6b46 100644
 --- a/src/daemon/service.rs
 +++ b/src/daemon/service.rs
-@@ -299,12 +299,15 @@ fn status_with_runner(runner: &impl LaunchctlRunner) -> Result<ServiceStatus> {
-     let program_matches_current = program
-         .as_ref()
-         .map(|program| paths_resolve_to_same_file(program, &current_executable));
+@@ -343,12 +343,15 @@ fn status_with_runner(runner: &impl LaunchctlRunner) -> Result<ServiceStatus> {
+             && enclosing_bundle(program).is_none()
+             && paths_resolve_to_same_file(program, &current_executable)
+     });
 -    let runtime = service_runtime(runner, &spec)?;
 +    // Report "unknown" instead of failing when launchctl cannot inspect
 +    // the GUI domain (e.g. sandboxed builds or SSH sessions without a
@@ -42,7 +42,7 @@ index 8b8d043..97ab189 100644
          program,
          current_executable,
 diff --git a/src/daemon/service/systemd.rs b/src/daemon/service/systemd.rs
-index d47f083..c8526a1 100644
+index bdba1a1..16da8a8 100644
 --- a/src/daemon/service/systemd.rs
 +++ b/src/daemon/service/systemd.rs
 @@ -148,22 +148,23 @@ pub(super) fn status_with_runner(

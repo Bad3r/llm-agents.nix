@@ -73,6 +73,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # /usr/bin/false) and compile a fixture with `rustc` at run time, none of
     # which exist in the sandbox, so every invocation fails to start.
     "--skip=tui::app::tests::custom_commands"
+    "--skip=tui::app::tests::triage::triage_custom_command"
   ]
   # needs wl-copy/xclip and a desktop session
   ++ lib.optionals stdenv.hostPlatform.isLinux [
