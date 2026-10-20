@@ -132,8 +132,7 @@ stdenvNoCC.mkDerivation {
           xdg-utils
         ]
       }" \
-      --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH" \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
+      --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH"
 
     runHook postInstall
   '';

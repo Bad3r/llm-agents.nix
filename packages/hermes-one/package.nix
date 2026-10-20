@@ -79,7 +79,6 @@ buildNpmPackage rec {
     # store-managed install.
     makeWrapper ${lib.getExe electron} $out/bin/hermes-one \
       --add-flags $out/share/hermes-one \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}" \
       --inherit-argv0
 
     runHook postInstall

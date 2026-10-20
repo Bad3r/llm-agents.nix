@@ -163,8 +163,7 @@ stdenv.mkDerivation {
   # makeShellWrapper, because --add-flags expands shell variables.
   postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
     makeShellWrapper $out/share/antigravity/antigravity $out/bin/antigravity \
-      "''${gappsWrapperArgs[@]}" \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
+      "''${gappsWrapperArgs[@]}"
   '';
 
   passthru = {
