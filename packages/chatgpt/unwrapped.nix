@@ -40,6 +40,7 @@
   qt5,
   qt6,
   systemd,
+  tpm2-tss,
   wayland,
   xdg-utils,
   libx11,
@@ -108,6 +109,7 @@ stdenv.mkDerivation {
     pipewire
     stdenv.cc.cc.lib
     systemd
+    tpm2-tss
     wayland
     libx11
     libxcomposite
