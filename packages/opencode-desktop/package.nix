@@ -235,8 +235,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
         makeWrapper ${lib.getExe electron} $out/bin/opencode-desktop \
           --inherit-argv0 \
           --set ELECTRON_FORCE_IS_PACKAGED 1 \
-          --add-flags $out/opt/opencode-desktop/resources/app.asar \
-          --add-flags "--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true --wayland-text-input-version=3"
+          --add-flags $out/opt/opencode-desktop/resources/app.asar
       '')
       ''
         runHook postInstall

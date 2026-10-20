@@ -236,8 +236,7 @@ buildNpmPackage {
         --add-flags "$appDir" \
         --set HERMES_DESKTOP_HERMES ${lib.escapeShellArg hermesExecutable} \
         --set ELECTRON_IS_DEV 0 \
-        --prefix PATH : ${runtimePath} \
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}"
+        --prefix PATH : ${runtimePath}
 
       sourceIcon="$out/share/icons/hicolor/1024x1024/apps/hermes-desktop.png"
       install -Dm644 apps/desktop/assets/icon.png \
