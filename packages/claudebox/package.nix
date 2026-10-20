@@ -7,7 +7,7 @@
   sourceDir ? "${callPackage ./source.nix { }}/src",
 }:
 let
-  inherit (pkgs.stdenv) isLinux isDarwin;
+  inherit (pkgs.stdenv.hostPlatform) isLinux isDarwin;
 
   # Bundle all the tools Claude needs into a single environment
   claudeTools = pkgs.buildEnv {
