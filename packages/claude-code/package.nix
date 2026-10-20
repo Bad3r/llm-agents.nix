@@ -56,10 +56,15 @@ stdenv.mkDerivation {
   # Uses a single wrapProgram call to avoid double-wrapping which causes the
   # process to show as ".claude-wrapped_" instead of "claude" in ps/htop.
   # --argv0 ensures the process name is preserved through the wrapper.
+  #
+  # CLAUDE_CODE_CERT_STORE=system drops the roots that the binary embeds, so
+  # that cacert updates (root removals) apply to Claude Code.
+  # See: https://code.claude.com/docs/en/network-config
   postFixup = ''
     wrapProgram $out/bin/claude \
       --argv0 claude \
       --set DISABLE_AUTOUPDATER 1 \
+      --set-default CLAUDE_CODE_CERT_STORE system \
       --set-default DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       ${lib.optionalString disableTelemetry "--set DISABLE_TELEMETRY 1 --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1"} \
       --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
