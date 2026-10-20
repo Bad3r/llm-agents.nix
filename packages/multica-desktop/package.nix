@@ -65,7 +65,6 @@ stdenv.mkDerivation (finalAttrs: {
 
     makeWrapper ${lib.getExe electron} $out/bin/multica-desktop \
       --add-flags $app/out/main/index.js \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations}}" \
       --inherit-argv0
 
     runHook postInstall

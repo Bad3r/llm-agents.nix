@@ -215,8 +215,7 @@ let
         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ libglvnd ]} \
         --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
         --set-default CHROME_DESKTOP grok-bot.desktop \
-        --add-flags "--no-sandbox" \
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
+        --add-flags "--no-sandbox"
 
       runHook postInstall
     '';

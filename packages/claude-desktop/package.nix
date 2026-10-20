@@ -264,7 +264,6 @@ let
         --prefix LD_LIBRARY_PATH : "$out/lib/claude-desktop" \
         --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
         --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
-        --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}" \
         --add-flags ${lib.escapeShellArg commandLineArgs}
 
       runHook postInstall

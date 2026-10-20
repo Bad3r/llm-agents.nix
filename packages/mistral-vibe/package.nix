@@ -247,7 +247,8 @@ python.pkgs.buildPythonApplication {
   # so drift fails the build.
   pythonImportsCheck = [
     "vibe"
-    "vibe.cli.cli"
+    "vibe.acp.entrypoint"
+    "vibe.app_server.stdio"
     "vibe.app_server.local"
     "vibe.core.llm.backend.mistral"
     "vibe.cli.transcribe.mistral_transcribe_client"
