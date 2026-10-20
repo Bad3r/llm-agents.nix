@@ -32,10 +32,12 @@
   nss,
   openssl,
   pango,
+  pciutils,
   pipewire,
   qt6,
   systemd,
   tpm2-tss,
+  vulkan-loader,
   wayland,
   xdg-utils,
   libx11,
@@ -45,6 +47,7 @@
   libxfixes,
   libxrandr,
   libxcb,
+  libxcursor,
   # Chromium loads the Qt6 shim under Plasma 6 for native fonts, scaling,
   # colors and file dialogs, and falls back to GTK without it.
   withQt ? false,
@@ -118,7 +121,10 @@ stdenv.mkDerivation {
     libnotify
     libsecret
     libpulseaudio
+    libxcursor
+    pciutils
     pipewire
+    vulkan-loader
     wayland
   ];
 
@@ -164,6 +170,10 @@ stdenv.mkDerivation {
         # Plasma 5 is gone from nixpkgs, so nothing loads the Qt5 shim.
         rm "$out/lib/chatgpt/libqt5_shim.so"
         ${lib.optionalString (!withQt) ''rm "$out/lib/chatgpt/libqt6_shim.so"''}
+
+        # Components that load libvulkan.so.1 by path find it here. The
+        # bundled loader does not search /run/opengl-driver for ICDs.
+        ln -sf ${lib.getLib vulkan-loader}/lib/libvulkan.so.1 "$out/lib/chatgpt/libvulkan.so.1"
 
         # See patch-asar.py for the NixOS-specific source patches.
         python3 ${./patch-asar.py} "$out/lib/chatgpt/resources/app.asar"
