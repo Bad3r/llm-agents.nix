@@ -9,16 +9,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "funes";
-  version = "1.9.0";
+  version = "1.9.1";
 
   src = fetchFromGitHub {
     owner = "huggingface";
     repo = "funes";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-zc3PNM1QpAGCbLcYrLmxsbGErrRN2Y5f1/GfYIo3Aow=";
+    hash = "sha256-CalBgI3fUDxgScUnw5ESLLsjd1C4SLSOIhkdh4haJJc=";
   };
 
-  cargoHash = "sha256-dOxkDqRkwJptpSrCzKBKR9/gmhDEV7XxZ6UuFi1ferE=";
+  cargoHash = "sha256-z4pvrJ/XTD653i8dY98OKBiCSwDDNuYtyDvFNr5drZg=";
 
   postPatch = ''
     # Release CI stamps the version on the tag; the tagged Cargo.toml still
