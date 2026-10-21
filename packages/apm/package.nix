@@ -115,6 +115,9 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
     websockets
   ];
 
+  # websockets<17 pin; the sync client apm uses is unchanged in 17.
+  pythonRelaxDeps = [ "websockets" ];
+
   pythonImportsCheck = [ "apm_cli" ];
 
   nativeBuildInputs = [ installAgentSkills ];
