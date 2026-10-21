@@ -5,7 +5,7 @@
   fetchFromGitHub,
   installAgentSkills,
   rustPlatform,
-  zig,
+  zig_0_16,
   xcbuild,
   cctools,
   installShellFiles,
@@ -31,7 +31,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # Pre-fetched Zig package cache for the vendored libghostty-vt, so zig can
   # build offline.  fetchDeps is a fixed-output derivation, so this does not
   # require import-from-derivation (disabled repo-wide).
-  zigDeps = zig.fetchDeps {
+  zigDeps = zig_0_16.fetchDeps {
     inherit (finalAttrs) pname version;
     src = "${finalAttrs.src}/vendor/libghostty-vt";
     fetchAll = true;
@@ -39,7 +39,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
 
   nativeBuildInputs = [
-    zig
+    zig_0_16
     installShellFiles
     installAgentSkills
   ]
