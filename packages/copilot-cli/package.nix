@@ -5,7 +5,7 @@
   stdenv,
   platformSource,
   makeWrapper,
-  patchelf,
+  formatelf,
   versionCheckHook,
   versionCheckHomeHook,
 }:
@@ -28,15 +28,16 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "copilot-cli";
   inherit (source) version src;
 
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
+
   nativeBuildInputs = [
     makeWrapper
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ patchelf ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [ formatelf ];
 
   dontBuild = true;
 
-  # `copilot` is a Node single-executable application with an embedded blob;
-  # stripping or rewriting its program headers corrupts it.
+  # `copilot` is a Node single-executable application with an embedded blob.
   dontStrip = true;
   dontPatchELF = true;
 
@@ -50,19 +51,8 @@ stdenv.mkDerivation (finalAttrs: {
       mkdir -p $out/lib/${finalAttrs.pname}
       cp -r . $out/lib/${finalAttrs.pname}
       bin=$out/lib/${finalAttrs.pname}/copilot
-    ''
-    + lib.optionalString stdenv.hostPlatform.isLinux ''
-      # `copilot` is a Node single-executable application; autoPatchelfHook
-      # grows the program headers and corrupts the embedded SEA blob, so patch
-      # the interpreter and rpath minimally instead. The bundled .node libraries
-      # are dlopen'd, so make their dependencies available via LD_LIBRARY_PATH;
-      # the bundled rg/tgrep are static-pie and need nothing.
-      patchelf \
-        --set-interpreter "$(cat ${stdenv.cc}/nix-support/dynamic-linker)" \
-        --set-rpath "${libPath}" \
-        "$bin"
-    ''
-    + ''
+
+      # Native addons are extracted to ~/.cache at runtime, out of the hook's reach.
       makeWrapper "$bin" $out/bin/copilot \
         --set-default COPILOT_AUTO_UPDATE false \
         ${lib.optionalString stdenv.hostPlatform.isLinux ''--prefix LD_LIBRARY_PATH : "${libPath}"''}

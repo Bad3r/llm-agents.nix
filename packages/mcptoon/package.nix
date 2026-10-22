@@ -7,14 +7,14 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "mcptoon";
-  version = "0.8.24";
+  version = "0.8.25";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "activeing123";
     repo = "mcptoon";
     tag = "v${version}";
-    hash = "sha256-OM6iZkrqlgjs/uPuYiw1FobaHP00hpulrifKRqDEqIA=";
+    hash = "sha256-YXzSsJGv1Dstl3V3gy+dzJZ62tbVOFXMu9iJk34BF1A=";
   };
 
   # Upstream tags releases without bumping __version__ (v0.2.2 still
@@ -54,6 +54,8 @@ python3.pkgs.buildPythonApplication rec {
     "test_process_died_includes_stderr"
     # Uses `json` as a module without __main__, but Python 3.14 added one.
     "test_a_module_without_main_is_not_runnable"
+    # Release-process check: expects an "## [Unreleased]" CHANGELOG section.
+    "test_changelog_has_unreleased_delivery_mode"
   ];
 
   passthru.category = "Utilities";

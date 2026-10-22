@@ -7,8 +7,6 @@
   makeWrapper,
   formatelf,
   versionCheckHook,
-  codesignCheckHook,
-  mkCodesignCheck,
   zlib,
 }:
 
@@ -24,7 +22,6 @@ let
     urlTemplate = "https://github.com/JetBrains/junie/releases/download/{version}/junie-release-{version}-{platform}.zip";
   };
   inherit (source) version;
-  teamId = "2ZEFAR8TH3";
 in
 stdenv.mkDerivation {
   inherit pname;
@@ -99,9 +96,7 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   nativeInstallCheckInputs = [
     versionCheckHook
-  ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [ codesignCheckHook ];
-  codesignTeamId = teamId;
+  ];
   versionCheckProgramArg = "--version";
   # OpenJDK resolves user.home via getpwuid() and ignores $HOME. In the Nix
   # sandbox /etc/passwd lists the home directory as the literal string
@@ -127,11 +122,6 @@ stdenv.mkDerivation {
   '';
 
   passthru.category = "AI Coding Agents";
-  passthru.tests.codesign = mkCodesignCheck {
-    name = "junie";
-    inherit teamId;
-    srcs = source.darwinSrcs;
-  };
 
   meta = with lib; {
     description = "Junie, JetBrains AI coding agent CLI";

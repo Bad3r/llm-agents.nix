@@ -106,6 +106,11 @@ rustPlatform.buildRustPackage (
     # upstream's updater replace it. Run it from the store instead.
     patches = [ ./daemon-nix-store.patch ];
 
+    # webpki-roots 1.0.10 drops the emSign roots and rustls-webpki 0.103.16
+    # rejects the revoked eMudhra intermediates. Upstream main has both;
+    # drop this once a release ships them.
+    cargoPatches = lib.optional (lib.versionOlder version "0.164.0") ./webpki-bump.patch;
+
     # The future returned by `connectors::list_connectors` nests deeply
     # enough that computing its layout exceeds rustc's default query depth
     # limit of 128 ("queries overflow the depth limit"). Raise the limit for
