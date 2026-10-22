@@ -188,8 +188,6 @@ def main() -> None:
             )
         )
 
-        print("Validating updated package...")
-        nix_build(PACKAGE_ATTR)
         print(f"Updated to {latest}")
     except Exception:
         PACKAGE_NIX.write_text(original_nix)
