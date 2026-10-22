@@ -9,18 +9,18 @@
 let
   toktok-rs = python3Packages.buildPythonPackage rec {
     pname = "toktok-rs";
-    version = "0.1.4";
+    version = "0.3.0";
     pyproject = true;
 
     src = fetchPypi {
       pname = "toktok_rs";
       inherit version;
-      hash = "sha256-VmlGDK4Mdlxhg6ZIrrDxK7YnQ/HfRQ+QqwUeYq+DxCY=";
+      hash = "sha256-qQEGxQgC+UuIVBa2Z73i2yPwd49+pgKgQL1usBWom5w=";
     };
 
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit pname version src;
-      hash = "sha256-N6dunFUwDgTIk8ecvaBv+HR1tQo0bZUn9bJz2ht360c=";
+      hash = "sha256-2MXam95XcTOqBgaVZep/ewmqhV/vq3kMLBGj/4PogSc=";
     };
 
     nativeBuildInputs = with rustPlatform; [
