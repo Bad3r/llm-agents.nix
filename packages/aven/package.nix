@@ -12,16 +12,16 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "aven";
-  version = "0.1.50";
+  version = "0.1.51";
 
   src = fetchFromGitHub {
     owner = "raine";
     repo = "aven";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-nv9b6Dnr2ukRfX6nPu67RYRwIMXoza/VePXhnfesT64=";
+    hash = "sha256-vARyE3x8lMfpy31Ue7VAkTB95FLKvH6+bOyADIMZxbw=";
   };
 
-  cargoHash = "sha256-a1gJUIZRWTS08dl7+v8KP3igRpXwoWP07TSADXPWPW0=";
+  cargoHash = "sha256-kY6vzkBZ5zTrQGXGFkd2cqflr8Px6oTGYOJgDL8vTR8=";
 
   # `launchctl print gui/<uid>/...` fails with exit code 125 for the darwin
   # build user, which has no per-user launchd domain, making every doctor
@@ -74,6 +74,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     # which exist in the sandbox, so every invocation fails to start.
     "--skip=tui::app::tests::custom_commands"
     "--skip=tui::app::tests::triage::triage_custom_command"
+    # Fails in upstream CI for v0.1.51 too.
+    "--skip=tui::app::tests::filters_and_workspaces::filter_shortcuts_apply_label_status_priority_and_deleted"
   ]
   # needs wl-copy/xclip and a desktop session
   ++ lib.optionals stdenv.hostPlatform.isLinux [
