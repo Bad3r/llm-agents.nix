@@ -11,13 +11,13 @@
 
 buildGoModule rec {
   pname = "treehouse";
-  version = "3.1.4";
+  version = "3.1.5";
 
   src = fetchFromGitHub {
     owner = "kunchenguid";
     repo = "treehouse";
     tag = "v${version}";
-    hash = "sha256-k4Wep5bIVXeLqQPJKrAAuQMvLtR/SdMaO3QZ2tp7aN4=";
+    hash = "sha256-JJNVP3bO4FhzSTPCWlArMLBh5eJnxuq4qFlD9CBxqkg=";
   };
 
   vendorHash = "sha256-z8IndcHcZ6nLqhLtAYul3ppddpOA4AHGQWIlfYY/pfI=";

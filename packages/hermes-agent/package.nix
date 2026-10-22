@@ -266,15 +266,15 @@ let
     };
   };
 
-  version = "0.22.2";
+  version = "0.22.4";
   # The commit of the tag. Hermes ignores an install stamp without one.
-  rev = "d923a5eb487a17c0a68801bba9ef0f56c81040a8";
+  rev = "4d04303818b61bf3aa09278af48356315515965b";
 
   src = fetchFromGitHub {
     owner = "NousResearch";
     repo = "hermes-agent";
     tag = "v${version}";
-    hash = "sha256-Zs5Jr2BZ89RHbyj2WX2y4hIh4Vuwz8mJvGJooWytCk4=";
+    hash = "sha256-IqS/RFb/WwiYJc4Fq9K37fK6sIe3+y0+FRlGEgvp0b4=";
     # contributors/emails/ holds paths differing only in case; they collapse
     # on case-insensitive stores (APFS) so the NAR hash diverges between
     # Linux and darwin. Unused at build/runtime. Upstream:
@@ -292,7 +292,7 @@ let
   hermes-frontend = buildNpmPackage {
     pname = "hermes-frontend";
     inherit version src;
-    npmDepsHash = "sha256-45CV8Qavo5UQlUfSQuWzhZK1Xicx9iW8dDDsDvAM2Dc=";
+    npmDepsHash = "sha256-mBJZ6fzTEqC4hYmdATcRuKZP8jhLqWadyPiA8gypSyQ=";
 
     # The apps/desktop workspace pulls in electron; skip its binary download
     # and all install scripts — the esbuild/vite builds below don't need them.
