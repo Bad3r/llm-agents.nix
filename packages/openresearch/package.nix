@@ -15,6 +15,7 @@
   gnutar,
   openssh,
   procps,
+  python3,
   xdg-utils,
   versionCheckHook,
   versionCheckHomeHook,
@@ -35,11 +36,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
 
   patches = [
-    # APFS rejects the non-UTF-8 fixture. Remove once a release includes upstream #678.
-    (fetchpatch {
-      url = "https://github.com/alphaXiv/OpenResearch/commit/e1f6a2cf600116b2526f5f7d517983f760992509.patch";
-      hash = "sha256-3f0TjrlCzHi43OArxYfAdnCM2A1gwVW4l8P+ZEOEQE0=";
-    })
     # Pending upstream #698; remove once a release includes the readiness EINTR fix.
     (fetchpatch {
       url = "https://github.com/alphaXiv/OpenResearch/commit/f53d9b0e8956ab14cbc85314c7780d697e8f2009.patch";
@@ -76,6 +72,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=jobs::ssh::tests::host_wrapper_finishes_cooperative_term_promptly"
     # needs live ssh control sockets under /tmp, which the sandbox lacks
     "--skip=jobs::ssh::sharing::tests::native_config_shares_only_matching_live_sockets_and_preserves_user_settings"
+    # runs /bin/sh, which the Linux sandbox lacks
+    "--skip=jobs::rental::tests::rental_bootstrap_runs_bash_syntax_through_the_posix_login_shell"
   ]
   # child process is not reaped within the test's deadline in the darwin sandbox
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
@@ -92,6 +90,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     gnutar
     openssh
     procps
+    # the ACP tests launch python3 fixture agents
+    python3
   ];
 
   postInstall = ''
