@@ -54,6 +54,8 @@ python3.pkgs.buildPythonApplication rec {
     "test_process_died_includes_stderr"
     # Uses `json` as a module without __main__, but Python 3.14 added one.
     "test_a_module_without_main_is_not_runnable"
+    # Release-process check: expects an "## [Unreleased]" CHANGELOG section.
+    "test_changelog_has_unreleased_delivery_mode"
   ];
 
   passthru.category = "Utilities";
