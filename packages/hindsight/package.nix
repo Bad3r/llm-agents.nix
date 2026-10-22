@@ -9,18 +9,18 @@
 let
   toktok-rs = python3Packages.buildPythonPackage rec {
     pname = "toktok-rs";
-    version = "0.1.4";
+    version = "0.3.0";
     pyproject = true;
 
     src = fetchPypi {
       pname = "toktok_rs";
       inherit version;
-      hash = "sha256-VmlGDK4Mdlxhg6ZIrrDxK7YnQ/HfRQ+QqwUeYq+DxCY=";
+      hash = "sha256-qQEGxQgC+UuIVBa2Z73i2yPwd49+pgKgQL1usBWom5w=";
     };
 
     cargoDeps = rustPlatform.fetchCargoVendor {
       inherit pname version src;
-      hash = "sha256-N6dunFUwDgTIk8ecvaBv+HR1tQo0bZUn9bJz2ht360c=";
+      hash = "sha256-2MXam95XcTOqBgaVZep/ewmqhV/vq3kMLBGj/4PogSc=";
     };
 
     nativeBuildInputs = with rustPlatform; [
@@ -71,13 +71,13 @@ let
 in
 python3Packages.buildPythonApplication rec {
   pname = "hindsight";
-  version = "1.0.0";
+  version = "1.1.0";
 
   src = fetchFromGitHub {
     owner = "vectorize-io";
     repo = "hindsight";
     tag = "v${version}";
-    hash = "sha256-gfrWtZcEUGVSzmwhlkwav4fv1Gz2ulj3LlWzYWNrWQ0=";
+    hash = "sha256-0+BuUhlf3mljlo9F9cVLcnOORZhMlK1mFY7Cqem6oYs=";
   };
 
   sourceRoot = "${src.name}/hindsight-api-slim";
