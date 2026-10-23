@@ -512,6 +512,9 @@ python3.pkgs.buildPythonApplication {
     substituteInPlace hermes_cli/doctor_platform.py \
       --replace-fail '[sys.executable, "-c", "import hermes_cli.web_server"]' \
         '[os.environ.get("HERMES_PYTHON", sys.executable), "-c", "import hermes_cli.web_server"]'
+    substituteInPlace hermes_cli/gateway_runtime_start.py \
+      --replace-fail 'command = [sys.executable, "-m", "hermes_cli.main"' \
+        'command = [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "hermes_cli.main"'
   '';
 
   # setup.py refuses to build wheels/sdists unless it knows this is a Nix
