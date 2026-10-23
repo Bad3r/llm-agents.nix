@@ -58,13 +58,18 @@ stdenv.mkDerivation {
   # --argv0 ensures the process name is preserved through the wrapper.
   #
   # CLAUDE_CODE_CERT_STORE=system drops the roots that the binary embeds, so
-  # that cacert updates (root removals) apply to Claude Code.
+  # that cacert updates (root removals) apply to Claude Code. Linux only: on
+  # darwin the system store holds just the CA certificates in the login and
+  # System keychains, not Apple's built-in roots, so Claude Code would trust
+  # only those (e.g. Xcode's signing intermediates) and fail every TLS
+  # connection, or fall back to the embedded roots when there are none.
   # See: https://code.claude.com/docs/en/network-config
+  # See: https://github.com/numtide/llm-agents.nix/issues/11153
   postFixup = ''
     wrapProgram $out/bin/claude \
       --argv0 claude \
       --set DISABLE_AUTOUPDATER 1 \
-      --set-default CLAUDE_CODE_CERT_STORE system \
+      ${lib.optionalString stdenv.hostPlatform.isLinux "--set-default CLAUDE_CODE_CERT_STORE system"} \
       --set-default DISABLE_NON_ESSENTIAL_MODEL_CALLS 1 \
       ${lib.optionalString disableTelemetry "--set DISABLE_TELEMETRY 1 --set CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC 1"} \
       --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "--prefix PATH : ${
