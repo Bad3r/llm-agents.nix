@@ -133,6 +133,7 @@ stdenv.mkDerivation {
     makeWrapper "$out/lib/terminal-browser/${electronBinary}" $out/bin/terminal-browser \
       --set TERMINAL_BROWSER_DIST_ROOT "$out/lib/terminal-browser" \
       --set ELECTRON_RUN_AS_NODE 1 \
+      --set TERMINAL_BROWSER_NO_TELEMETRY 1 \
       ${lib.optionalString stdenv.hostPlatform.isDarwin ''--set-default NATIVE_SCROLL_HELPER "$out/lib/terminal-browser/bin/native-scroll-helper"''} \
       --add-flags "$out/lib/terminal-browser/cli/dist/main.js"
     runHook postInstall
