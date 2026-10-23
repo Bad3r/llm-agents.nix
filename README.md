@@ -1277,6 +1277,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ovis</strong> - Browser and phone client for herdr terminal workspaces</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/devswha/ovis
+- **Usage**: `nix run github:numtide/llm-agents.nix#ovis -- --help`
+- **Nix**: [packages/ovis/package.nix](packages/ovis/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
