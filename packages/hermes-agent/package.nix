@@ -15,6 +15,24 @@
 }:
 
 let
+  # Hermes' Anthropic adapter passes httpx objects; SDK 1.x requires httpx2.
+  # Keep this private dependency aligned with the upstream extra, not nixpkgs.
+  anthropic = python3.pkgs.anthropic.overridePythonAttrs (old: {
+    version = "0.87.0";
+    src = fetchFromGitHub {
+      owner = "anthropics";
+      repo = "anthropic-sdk-python";
+      tag = "v0.87.0";
+      hash = "sha256-T9DMOwtCd63BNR3V21Y2s1BbUg5X4N5W/RjtmG8+aWs=";
+    };
+    dependencies =
+      builtins.filter (dependency: dependency.pname or "" != "httpx2") old.dependencies
+      ++ [
+        python3.pkgs.httpx
+        python3.pkgs.distro
+      ];
+  });
+
   # Native (PyO3) runtime for hermes' Relay lifecycle and shared metrics.
   # PyPI ships wheels only, so build from source with maturin.
   # Version is kept in range of hermes' pyproject constraint by update.py.
@@ -503,6 +521,8 @@ python3.pkgs.buildPythonApplication {
   # These re-exec sys.executable, which is the bare interpreter without Hermes'
   # dependencies under Nix. Use the wrapper-provided env.
   postPatch = ''
+    # Fail an update rather than silently keeping an SDK that upstream replaced.
+    ${python3.interpreter} -c 'import tomllib; p = tomllib.load(open("pyproject.toml", "rb")); expected = "anthropic==${anthropic.version}"; actual = p["project"]["optional-dependencies"]["anthropic"]; assert actual == [expected], f"Anthropic pin changed: {actual}; review the private SDK override"'
     substituteInPlace tui_gateway/server.py \
       --replace-fail 'argv = [sys.executable, "-m", "tui_gateway.slash_worker"' \
         'argv = [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "tui_gateway.slash_worker"'
@@ -593,6 +613,8 @@ python3.pkgs.buildPythonApplication {
     "urllib3"
     "websockets"
     # nixpkgs moved past upstream's == pins
+    "prompt_toolkit"
+    "markdown"
     "rich"
     "pillow"
     "croniter"
