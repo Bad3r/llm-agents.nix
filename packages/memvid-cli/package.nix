@@ -2,7 +2,8 @@
   lib,
   flake,
   stdenv,
-  fetchzip,
+  mkUpdater,
+  platformSource,
   makeWrapper,
   formatelf,
   libx11,
@@ -15,14 +16,21 @@
   alsa-lib,
 }:
 
-stdenv.mkDerivation rec {
-  pname = "memvid-cli";
-  version = "2.0.160";
-
-  src = fetchzip {
-    url = "https://registry.npmjs.org/@memvid/cli-linux-x64/-/cli-linux-x64-${version}.tgz";
-    hash = "sha256-we0KZzKrYRATJElP9OkR4hERQ5S+Zb9qFDCO3WJtV/I=";
+let
+  source = platformSource {
+    hashesFile = ./hashes.json;
+    platforms = {
+      x86_64-linux = "linux-x64";
+      aarch64-linux = "linux-arm64";
+    };
+    urlTemplate = "https://registry.npmjs.org/@memvid/cli-{platform}/-/cli-{platform}-{version}.tgz";
   };
+in
+stdenv.mkDerivation {
+  pname = "memvid-cli";
+  inherit (source) version src;
+
+  sourceRoot = "package";
 
   nativeBuildInputs = [
     formatelf
@@ -45,7 +53,7 @@ stdenv.mkDerivation rec {
     runHook preInstall
 
     install -d $out/libexec/memvid-cli
-    cp -R $src/. $out/libexec/memvid-cli/
+    cp -R . $out/libexec/memvid-cli/
     chmod -R u+w $out/libexec/memvid-cli
     chmod 755 $out/libexec/memvid-cli/memvid
 
@@ -70,6 +78,15 @@ stdenv.mkDerivation rec {
   '';
 
   passthru.category = "Memory & Code Intelligence";
+  passthru.updater = mkUpdater (
+    source.updater
+    // {
+      versionSource = {
+        type = "npm";
+        package = "memvid-cli";
+      };
+    }
+  );
 
   meta = with lib; {
     description = "AI memory CLI - crash-safe, single-file storage with semantic search";
@@ -82,6 +99,6 @@ stdenv.mkDerivation rec {
     ];
     maintainers = with flake.lib.maintainers; [ smdex ];
     mainProgram = "memvid";
-    platforms = [ "x86_64-linux" ];
+    inherit (source) platforms;
   };
 }
