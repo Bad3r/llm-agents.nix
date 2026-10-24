@@ -1,8 +1,8 @@
 diff --git a/app-server-daemon/src/prepare_install.rs b/app-server-daemon/src/prepare_install.rs
-index ecf2501..ae0f01e 100644
+index ef09b6d..52680f4 100644
 --- a/app-server-daemon/src/prepare_install.rs
 +++ b/app-server-daemon/src/prepare_install.rs
-@@ -76,6 +76,8 @@ pub async fn update_from_cli(
+@@ -78,6 +78,8 @@ pub async fn update_from_cli(
      }))
  }
  
@@ -11,7 +11,7 @@ index ecf2501..ae0f01e 100644
  #[derive(Clone, Copy, PartialEq, Eq)]
  enum InstallMode {
      Missing,
-@@ -108,9 +110,14 @@ async fn prepare_from_package(
+@@ -110,9 +112,14 @@ async fn prepare_from_package(
          {
              return Ok(true);
          }
@@ -28,7 +28,7 @@ index ecf2501..ae0f01e 100644
          {
              daemon.ensure_managed_codex_bin()?;
              return Ok(true);
-@@ -220,7 +227,12 @@ async fn prepare_from_package(
+@@ -226,7 +233,12 @@ async fn prepare_from_package(
          "daemon running state changed while awaiting confirmation; retry the command"
      );
      let backend = current_backend;
@@ -42,27 +42,27 @@ index ecf2501..ae0f01e 100644
      let releases = root.join("releases");
      std::fs::create_dir_all(&releases)?;
      let stage = tempfile::Builder::new()
-@@ -264,6 +276,7 @@ async fn prepare_from_package(
-         }
+@@ -318,6 +330,7 @@ async fn prepare_from_package(
+         #[cfg(not(windows))]
          std::fs::rename(stage.path(), &release)?;
      }
 +    }
+     let release = release.canonicalize()?;
      let standalone = home.join("packages/standalone");
      let canonical_source = source.canonicalize()?;
-     let follows_latest = mode == InstallMode::Missing
-@@ -338,6 +351,15 @@ async fn prepare_from_package(
-         let link = temporary.path().join("current");
-         std::os::unix::fs::symlink(&release, &link)?;
-         std::fs::rename(link, root.join("current"))?;
-+        // Best effort: a collected package is reselected on the next start.
-+        if let Err(error) = std::process::Command::new("nix-store")
-+            .args(["--realise", "@out@", "--add-root"])
-+            .arg(root.join("nix-gcroot"))
-+            .stdout(std::process::Stdio::null())
-+            .status()
-+        {
-+            eprintln!("warning: failed to register a Nix GC root for the daemon: {error}");
-+        }
-     }
-     #[cfg(windows)]
-     windows::select_release(&root, &release)?;
+@@ -394,6 +407,15 @@ async fn prepare_from_package(
+             let link = temporary.path().join("current");
+             std::os::unix::fs::symlink(&release, &link)?;
+             std::fs::rename(link, root.join("current"))?;
++            // Best effort: a collected package is reselected on the next start.
++            if let Err(error) = std::process::Command::new("nix-store")
++                .args(["--realise", "@out@", "--add-root"])
++                .arg(root.join("nix-gcroot"))
++                .stdout(std::process::Stdio::null())
++                .status()
++            {
++                eprintln!("warning: failed to register a Nix GC root for the daemon: {error}");
++            }
+         }
+         #[cfg(windows)]
+         windows::select_release(&root, &release)?;
