@@ -27,16 +27,16 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "tonguetyped";
-  version = "0.3.0";
+  version = "0.3.2";
 
   src = fetchFromGitHub {
     owner = "cheerfulScumbag";
     repo = "tonguetyped";
     tag = "v${version}";
-    hash = "sha256-NE7kIDaiTetvHiVJoxkrlYFBIorxewLxX4GHslxWv5k=";
+    hash = "sha256-s+5RMmpFA22L5o9kCqQGvlPSwemL1Rupd6+DHHVqw8c=";
   };
 
-  cargoHash = "sha256-/BNtUS59EwGqg5IhW8nCsuKOYePzw0ogqfJ0FGHDslI=";
+  cargoHash = "sha256-MZ0fdBuT0nUhkKgGdud1Jy46YG1S9VhhI1rU/peWUiQ=";
 
   nativeBuildInputs = [
     cmake
