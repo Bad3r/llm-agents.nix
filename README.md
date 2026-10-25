@@ -1566,6 +1566,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>deja-vu</strong> - Local search and recall over the session history coding agents already write to disk</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vshulcz/deja-vu
+- **Usage**: `nix run github:numtide/llm-agents.nix#deja-vu -- --help`
+- **Nix**: [packages/deja-vu/package.nix](packages/deja-vu/package.nix)
+
+</details>
+<details>
 <summary><strong>funes</strong> - Searchable memory of past AI agent sessions, exposed over MCP</summary>
 
 - **Source**: source
