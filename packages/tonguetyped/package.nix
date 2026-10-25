@@ -17,22 +17,26 @@
   libcanberra-gtk3,
   wtype,
   dotool,
+  wl-clipboard,
+  xclip,
+  wayland,
+  libxkbcommon,
   dbus,
   versionCheckHook,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "tonguetyped";
-  version = "0.2.2";
+  version = "0.3.0";
 
   src = fetchFromGitHub {
     owner = "cheerfulScumbag";
     repo = "tonguetyped";
     tag = "v${version}";
-    hash = "sha256-6IvPDbMJyt+ZGkY8IJO56ac8wkRdNnu0YASK67ybFOA=";
+    hash = "sha256-NE7kIDaiTetvHiVJoxkrlYFBIorxewLxX4GHslxWv5k=";
   };
 
-  cargoHash = "sha256-79+uC0EvrQ7ndGCngLzCI29Wp9taDZQPWcLZiuNC8HY=";
+  cargoHash = "sha256-/BNtUS59EwGqg5IhW8nCsuKOYePzw0ogqfJ0FGHDslI=";
 
   nativeBuildInputs = [
     cmake
@@ -50,6 +54,8 @@ rustPlatform.buildRustPackage rec {
     vulkan-loader
     openssl
     xdotool
+    wayland
+    libxkbcommon
   ];
 
   buildFeatures = [ "gpu-vulkan" ];
@@ -70,8 +76,10 @@ rustPlatform.buildRustPackage rec {
   ];
 
   postInstall = ''
-    install -Dm644 data/tonguetyped.desktop \
+    install -Dm644 data/io.github.cheerfulScumbag.tonguetyped.desktop \
       $out/share/applications/io.github.cheerfulScumbag.tonguetyped.desktop
+    install -Dm644 data/icons/hicolor/scalable/apps/io.github.cheerfulScumbag.tonguetyped.svg \
+      $out/share/icons/hicolor/scalable/apps/io.github.cheerfulScumbag.tonguetyped.svg
   '';
 
   postFixup = ''
@@ -81,6 +89,8 @@ rustPlatform.buildRustPackage rec {
           libcanberra-gtk3
           wtype
           dotool
+          wl-clipboard
+          xclip
         ]
       }
   '';
