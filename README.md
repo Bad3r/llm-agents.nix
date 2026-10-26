@@ -1916,6 +1916,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>mercat</strong> - Render markdown and mermaid diagrams in the terminal</summary>
+
+- **Source**: source
+- **License**: GPL-3.0-or-later
+- **Homepage**: https://github.com/tawago/mercat
+- **Usage**: `nix run github:numtide/llm-agents.nix#mercat -- --help`
+- **Nix**: [packages/mercat/package.nix](packages/mercat/package.nix)
+
+</details>
+<details>
 <summary><strong>officecli</strong> - CLI for creating and editing Office Open XML documents</summary>
 
 - **Source**: source
