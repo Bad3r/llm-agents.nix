@@ -104,7 +104,11 @@ rustPlatform.buildRustPackage (
 
     # The daemon would copy the whole package (~550 MB) into ~/.codex and let
     # upstream's updater replace it. Run it from the store instead.
-    patches = [ ./daemon-nix-store.patch ];
+    # Upstream skips symlinked rules files, which drops Home Manager links.
+    patches = [
+      ./daemon-nix-store.patch
+      ./rules-symlink.patch
+    ];
 
     # webpki-roots 1.0.10 drops the emSign roots and rustls-webpki 0.103.16
     # rejects the revoked eMudhra intermediates. Upstream main has both;
