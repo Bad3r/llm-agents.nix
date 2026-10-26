@@ -2,7 +2,7 @@
   lib,
   stdenv,
   flake,
-  buildGoModule,
+  buildGo127Module,
   fetchFromGitHub,
   versionCheckHook,
   versionCheckHomeHook,
@@ -12,18 +12,18 @@
   tmux,
 }:
 
-buildGoModule rec {
+buildGo127Module rec {
   pname = "agent-deck";
-  version = "1.16.27";
+  version = "1.16.34";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     tag = "v${version}";
-    hash = "sha256-yCtoCPOPiKDPZM4t/vtv4/Yn1Ut6hCc7E1a5uklmQm0=";
+    hash = "sha256-fehA9JNE/viQ4hAZ0djyignluQWRoYunKnQOWRLv+YA=";
   };
 
-  vendorHash = "sha256-AChAtXMmFDfJzlqnUpgkyD1KCmLGxkPZtKsD0+Tnt7E=";
+  vendorHash = "sha256-MPtWVgxZ6JKrLOtujlueHAisyRXf7w6lBW+CPRLg3kE=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -53,6 +53,10 @@ buildGoModule rec {
           "TestCleanupExcludesLiveProcessCWDInside"
           "TestCleanupRevalidatesRealityBeforeRemoval"
           "TestCleanupForceCannotOverrideRealityExclusions"
+          "TestAskSecretNeverLeaks" # samples /proc, which darwin lacks
+          # mcp-proxy polls stdin with no requested events; darwin then never
+          # reports POLLHUP, so EOF behind backpressure goes unnoticed
+          "TestMCPProxyEOFWithInputBackpressure"
         ]
       )
     )
