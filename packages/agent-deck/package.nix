@@ -2,12 +2,14 @@
   lib,
   stdenv,
   flake,
+  bash,
   buildGo127Module,
   fetchFromGitHub,
   versionCheckHook,
   versionCheckHomeHook,
   git,
   lsof,
+  ncurses,
   procps,
   tmux,
 }:
@@ -26,6 +28,13 @@ buildGo127Module rec {
   vendorHash = "sha256-MPtWVgxZ6JKrLOtujlueHAisyRXf7w6lBW+CPRLg3kE=";
 
   subPackages = [ "cmd/agent-deck" ];
+
+  # launch-subagent.sh tests write stub agent-deck/jq scripts with a
+  # /bin/bash shebang, which is absent from the linux sandbox.
+  postPatch = ''
+    substituteInPlace cmd/agent-deck/fanout_hint_docs_test.go \
+      --replace-fail '#!/bin/bash' '#!${lib.getExe bash}'
+  '';
 
   nativeInstallCheckInputs = [
     versionCheckHook
@@ -47,6 +56,7 @@ buildGo127Module rec {
           "TestHealthRemoteExecJSONParity" # needs ssh client
           "TestRecallSearch_FederatedMergesAndLabels" # sqlite "database is locked" under parallel tests
           "TestIssue2388_CapabilitiesCarryProbe" # resets PATH to /usr/bin:/bin, losing cat
+          "TestIssue1576_WorktreeFinishSweepsNotifierState" # async event-bus flush races TempDir cleanup
         ]
         ++ lib.optionals stdenv.hostPlatform.isDarwin [
           # lsof on live processes is denied by the sandbox
@@ -57,6 +67,14 @@ buildGo127Module rec {
           # mcp-proxy polls stdin with no requested events; darwin then never
           # reports POLLHUP, so EOF behind backpressure goes unnoticed
           "TestMCPProxyEOFWithInputBackpressure"
+        ]
+        ++ lib.optionals stdenv.hostPlatform.isLinux [
+          # the fake vault runs under the hardcoded PATH /usr/local/bin:/usr/bin:/bin,
+          # where the linux sandbox has no tr or cat, so it never stores the value
+          "TestAskSecretNeverLeaks"
+          "TestAskSecretAcceptanceEndToEnd"
+          "TestAskSecretRefusesExistingNameWithoutReplace"
+          "TestAskDeliverAcceptsMacAppStdinBytes"
         ]
       )
     )
@@ -73,6 +91,7 @@ buildGo127Module rec {
 
   nativeCheckInputs = [
     lsof
+    ncurses # clear, used by the fake claude pane in the switch-settle tests
     procps
     tmux
   ];
