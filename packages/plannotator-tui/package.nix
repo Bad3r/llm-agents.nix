@@ -6,16 +6,16 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "plannotator-tui";
-  version = "0.9.4";
+  version = "0.9.5";
 
   src = fetchFromGitHub {
     owner = "plannotator";
     repo = "plannotator-tui";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-oJ+AMl2G9m/hxFJLwiN6CQ9urhyhK0w6VEcbnpUgQv0=";
+    hash = "sha256-W5rNNdsjjbwCkAUwNwFVtcNDU/LWKNLXGtFzYwBf+Dk=";
   };
 
-  cargoHash = "sha256-EK3iCT+VJQ/1Sjhdt06nc1pUdo0B6tPBjbjSV9jsRKY=";
+  cargoHash = "sha256-hnnZvDTfvoY/4f6LVsFYMQUJpqAys0viB1fi2AXnY+Y=";
 
   # The darwin cc-wrapper re-quotes non-ASCII arguments as $'\303\274', which
   # breaks linking the fake herdr in a temp dir named with "ü".
