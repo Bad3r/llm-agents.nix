@@ -201,7 +201,7 @@ buildNpmPackage (finalAttrs: {
     description = "Voice-controlled desktop development environment for AI coding agents";
     homepage = "https://paseo.sh";
     changelog = "https://github.com/getpaseo/paseo/releases/tag/v${finalAttrs.version}";
-    license = lib.licenses.agpl3Plus;
+    license = lib.licenses.asl20;
     sourceProvenance = [ lib.sourceTypes.fromSource ];
     maintainers = with flake.lib.maintainers; [ smdex ];
     mainProgram = "paseo-desktop";
