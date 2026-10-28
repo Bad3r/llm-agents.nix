@@ -29,6 +29,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # Upstream pins a specific stable channel; allow building with nixpkgs' rustc.
   postPatch = ''
     rm -f rust-toolchain.toml
+    # nixpkgs' rustc uses LLVM 21, whose vpdpbusd.256 signature does not match
+    # core::arch's; drop adler32furious' VNNI kernels until rustc uses LLVM 22.
+    patch -p1 -d "$cargoDepsCopy/source-registry-0/adler32furious-0.1.1" < ${./adler32furious-llvm21.patch}
   '';
 
   nativeBuildInputs = [
