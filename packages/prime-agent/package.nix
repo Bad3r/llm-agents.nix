@@ -13,16 +13,16 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "prime-agent";
-  version = "0.10.1";
+  version = "0.10.2";
 
   src = fetchFromGitHub {
     owner = "PrimeIntellect-ai";
     repo = "prime-agent";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-4dEdS+CYzWs5LvnpNPIpKxAJQzrnJSmRvAJ39/cmk/U=";
+    hash = "sha256-W9lEIKpiX7+KeIpaKWt1uuYrF/ZhBHtgUBn8HwdKIHQ=";
   };
 
-  cargoHash = "sha256-YdvLX0TaoKiB/8isIK9ufPXa4rP6hskpVxoTyY7IGgI=";
+  cargoHash = "sha256-qRr2PDs8QD/Z+DXYFVkcX700HHTCF3RpAS0v/63xDu4=";
   cargoBuildType = "release";
   cargoBuildFlags = [
     "-p"
