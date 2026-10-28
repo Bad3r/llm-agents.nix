@@ -11,6 +11,11 @@
 }:
 
 let
+  # TODO: drop once NixOS/nixpkgs#579978 is in our nixpkgs input.
+  ctranslate2 = python3.pkgs.ctranslate2.overridePythonAttrs (old: {
+    disabledTests = old.disabledTests or [ ] ++ [ "test_float32_float16_and_independent_chunks" ];
+  });
+
   # Not yet in nixpkgs. Packaged inline; all transitive deps are available.
   faster-whisper = python3.pkgs.buildPythonPackage rec {
     pname = "faster-whisper";
