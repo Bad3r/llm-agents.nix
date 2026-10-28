@@ -22,6 +22,7 @@ DEP_SECTIONS = [
 # Runtime dependencies needed by the workspaces we build.  Hoisting them to the
 # root workspace lets Bun resolve them directly from the bun2nix cache.
 HOISTED = {
+    "@agentclientprotocol/sdk",
     "@joplin/turndown-plugin-gfm",
     "@modelcontextprotocol/client",
     "@modelcontextprotocol/server",
