@@ -18,13 +18,13 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "qwen-code";
-  version = "0.26.2";
+  version = "0.26.3";
 
   src = fetchFromGitHub {
     owner = "QwenLM";
     repo = "qwen-code";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-c9OgjYqed666jzINkOB8EK4isLpN3KDuAnowLng96+o=";
+    hash = "sha256-KCwC6LG41aAX80/SxH7S+yHipsebxTaDmjl1qHS2LI8=";
   };
 
   npmDeps = null;
