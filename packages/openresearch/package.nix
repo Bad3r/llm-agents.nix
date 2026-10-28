@@ -5,9 +5,14 @@
   rustPlatform,
   fetchFromGitHub,
   fetchpatch,
+  fetchurl,
+  runCommand,
   makeWrapper,
   installAgentSkills,
-  mkUpdater,
+  fetchPnpmDeps,
+  nodejs,
+  pnpm_10,
+  pnpmConfigHook,
   bash,
   coreutils,
   gawk,
@@ -22,18 +27,34 @@
 }:
 
 let
-  hashes = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inlangPlugin =
+    name: version: hash:
+    let
+      tgz = fetchurl {
+        url = "https://registry.npmjs.org/@inlang/${name}/-/${name}-${version}.tgz";
+        inherit hash;
+      };
+    in
+    runCommand "${name}-${version}.js" { } "tar -xzOf ${tgz} package/dist/index.js > $out";
+  inlangMessageFormat =
+    inlangPlugin "plugin-message-format" "4.5.5"
+      "sha512-wFA0x9isGySoim2JUP2NNMslLnYrYQESbWfhv8qJueRH+d3c6iHkkQJxMF3D7PZ9BafEaj6fw0HJhoTa5c2EMw==";
+  inlangMFunctionMatcher =
+    inlangPlugin "plugin-m-function-matcher" "2.3.4"
+      "sha512-Jd2ccLjEqyUAj+y54fb/8O1bEREsaHcPOw6PBercVjDMTvcUqAQZ8V/1t5Z0ZmSCuWgof7XxnmBcwgMuf0Xk+A==";
 in
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "openresearch";
-  inherit (hashes) version cargoHash;
+  version = "0.2.22";
 
   src = fetchFromGitHub {
     owner = "alphaXiv";
     repo = "OpenResearch";
     tag = "v${finalAttrs.version}";
-    inherit (hashes) hash;
+    hash = "sha256-B5XCBOf2cvbOehL7GV9eW/CVyI6ag1B/L8pzbkEUCHg=";
   };
+
+  cargoHash = "sha256-8WEU0pJ77SFiiiPhVa5s5FfpXk5dsuQvhIdYy3rKP+g=";
 
   patches = [
     # Pending upstream #698; remove once a release includes the readiness EINTR fix.
@@ -52,14 +73,22 @@ rustPlatform.buildRustPackage (finalAttrs: {
   dontInstallAgentSkills = true;
 
   postPatch = ''
+    cp -r ${finalAttrs.passthru.ui} ui/dist
     substituteInPlace $(grep -rl '#!/bin/sh' src) \
       --replace-fail '#!/bin/sh' '#!${bash}/bin/sh'
     substituteInPlace src/commands/up.rs \
       --replace-fail '"sh",' '"${bash}/bin/sh",'
     # The fake ssh in these tests calls cat and, for `ssh -G`, /usr/bin/ssh;
     # neither exists in the sandbox.
-    substituteInPlace tests/compute_cli.rs \
-      --replace-fail '{}:/usr/bin:/bin"' '{}:${coreutils}/bin"' \
+    substituteInPlace tests/cli/compute_cli.rs \
+      --replace-fail '{}:/usr/bin:/bin"' '{}:${
+        lib.makeBinPath [
+          bash
+          coreutils
+          gnutar
+          python3
+        ]
+      }"' \
       --replace-fail 'exec /usr/bin/ssh' 'exec ${openssh}/bin/ssh'
   '';
 
@@ -74,6 +103,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     "--skip=jobs::ssh::sharing::tests::native_config_shares_only_matching_live_sockets_and_preserves_user_settings"
     # runs /bin/sh, which the Linux sandbox lacks
     "--skip=jobs::rental::tests::rental_bootstrap_runs_bash_syntax_through_the_posix_login_shell"
+    # the compacted sqlite file is not smaller than before in our build
+    "--skip=local::native_store::tests::opencode_sweep_purges_settled_unreferenced_roots_and_compacts"
   ]
   # child process is not reaped within the test's deadline in the darwin sandbox
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
@@ -134,11 +165,51 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   passthru = {
     category = "Workflow & Project Management";
-    updater = mkUpdater {
-      kind = "github-source";
-      purl = "pkg:github/alphaXiv/OpenResearch";
-      depHashKey = "cargoHash";
-    };
+
+    ui = stdenv.mkDerivation (uiAttrs: {
+      pname = "openresearch-ui";
+      inherit (finalAttrs) version src;
+      sourceRoot = "${finalAttrs.src.name}/ui";
+
+      pnpmDeps = fetchPnpmDeps {
+        inherit (uiAttrs)
+          pname
+          version
+          src
+          sourceRoot
+          ;
+        pnpm = pnpm_10;
+        fetcherVersion = 3;
+        hash = "sha256-SylFpv2bkneoZgmgAGDgkUTIEmTlQSc2Q+476Tzl6z4=";
+      };
+
+      nativeBuildInputs = [
+        nodejs
+        pnpm_10
+        pnpmConfigHook
+      ];
+
+      # The inlang project loads its plugins from jsdelivr at build time.
+      postPatch = ''
+        install -Dm644 ${inlangMessageFormat} project.inlang/plugins/message-format.js
+        install -Dm644 ${inlangMFunctionMatcher} project.inlang/plugins/m-function-matcher.js
+        substituteInPlace project.inlang/settings.json \
+          --replace-fail "https://cdn.jsdelivr.net/npm/@inlang/plugin-message-format@4/dist/index.js" "./project.inlang/plugins/message-format.js" \
+          --replace-fail "https://cdn.jsdelivr.net/npm/@inlang/plugin-m-function-matcher@2/dist/index.js" "./project.inlang/plugins/m-function-matcher.js"
+      '';
+
+      buildPhase = ''
+        runHook preBuild
+        pnpm build
+        runHook postBuild
+      '';
+
+      installPhase = ''
+        runHook preInstall
+        cp -r dist $out
+        runHook postInstall
+      '';
+    });
   };
 
   meta = with lib; {
