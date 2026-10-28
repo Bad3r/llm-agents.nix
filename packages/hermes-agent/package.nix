@@ -15,6 +15,20 @@
 }:
 
 let
+  # TODO: drop once NixOS/nixpkgs#579978 is in our nixpkgs input.
+  ctranslate2 =
+    let
+      test = "test_float32_float16_and_independent_chunks";
+      pkg = python3.pkgs.ctranslate2;
+    in
+    if lib.elem test (pkg.disabledTests or [ ]) then
+      pkg
+    else
+      pkg.overridePythonAttrs (old: {
+        disabledTests = old.disabledTests or [ ] ++ [ test ];
+      });
+  faster-whisper = python3.pkgs.faster-whisper.override { inherit ctranslate2; };
+
   # Hermes' Anthropic adapter passes httpx objects; SDK 1.x requires httpx2.
   # Keep this private dependency aligned with the upstream extra, not nixpkgs.
   anthropic = python3.pkgs.anthropic.overridePythonAttrs (old: {
