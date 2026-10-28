@@ -183,7 +183,7 @@ python3.pkgs.buildPythonApplication rec {
     orjson
     tqdm
     # [mcp] extra:
-    mcp_2
+    mcp
   ];
 
   nativeBuildInputs = [ makeWrapper ];

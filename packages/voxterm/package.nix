@@ -11,6 +11,19 @@
 }:
 
 let
+  # TODO: drop once NixOS/nixpkgs#579978 is in our nixpkgs input.
+  ctranslate2 =
+    let
+      test = "test_float32_float16_and_independent_chunks";
+      pkg = python3.pkgs.ctranslate2;
+    in
+    if lib.elem test (pkg.disabledTests or [ ]) then
+      pkg
+    else
+      pkg.overridePythonAttrs (old: {
+        disabledTests = old.disabledTests or [ ] ++ [ test ];
+      });
+
   # Not yet in nixpkgs. Packaged inline; all transitive deps are available.
   faster-whisper = python3.pkgs.buildPythonPackage rec {
     pname = "faster-whisper";

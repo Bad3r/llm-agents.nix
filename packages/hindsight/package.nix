@@ -1,12 +1,22 @@
 {
   lib,
   flake,
-  python3Packages,
+  python3,
   fetchFromGitHub,
   fetchPypi,
   rustPlatform,
 }:
 let
+  python3Packages = python3.pkgs.overrideScope (
+    final: prev: {
+      # fastmcp-slim 3.4.7 is marked broken against mcp >= 2, so pin the
+      # whole scope to mcp 1.x where nixpkgs ships it as `mcp_1`. Drop this
+      # once fastmcp 4.x lands (NixOS/nixpkgs#563493). Pins that predate
+      # `mcp_1` still carry mcp 1.x as `mcp`.
+      mcp = final.mcp_1 or prev.mcp;
+    }
+  );
+
   toktok-rs = python3Packages.buildPythonPackage rec {
     pname = "toktok-rs";
     version = "0.3.0";
