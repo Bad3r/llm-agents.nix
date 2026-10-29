@@ -4,6 +4,7 @@
   go_1_26,
   fetchFromGitHub,
   git,
+  installAgentSkills,
   unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
@@ -33,11 +34,21 @@ buildGoModule.override { go = go_1_26; } {
     "-X main.Version=v${version}"
   ];
 
-  # go.mod pins a newer patch release than nixpkgs' go_1_26.
-  nativeBuildInputs = [ unpinGoModVersionHook ];
+  nativeBuildInputs = [
+    installAgentSkills
+    # go.mod pins a newer patch release than nixpkgs' go_1_26.
+    unpinGoModVersionHook
+  ];
+  # plugins/ holds Codex plugin mirrors of the same skills; install only the
+  # canonical top-level skills/ ones.
+  dontInstallAgentSkills = true;
 
   postInstall = ''
     mv $out/bin/opencodereview $out/bin/ocr
+
+    for skill in skills/*/; do
+      installSkill "$skill"
+    done
   '';
 
   # The cmd tests shell out to git.
