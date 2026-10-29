@@ -13,12 +13,18 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-# @parcel/watcher uses detect-libc in a named worker. Its process.report
-# fallback trips a CFI guard in the bundled Owl/Electron runtime on NixOS.
-# detect-libc falls back to its ELF/filesystem/ldd probes instead.
+# detect-libc's process.report probe trips a CFI guard in the bundled
+# Owl/Electron runtime on NixOS and kills the process with SIGILL. With the
+# guard false, detect-libc falls back to its ELF/filesystem/ldd probes. The
+# source copy runs in @parcel/watcher's named worker, the minified copy in the
+# main process, where LaTeX previews load it.
 SKIP_PROCESS_REPORT = (
     re.compile(rb"isLinux\(\) && process\.report"),
     lambda _m: b"false /* nix:skip report */",
+)
+SKIP_MINIFIED_PROCESS_REPORT = (
+    re.compile(rb"if\([\w$]+\(\)&&process\.report\)\{let"),
+    lambda _m: b"if(false){let",
 )
 
 # The app copies bundled plugins to ~/.codex with fs.cp, which preserves the
@@ -104,6 +110,7 @@ def _copy_executor_plugin_writable(m: re.Match[bytes]) -> bytes:
 
 PATCHES: list[tuple[re.Pattern[bytes], Callable[[re.Match[bytes]], bytes]]] = [
     SKIP_PROCESS_REPORT,
+    SKIP_MINIFIED_PROCESS_REPORT,
     # Runs before COPY_PLUGINS_WRITABLE rewrites the function it reads exec from.
     (COPY_EXECUTOR_PLUGIN_WRITABLE, _copy_executor_plugin_writable),
     (COPY_PLUGINS_WRITABLE, _copy_writable),
