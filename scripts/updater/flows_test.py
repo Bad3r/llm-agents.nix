@@ -13,6 +13,7 @@ from typing import Any
 
 from updater import http
 from updater.flows import manifest_checksums as mc
+from updater.flows.bun_github import update_bun_github
 from updater.hash import hex_to_sri
 
 _MANIFEST = {
@@ -73,6 +74,19 @@ class TestManifestChecksums(unittest.TestCase):
     def test_semver_skips_downgrade(self) -> None:
         data = self._run(latest="0.9.0", allow_downgrade=False)
         self.assertEqual(data["version"], "1.0.0")  # unchanged
+
+
+class TestBunGithub(unittest.TestCase):
+    def test_dep_hash_without_flake_attr_fails_before_writing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pkg = Path(tmp)
+            hashes = pkg / "hashes.json"
+            hashes.write_text('{"version": "1.0.0", "hash": "sha256-x"}\n')
+            with self.assertRaises(ValueError):
+                update_bun_github(pkg, "o", "r", dep_hash_key="cargoHash")
+            self.assertEqual(
+                json.loads(hashes.read_text()), {"version": "1.0.0", "hash": "sha256-x"}
+            )
 
 
 if __name__ == "__main__":

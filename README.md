@@ -1277,6 +1277,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>ovis</strong> - Browser and phone client for herdr terminal workspaces</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/devswha/ovis
+- **Usage**: `nix run github:numtide/llm-agents.nix#ovis -- --help`
+- **Nix**: [packages/ovis/package.nix](packages/ovis/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -1442,7 +1452,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>open-code-review</strong> - AI-powered code review CLI</summary>
 
-- **Source**: binary
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/alibaba/open-code-review
 - **Usage**: `nix run github:numtide/llm-agents.nix#open-code-review -- --help`
@@ -1913,6 +1923,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/activeing123/mcptoon
 - **Usage**: `nix run github:numtide/llm-agents.nix#mcptoon -- --help`
 - **Nix**: [packages/mcptoon/package.nix](packages/mcptoon/package.nix)
+
+</details>
+<details>
+<summary><strong>mercat</strong> - Render markdown and mermaid diagrams in the terminal</summary>
+
+- **Source**: source
+- **License**: GPL-3.0-or-later
+- **Homepage**: https://github.com/tawago/mercat
+- **Usage**: `nix run github:numtide/llm-agents.nix#mercat -- --help`
+- **Nix**: [packages/mercat/package.nix](packages/mercat/package.nix)
 
 </details>
 <details>

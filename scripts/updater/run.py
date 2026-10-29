@@ -132,6 +132,8 @@ def run(pkg_dir: Path, config: dict[str, Any], *, flows: FlowMap | None = None) 
             _owner(purl),
             purl.name,
             ref_prefix=config.get("refPrefix", "v"),
+            flake_attr=config.get("flakeAttr"),
+            dep_hash_key=config.get("depHashKey"),
         )
     elif kind == "npm":
         purl = Purl.parse(config["purl"])

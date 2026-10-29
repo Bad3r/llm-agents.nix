@@ -48,8 +48,7 @@
   libxrandr,
   libxcb,
   libxcursor,
-  # Chromium loads the Qt6 shim under Plasma 6 for native fonts, scaling,
-  # colors and file dialogs, and falls back to GTK without it.
+  # Qt6 shim for Plasma 6 integration; Chromium falls back to GTK without it.
   withQt ? false,
 }:
 
@@ -70,6 +69,7 @@ stdenv.mkDerivation {
 
   dontStrip = true;
   dontWrapGApps = true;
+  dontWrapQtApps = true;
 
   nativeBuildInputs =
     lib.optionals isLinux [
@@ -83,34 +83,36 @@ stdenv.mkDerivation {
       unzip
     ];
 
-  buildInputs = lib.optionals isLinux [
-    alsa-lib
-    at-spi2-core
-    cairo
-    cups
-    dbus
-    expat
-    gdk-pixbuf
-    glib
-    gtk3
-    libgbm
-    libusb1
-    libxkbcommon
-    nspr
-    nss
-    openssl
-    pango
-    stdenv.cc.cc.lib
-    systemd
-    tpm2-tss
-    libx11
-    libxcomposite
-    libxdamage
-    libxext
-    libxfixes
-    libxrandr
-    libxcb
-  ];
+  buildInputs =
+    lib.optionals isLinux [
+      alsa-lib
+      at-spi2-core
+      cairo
+      cups
+      dbus
+      expat
+      gdk-pixbuf
+      glib
+      gtk3
+      libgbm
+      libusb1
+      libxkbcommon
+      nspr
+      nss
+      openssl
+      pango
+      stdenv.cc.cc.lib
+      systemd
+      tpm2-tss
+      libx11
+      libxcomposite
+      libxdamage
+      libxext
+      libxfixes
+      libxrandr
+      libxcb
+    ]
+    ++ lib.optionals (isLinux && withQt) [ qt6.qtbase ];
 
   # Electron loads these at runtime rather than linking them directly. Put
   # them on each ELF object's RPATH without leaking a broad LD_LIBRARY_PATH
@@ -131,17 +133,11 @@ stdenv.mkDerivation {
   # The archive includes musl, glibc, and Android prebuilds for a few Node
   # modules. NixOS uses the glibc variants, so the other runtimes are
   # intentionally absent.
-  autoPatchelfIgnoreMissingDeps =
-    lib.optionals isLinux [
-      "libc++_shared.so"
-      "libc.musl-x86_64.so.1"
-      "liblog.so"
-    ]
-    ++ lib.optionals (isLinux && withQt) [
-      "libQt6Core.so.6"
-      "libQt6Gui.so.6"
-      "libQt6Widgets.so.6"
-    ];
+  autoPatchelfIgnoreMissingDeps = lib.optionals isLinux [
+    "libc++_shared.so"
+    "libc.musl-x86_64.so.1"
+    "liblog.so"
+  ];
 
   unpackPhase =
     if isLinux then
@@ -167,12 +163,11 @@ stdenv.mkDerivation {
         cp -r usr/share/applications usr/share/pixmaps "$out/share/"
         ln -s ../lib/chatgpt/codex-launcher "$out/bin/chatgpt"
 
-        # Plasma 5 is gone from nixpkgs, so nothing loads the Qt5 shim.
+        # Plasma 5 is gone from nixpkgs.
         rm "$out/lib/chatgpt/libqt5_shim.so"
         ${lib.optionalString (!withQt) ''rm "$out/lib/chatgpt/libqt6_shim.so"''}
 
-        # Components that load libvulkan.so.1 by path find it here. The
-        # bundled loader does not search /run/opengl-driver for ICDs.
+        # The bundled loader does not search /run/opengl-driver for ICDs.
         ln -sf ${lib.getLib vulkan-loader}/lib/libvulkan.so.1 "$out/lib/chatgpt/libvulkan.so.1"
 
         # See patch-asar.py for the NixOS-specific source patches.
@@ -191,8 +186,7 @@ stdenv.mkDerivation {
       '';
 
   # gappsWrapperArgs is only populated by wrapGAppsHook3 after installPhase.
-  # Host Qt plugins can use a different private ABI than the Qt shim, so the
-  # shim discovers plugins from its own Qt installation.
+  # Host Qt plugins may not match the shim's Qt ABI.
   preFixup = lib.optionalString isLinux ''
     wrapProgram "$out/lib/chatgpt/ChatGPT" \
       "''${gappsWrapperArgs[@]}" \
@@ -205,12 +199,6 @@ stdenv.mkDerivation {
           xdg-utils
         ]
       }
-  '';
-
-  # The shim is dlopen'd, so autoPatchelf does not resolve its Qt runtime.
-  postFixup = lib.optionalString (isLinux && withQt) ''
-    patchelf --add-rpath ${lib.makeLibraryPath [ qt6.qtbase ]} \
-      "$out/lib/chatgpt/libqt6_shim.so"
   '';
 
   # Any modification forces ad-hoc re-signing, which drops OpenAI's keychain

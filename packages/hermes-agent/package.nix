@@ -507,6 +507,26 @@ let
   # resolves the gateway import root from HERMES_PYTHON_SRC_ROOT.
   pythonEnv = python3.withPackages (_: hermesDeps);
 
+  # Hermes' dependency manager (PM) installs and launches managed tools such as
+  # npx/uvx MCP servers. It runs in its own environment, which a Nix install
+  # names through `pmRuntime` in the install stamp (upstream nix/pm-runtime.nix).
+  pmRuntime = python3.buildEnv.override {
+    extraLibs = with python3.pkgs; [
+      packaging
+      tomli-w
+      ruamel-yaml
+      truststore
+    ];
+    postBuild = ''
+      printf '%s\n' '${
+        builtins.toJSON {
+          python = python3.interpreter;
+          inherit (python3) sitePackages;
+        }
+      }' > "$out/pm-runtime.json"
+    '';
+  };
+
   installStamp = writeText "install-stamp.json" (
     builtins.toJSON {
       schemaVersion = 2;
@@ -518,6 +538,7 @@ let
       source = "nix";
       distribution = "nix";
       updateMechanism = "external";
+      pmRuntime = toString pmRuntime;
       # Desktop: use an external Hermes instead of a bundled one.
       payload = "bootstrap";
     }
@@ -549,6 +570,11 @@ python3.pkgs.buildPythonApplication {
     substituteInPlace hermes_cli/gateway_runtime_start.py \
       --replace-fail 'command = [sys.executable, "-m", "hermes_cli.main"' \
         'command = [os.environ.get("HERMES_PYTHON", sys.executable), "-m", "hermes_cli.main"'
+    # `hermes gateway install` writes this interpreter into the service unit.
+    # A Python that PM installed into ~/.hermes/tools lacks Hermes' dependencies.
+    substituteInPlace hermes_cli/gateway.py \
+      --replace-fail 'return str(resolve_store_python(PROJECT_ROOT) or sys.executable)' \
+        'return os.environ.get("HERMES_PYTHON") or str(resolve_store_python(PROJECT_ROOT) or sys.executable)'
   '';
 
   # setup.py refuses to build wheels/sdists unless it knows this is a Nix
@@ -686,6 +712,13 @@ python3.pkgs.buildPythonApplication {
     # internals; assert submit() actually executes work on this Python.
     PYTHONPATH="$out/${python3.sitePackages}" \
       ${pythonEnv}/bin/python3 -c 'from tools.daemon_pool import DaemonThreadPoolExecutor; assert DaemonThreadPoolExecutor(max_workers=1).submit(lambda: 42).result(timeout=30) == 42'
+    # PM launches its scripts in the packaged runtime named by the install stamp.
+    # Run outside the source tree, so `pm` imports from $out beside the stamp.
+    pushd "$(mktemp -d)" >/dev/null
+    echo 'import packaging, tomli_w, truststore; from ruamel.yaml import YAML' > pm-check.py
+    PYTHONPATH="$out/${python3.sitePackages}" \
+      ${pythonEnv}/bin/python3 -c 'import pathlib, subprocess; from pm.runtime import runtime_command; subprocess.run(runtime_command(pathlib.Path("pm-check.py").resolve(), bootstrap=False), check=True)'
+    popd >/dev/null
   ''
   + lib.optionalString stdenv.hostPlatform.isLinux ''
     # Matrix E2EE: mautrix.crypto must import and the disable switch wired in.
@@ -695,7 +728,12 @@ python3.pkgs.buildPythonApplication {
 
   passthru = {
     category = "AI Assistants";
-    inherit hermes-frontend nemo-relay installStamp;
+    inherit
+      hermes-frontend
+      nemo-relay
+      installStamp
+      pmRuntime
+      ;
   };
 
   meta = with lib; {

@@ -1,37 +1,58 @@
 {
   lib,
-  stdenv,
-  platformSource,
+  buildGoModule,
+  go_1_26,
+  fetchFromGitHub,
+  git,
+  installAgentSkills,
+  unpinGoModVersionHook,
   versionCheckHook,
   versionCheckHomeHook,
   mkUpdater,
 }:
 
 let
-  source = platformSource {
-    hashesFile = ./hashes.json;
-    platforms = {
-      x86_64-linux = "linux-amd64";
-      aarch64-linux = "linux-arm64";
-      aarch64-darwin = "darwin-arm64";
-    };
-    urlTemplate = "https://github.com/alibaba/open-code-review/releases/download/v{version}/opencodereview-{platform}";
-  };
-  inherit (source) version;
+  versionData = builtins.fromJSON (builtins.readFile ./hashes.json);
+  inherit (versionData) version hash vendorHash;
 in
-stdenv.mkDerivation {
+buildGoModule.override { go = go_1_26; } {
   pname = "open-code-review";
-  inherit (source) version src;
+  inherit version vendorHash;
 
-  # Upstream releases are single statically linked Go binaries.
-  dontUnpack = true;
+  src = fetchFromGitHub {
+    owner = "alibaba";
+    repo = "open-code-review";
+    tag = "v${version}";
+    inherit hash;
+  };
 
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/bin
-    install -m755 $src $out/bin/ocr
-    runHook postInstall
+  subPackages = [ "cmd/opencodereview" ];
+
+  ldflags = [
+    "-s"
+    "-w"
+    "-X main.Version=v${version}"
+  ];
+
+  nativeBuildInputs = [
+    installAgentSkills
+    # go.mod pins a newer patch release than nixpkgs' go_1_26.
+    unpinGoModVersionHook
+  ];
+  # plugins/ holds Codex plugin mirrors of the same skills; install only the
+  # canonical top-level skills/ ones.
+  dontInstallAgentSkills = true;
+
+  postInstall = ''
+    mv $out/bin/opencodereview $out/bin/ocr
+
+    for skill in skills/*/; do
+      installSkill "$skill"
+    done
   '';
+
+  # The cmd tests shell out to git.
+  nativeCheckInputs = [ git ];
 
   doInstallCheck = true;
   nativeInstallCheckInputs = [
@@ -41,25 +62,20 @@ stdenv.mkDerivation {
   versionCheckProgramArg = [ "version" ];
 
   passthru.category = "Code Review";
-  passthru.updater = mkUpdater (
-    source.updater
-    // {
-      versionSource = {
-        type = "github";
-        owner = "alibaba";
-        repo = "open-code-review";
-      };
-    }
-  );
+  passthru.updater = mkUpdater {
+    kind = "github-source";
+    purl = "pkg:github/alibaba/open-code-review";
+    depHashKey = "vendorHash";
+  };
 
   meta = with lib; {
     description = "AI-powered code review CLI";
     homepage = "https://github.com/alibaba/open-code-review";
     changelog = "https://github.com/alibaba/open-code-review/releases/tag/v${version}";
     license = licenses.asl20;
-    sourceProvenance = with sourceTypes; [ binaryNativeCode ];
+    sourceProvenance = with sourceTypes; [ fromSource ];
     mainProgram = "ocr";
     maintainers = with maintainers; [ fridh ];
-    platforms = source.platforms;
+    platforms = platforms.unix;
   };
 }
