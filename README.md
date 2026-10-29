@@ -1442,7 +1442,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 <details>
 <summary><strong>open-code-review</strong> - AI-powered code review CLI</summary>
 
-- **Source**: binary
+- **Source**: source
 - **License**: Apache-2.0
 - **Homepage**: https://github.com/alibaba/open-code-review
 - **Usage**: `nix run github:numtide/llm-agents.nix#open-code-review -- --help`
