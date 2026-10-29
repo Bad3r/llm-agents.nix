@@ -66,7 +66,9 @@ class TestRun(unittest.TestCase):
         )
         rec = flows["bun-github"]
         self.assertEqual(rec.args, (PKG, "gmickel", "gno"))
-        self.assertEqual(rec.kwargs, {"ref_prefix": "v"})
+        self.assertEqual(
+            rec.kwargs, {"ref_prefix": "v", "flake_attr": None, "dep_hash_key": None}
+        )
 
     def test_bun_github_custom_prefix(self) -> None:
         flows = recorders()
@@ -75,7 +77,25 @@ class TestRun(unittest.TestCase):
             {"kind": "bun-github", "purl": "pkg:github/o/r", "refPrefix": "release-"},
             flows=flows,  # type: ignore[arg-type]
         )
-        self.assertEqual(flows["bun-github"].kwargs, {"ref_prefix": "release-"})
+        assert flows["bun-github"].kwargs is not None
+        self.assertEqual(flows["bun-github"].kwargs["ref_prefix"], "release-")
+
+    def test_bun_github_dep_hash(self) -> None:
+        flows = recorders()
+        run(
+            PKG,
+            {
+                "kind": "bun-github",
+                "purl": "pkg:github/devswha/ovis",
+                "flakeAttr": ".#ovis",
+                "depHashKey": "cargoHash",
+            },
+            flows=flows,  # type: ignore[arg-type]
+        )
+        self.assertEqual(
+            flows["bun-github"].kwargs,
+            {"ref_prefix": "v", "flake_attr": ".#ovis", "dep_hash_key": "cargoHash"},
+        )
 
     def test_npm_scoped(self) -> None:
         flows = recorders()
