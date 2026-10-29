@@ -17,12 +17,12 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "yvgude";
     repo = "lean-ctx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-1aen/yz9AkEopwjizKpFoimnmoeJg3W719AAKYKgsqU=";
+    hash = "sha256-Nod1Bx5iU0I+MiVV74lzllW9Nr1hkhNZK84XV3Nt1Kg=";
   };
 
   cargoRoot = "rust";
   buildAndTestSubdir = "rust";
-  cargoHash = "sha256-NJtonYpbLJEaQrEujJA4gWCIMM34CgN1hIoIwCZ/OYM=";
+  cargoHash = "sha256-1+y3EtkFITSWhRMHWoQXFhL6a3P9LI7Xqy1RzRR2f5Y=";
 
   nativeBuildInputs = [
     cmake
