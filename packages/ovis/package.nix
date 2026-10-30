@@ -27,7 +27,7 @@ let
   };
   # Mirrors upstream package.json; reading it from src would need IFD.
   patchedDependencies = {
-    "@xterm/xterm@5.5.0" = "@xterm%2Fxterm@5.5.0.patch";
+    "@xterm/xterm@6.0.0" = "@xterm%2Fxterm@6.0.0.patch";
     "@legendapp/list@3.3.5" = "@legendapp%2Flist@3.3.5.patch";
   };
   # fetchBunDeps ignores overrides for packages absent from bun.nix, which would drop a patch silently.
