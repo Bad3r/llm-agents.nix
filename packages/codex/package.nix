@@ -23,20 +23,7 @@
   cargoVendor ? {
     cargoHash = versionData.cargoHash;
   },
-  preBuild ? ''
-    # Upstream's ThinLTO + codegen-units=4 make late-stage rustc peak at
-    # ~12 GiB and the whole build crawl; fall back to cargo defaults like
-    # nixpkgs does. Line tables for codex-core/codex-tui add more memory
-    # and the aarch64 builders OOM-kill rustc when many big crates compile
-    # in parallel, so drop debuginfo and cap cargo's job count.
-    substituteInPlace Cargo.toml \
-      --replace-fail 'lto = "thin"' "" \
-      --replace-fail 'codegen-units = 4' "" \
-      --replace-fail 'debug = "line-tables-only"' 'debug = "none"'
-    if [ "$NIX_BUILD_CORES" -gt 8 ]; then
-      export NIX_BUILD_CORES=8
-    fi
-  '',
+  preBuild ? "",
   doInstallCheck ? true,
   librusty_v8 ? mkRustyV8Archive versionData.librusty_v8,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
