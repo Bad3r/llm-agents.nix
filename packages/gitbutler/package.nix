@@ -33,19 +33,23 @@ in
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "gitbutler";
-  version = "0.22.3";
+  version = "0.23.1";
 
   src = fetchFromGitHub {
     owner = "gitbutlerapp";
     repo = "gitbutler";
     tag = "release/${finalAttrs.version}";
-    hash = "sha256-nW3yCbpbIhawLQVV+DptzGYiFBSKcyAP89NtDWHJM+0=";
+    hash = "sha256-bAjwZRP7kEua82kbhiy+qpGV1CjvylUAdYewd3Jn59s=";
   };
 
   # Pin the user-facing version into the Tauri release config and disable the
   # built-in updater so the packaged app doesn't try to self-update. The
   # `externalBin` rewrite keeps only the git helper shims that we actually ship.
   postPatch = ''
+    # nixpkgs' rustc uses LLVM 21, whose vpdpbusd.256 signature does not match
+    # core::arch's; drop adler32furious' VNNI kernels until rustc uses LLVM 22.
+    patch -p1 -d "$cargoDepsCopy/source-registry-0/adler32furious-0.1.1" < ${./adler32furious-llvm21.patch}
+
     tauriConfRelease="crates/gitbutler-tauri/tauri.conf.release.json"
     jq '.
         | (.version = "${finalAttrs.version}")
@@ -58,13 +62,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   '';
 
-  cargoHash = "sha256-XRc2yok9K7f/vRAqgO78JUq/U36XSiUeOINupfOOSjw=";
+  cargoHash = "sha256-mlfF2e+UqWgsjt++huxcdMKuEroIvj3GDnY/KDuqCKM=";
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 3;
-    hash = "sha256-CZZOZ+ox4kE5hq/W82UrpJ4I9al9TFBiN+K4XUhxnDE=";
+    hash = "sha256-LDRFTJu4bHgcM5W4ncsdGbYvKY6QOHg6nDSHbYQrMOM=";
   };
 
   nativeBuildInputs = [
@@ -126,6 +130,9 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
 
   preBuild = ''
+    # devEngines.runtime makes pnpm install its own, unpatched node.
+    ln -sf ${lib.getExe nodejs} node_modules/.pnpm/node@runtime+*/node_modules/node/bin/node
+
     # Force the bundled sass-embedded wrapper to invoke our dart-sass binary
     # instead of the prebuilt one it ships with.
     substituteInPlace node_modules/.pnpm/sass-embedded@*/node_modules/sass-embedded/dist/lib/src/compiler-path.js \
