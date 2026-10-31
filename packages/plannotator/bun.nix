@@ -3635,9 +3635,9 @@
     url = "https://registry.npmjs.org/jws/-/jws-4.0.1.tgz";
     hash = "sha512-EKI/M/yqPncGUUh44xz0PxSidXFr/+r0pA70+gIYhjv+et7yxM+s29Y+VGDkovRofQem0fs7Uvf4+YmAdyRduA==";
   };
-  "katex@0.18.11" = fetchurl {
-    url = "https://registry.npmjs.org/katex/-/katex-0.18.11.tgz";
-    hash = "sha512-yvyz/2VMKqoho/35Hat5w37wIEdWJ5ElVMidTAlWrxr5uW4aBGsEpveTmKh18/zw08v/7lGswCPon4OhqmqrTA==";
+  "katex@0.19.0" = fetchurl {
+    url = "https://registry.npmjs.org/katex/-/katex-0.19.0.tgz";
+    hash = "sha512-v6Tznz3zJ7u3niRCoDTsumM2+HA2XXcCu+WAacCeHD2z3p9A9Ks987o5FzfTGBN0e8A0vjEgIDvLbICrXpdw/Q==";
   };
   "keytar@7.9.0" = fetchurl {
     url = "https://registry.npmjs.org/keytar/-/keytar-7.9.0.tgz";
