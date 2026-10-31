@@ -17,7 +17,7 @@
   nodejs,
   openssl,
   pkg-config,
-  # Lockfile predates pnpm 11's stricter overrides validation
+  # pnpm 11+ needs fetcherVersion >= 4 and a different pnpmDeps hash
   pnpm_10,
   pnpmConfigHook,
   rust,
@@ -29,6 +29,22 @@
 }:
 let
   pnpm = pnpm_10;
+
+  # pnpm stores only the fetching host's node for `devEngines.runtime`, which
+  # makes the pnpmDeps hash platform-dependent. We build with nixpkgs' nodejs.
+  # Replace with pnpm's `runtime: false` once nixpkgs ships pnpm >= 12.16.
+  stripNodeRuntime = ''
+    ${lib.getExe jq} -e '.devEngines.runtime' package.json >/dev/null
+    grep -q '^  node@runtime:' pnpm-lock.yaml
+    ${lib.getExe jq} 'del(.devEngines.runtime)' package.json > package.json.tmp
+    mv package.json.tmp package.json
+    sed -i -e '/^  node@runtime:/,/^$/d' \
+      -e '/^      node:$/{N;/specifier: runtime:/{N;d}}' pnpm-lock.yaml
+    if grep -Eq 'node@runtime|specifier: runtime:' pnpm-lock.yaml; then
+      echo "node runtime still referenced after stripping" >&2
+      exit 1
+    fi
+  '';
 in
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -46,6 +62,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   # built-in updater so the packaged app doesn't try to self-update. The
   # `externalBin` rewrite keeps only the git helper shims that we actually ship.
   postPatch = ''
+    ${stripNodeRuntime}
+
     # nixpkgs' rustc uses LLVM 21, whose vpdpbusd.256 signature does not match
     # core::arch's; drop adler32furious' VNNI kernels until rustc uses LLVM 22.
     patch -p1 -d "$cargoDepsCopy/source-registry-0/adler32furious-0.1.1" < ${./adler32furious-llvm21.patch}
@@ -68,7 +86,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     inherit (finalAttrs) pname version src;
     inherit pnpm;
     fetcherVersion = 3;
-    hash = "sha256-LDRFTJu4bHgcM5W4ncsdGbYvKY6QOHg6nDSHbYQrMOM=";
+    postPatch = stripNodeRuntime;
+    hash = "sha256-Dn5j/BlQ26eAHw3qNDN4lumdyV3/mN5oOTPjbLf6D3I=";
   };
 
   nativeBuildInputs = [
@@ -130,9 +149,6 @@ rustPlatform.buildRustPackage (finalAttrs: {
   };
 
   preBuild = ''
-    # devEngines.runtime makes pnpm install its own, unpatched node.
-    ln -sf ${lib.getExe nodejs} node_modules/.pnpm/node@runtime+*/node_modules/node/bin/node
-
     # Force the bundled sass-embedded wrapper to invoke our dart-sass binary
     # instead of the prebuilt one it ships with.
     substituteInPlace node_modules/.pnpm/sass-embedded@*/node_modules/sass-embedded/dist/lib/src/compiler-path.js \
