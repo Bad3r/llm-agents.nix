@@ -1287,6 +1287,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 
 </details>
 <details>
+<summary><strong>paseo</strong> - Self-hosted daemon and CLI for orchestrating coding agents</summary>
+
+- **Source**: source
+- **License**: Apache-2.0
+- **Homepage**: https://paseo.sh
+- **Usage**: `nix run github:numtide/llm-agents.nix#paseo -- --help`
+- **Nix**: [packages/paseo/package.nix](packages/paseo/package.nix)
+
+</details>
+<details>
 <summary><strong>ralph-tui</strong> - AI Agent Loop Orchestrator TUI</summary>
 
 - **Source**: source
@@ -1583,6 +1593,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/andrewyng/context-hub
 - **Usage**: `nix run github:numtide/llm-agents.nix#context-hub -- --help`
 - **Nix**: [packages/context-hub/package.nix](packages/context-hub/package.nix)
+
+</details>
+<details>
+<summary><strong>deja-vu</strong> - Local search and recall over the session history coding agents already write to disk</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/vshulcz/deja-vu
+- **Usage**: `nix run github:numtide/llm-agents.nix#deja-vu -- --help`
+- **Nix**: [packages/deja-vu/package.nix](packages/deja-vu/package.nix)
 
 </details>
 <details>

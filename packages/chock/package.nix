@@ -11,13 +11,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "chock";
-  version = "0.1.0-unstable-20261026-c229295";
+  version = "0.1.0-unstable-20261029-1917242";
 
   src = fetchFromGitHub {
     owner = "LilithSemi";
     repo = "chock";
     tag = finalAttrs.version;
-    hash = "sha256-A1q55n8lgAdqTUYFdziJ/j+icDz1KEcD7h7b+5t94aU=";
+    hash = "sha256-ffKulPH8iHd19jwOtoblxp7kYDJp5b2HWjfgei35C7k=";
   };
 
   zigDeps = zig.fetchDeps {

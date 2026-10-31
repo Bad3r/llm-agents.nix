@@ -234,6 +234,13 @@ stdenv.mkDerivation {
 
     find "$out/libexec/t3code" "$desktop/libexec/t3code" -xtype l -delete
 
+    # Native modules ship prebuilds for every platform, and node-pty also
+    # bundles Windows-only ConPTY binaries.
+    find "$out/libexec/t3code" "$desktop/libexec/t3code" \
+      \( -path '*/prebuilds/*' ! -path '*/prebuilds/*/*' ! -name ${platformKey} \
+        -o -path '*/node-pty/third_party' \) \
+      -prune -exec rm -r {} +
+
     mkdir -p "$desktop/bin"
     makeWrapper ${lib.getExe electron_44} "$desktop/bin/t3code-desktop" \
       --add-flags "$desktop/libexec/t3code/apps/desktop" \
