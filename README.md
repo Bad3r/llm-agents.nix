@@ -528,6 +528,7 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://onorca.dev
 - **Usage**: `nix run github:numtide/llm-agents.nix#orca -- --help`
 - **Nix**: [packages/orca/package.nix](packages/orca/package.nix)
+- **Documentation**: See [packages/orca/README.md](packages/orca/README.md) for detailed usage
 
 </details>
 <details>
@@ -1704,6 +1705,16 @@ Nix packages for AI coding agents and development tools. Automatically updated d
 - **Homepage**: https://github.com/MinishLab/semble
 - **Usage**: `nix run github:numtide/llm-agents.nix#semble -- --help`
 - **Nix**: [packages/semble/package.nix](packages/semble/package.nix)
+
+</details>
+<details>
+<summary><strong>tilth</strong> - Tree-sitter-powered code reading CLI and MCP server for AI agents</summary>
+
+- **Source**: source
+- **License**: MIT
+- **Homepage**: https://github.com/jahala/tilth
+- **Usage**: `nix run github:numtide/llm-agents.nix#tilth -- --help`
+- **Nix**: [packages/tilth/package.nix](packages/tilth/package.nix)
 
 </details>
 <details>
