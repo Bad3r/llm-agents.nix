@@ -40,7 +40,7 @@
  }
  
  fn status_style_for(
-@@ -79,6 +103,41 @@
+@@ -79,6 +103,42 @@
  // Decorative table rules should remain visible without competing with cell content.
  const TABLE_SEPARATOR_FG_ALPHA: f32 = 0.20;
  
@@ -70,19 +70,20 @@
 +    themed_style("codex.ui.prompt", user_message_style())
 +}
 +
-+pub(crate) fn composer_bg_rgb(terminal_bg: (u8, u8, u8)) -> (u8, u8, u8) {
++pub(crate) fn composer_bg_rgb(terminal_bg: Option<(u8, u8, u8)>) -> (u8, u8, u8) {
 +    let surface = ui_style("codex.ui.prompt")
 +        .and_then(|style| style.bg)
 +        .or_else(|| ui_style("codex.ui.surface").and_then(|style| style.bg));
 +    surface
 +        .and_then(|color| background_rgb(Some(color)))
-+        .unwrap_or_else(|| user_message_bg_rgb(terminal_bg))
++        .or_else(|| terminal_bg.map(user_message_bg_rgb))
++        .unwrap_or((48, 48, 48))
 +}
 +
  pub fn user_message_style() -> Style {
      user_message_style_for(default_bg())
  }
-@@ -88,15 +147,17 @@
+@@ -88,15 +148,17 @@
  /// Some terminals do not answer the optional default-color probe. Keep submitted prompts shaded
  /// with an ANSI-safe fallback instead of dropping the surface.
  pub(crate) fn history_prompt_style() -> Style {
@@ -109,7 +110,7 @@
  }
  
  pub fn proposed_plan_style() -> Style {
-@@ -105,7 +166,10 @@
+@@ -105,7 +167,10 @@
  
  /// Returns a low-contrast rule style for separators within markdown tables.
  pub(crate) fn table_separator_style() -> Style {
@@ -121,7 +122,7 @@
  }
  
  /// Returns the shared accent style for active or selected TUI controls.
-@@ -171,14 +235,19 @@
+@@ -171,14 +236,19 @@
          .map_or(Color::Reset, |(fg, bg)| {
              rgb_color(blend(fg, bg, /*alpha*/ 0.6))
          });
@@ -146,7 +147,7 @@
  }
  
  /// Resolve emphasis on the shaded prompt surface, including its quantized background.
-@@ -212,7 +281,10 @@
+@@ -212,7 +282,10 @@
  
  /// Muted amber keeps the passive warning count visible without looking like an error.
  pub(crate) fn warning_notice_style() -> Style {
@@ -158,7 +159,7 @@
  }
  
  fn warning_notice_style_for(background: Option<(u8, u8, u8)>, level: StdoutColorLevel) -> Style {
-@@ -232,17 +304,19 @@
+@@ -232,17 +305,19 @@
  
  /// Returns the style for a user-authored message using the provided terminal background.
  pub fn user_message_style_for(terminal_bg: Option<(u8, u8, u8)>) -> Style {
@@ -182,7 +183,7 @@
  }
  
  /// Returns the shared accent style for the provided terminal background.
-@@ -251,11 +325,15 @@
+@@ -251,11 +326,15 @@
  }
  
  fn accent_color_for(terminal_bg: Option<(u8, u8, u8)>) -> Color {
@@ -329,15 +330,91 @@
          if self.footer.flash_visible()
 --- a/tui/src/transcript_image/composer.rs
 +++ b/tui/src/transcript_image/composer.rs
-@@ -46,7 +46,7 @@
+@@ -45,9 +45,7 @@
+         // Kitty can scale a nominal raster into its cell placement. Sixel needs physical pixels.
          let cell_size = terminal_cell_size()
              .or_else(|| (protocol != ImageProtocol::Sixel).then_some((8, 16)))?;
-         let background = crate::terminal_palette::default_bg()
+-        let background = crate::terminal_palette::default_bg()
 -            .map(crate::style::user_message_bg_rgb)
-+            .map(crate::style::composer_bg_rgb)
-             .unwrap_or((48, 48, 48));
+-            .unwrap_or((48, 48, 48));
++        let background = crate::style::composer_bg_rgb(crate::terminal_palette::default_bg());
          if previous.as_ref().is_some_and(|old| {
              (old.protocol, old.cell_size, old.background) == (protocol, cell_size, background)
+         }) {
+@@ -198,3 +196,73 @@
+     }
+     (visible, count - visible)
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::render::highlight::{current_syntax_theme, set_syntax_theme};
++    use crate::terminal_palette::with_test_default_colors;
++    use syntect::highlighting::{Color, StyleModifier, Theme, ThemeItem};
++
++    #[test]
++    fn semantic_ui_image_background_resolves_without_terminal_probe() {
++        let original = current_syntax_theme();
++        let directory = tempfile::tempdir().unwrap();
++        let path = directory.path().join("transparent.png");
++        RgbaImage::from_pixel(1, 1, Rgba([0, 0, 0, 0]))
++            .save(&path)
++            .unwrap();
++        for scope in ["codex.ui.prompt", "codex.ui.surface"] {
++            set_syntax_theme(Theme {
++                scopes: vec![ThemeItem {
++                    scope: scope.parse().unwrap(),
++                    style: StyleModifier {
++                        background: Some(Color {
++                            r: 36,
++                            g: 47,
++                            b: 58,
++                            a: 255,
++                        }),
++                        ..StyleModifier::default()
++                    },
++                }],
++                ..Theme::default()
++            });
++            with_test_default_colors(None, || {
++                assert_eq!(crate::terminal_palette::default_bg(), None);
++                let images = ComposerImages::for_terminal(ImageProtocol::Kitty, None).unwrap();
++                assert_eq!(images.background, (36, 47, 58));
++                assert_eq!(
++                    crate::style::composer_style().bg,
++                    Some(crate::terminal_palette::rgb_color((36, 47, 58)))
++                );
++                let tile = images.load_tile(&path).unwrap();
++                assert_eq!(tile.pixels.get_pixel(1, 1).0, [36, 47, 58, 255]);
++            });
++        }
++        set_syntax_theme(Theme::default());
++        with_test_default_colors(None, || {
++            assert_eq!(
++                ComposerImages::for_terminal(ImageProtocol::Kitty, None)
++                    .unwrap()
++                    .background,
++                (48, 48, 48)
++            );
++        });
++        with_test_default_colors(
++            crate::terminal_probe::DefaultColors {
++                fg: (255, 255, 255),
++                bg: (18, 19, 20),
++            },
++            || {
++                assert_eq!(
++                    ComposerImages::for_terminal(ImageProtocol::Kitty, None)
++                        .unwrap()
++                        .background,
++                    (46, 47, 48)
++                );
++            },
++        );
++        set_syntax_theme(original);
++    }
++}
 --- a/tui/src/terminal_program_status.rs
 +++ b/tui/src/terminal_program_status.rs
 @@ -114,12 +114,24 @@
