@@ -109,6 +109,7 @@ rustPlatform.buildRustPackage (
       ./daemon-nix-store.patch
       ./rules-symlink.patch
       ./ui-theme.patch
+      ./web-run-command.patch
     ];
 
     # webpki-roots 1.0.10 drops the emSign roots and rustls-webpki 0.103.16

@@ -1,0 +1,198 @@
+diff --git a/ext/web-search/Cargo.toml b/ext/web-search/Cargo.toml
+index d72c779..77697c4 100644
+--- a/ext/web-search/Cargo.toml
++++ b/ext/web-search/Cargo.toml
+@@ -27,6 +27,7 @@ codex-tools = { workspace = true }
+ http = { workspace = true }
+ schemars = { workspace = true }
+ serde_json = { workspace = true }
++tokio = { workspace = true, features = ["io-util", "process", "time"] }
+ url = { workspace = true }
+ 
+ [dev-dependencies]
+diff --git a/ext/web-search/src/tool.rs b/ext/web-search/src/tool.rs
+index 4b92af2..9078d93 100644
+--- a/ext/web-search/src/tool.rs
++++ b/ext/web-search/src/tool.rs
+@@ -1,10 +1,14 @@
++use std::ffi::OsStr;
++use std::process::Stdio;
+ use std::sync::Arc;
++use std::time::Duration;
+ 
+ use codex_api::ReqwestTransport;
+ use codex_api::SearchClient;
+ use codex_api::SearchCommands;
+ use codex_api::SearchQuery;
+ use codex_api::SearchRequest;
++use codex_api::SearchResponse;
+ use codex_api::SearchSettings;
+ use codex_core::X_CODEX_TURN_METADATA_HEADER;
+ use codex_core::web_search_action_detail;
+@@ -52,6 +56,10 @@ pub(crate) const RUN_TOOL_NAME: &str = "run";
+ const WEB_RUN_DESCRIPTION: &str = include_str!("../web_run_description.md");
+ const RESULTS_PAYLOAD_BYTES_METRIC: &str = "codex.web_search.results.payload_bytes";
+ const MAX_SEARCH_ERROR_BYTES: usize = 1024;
++// Answers web.run with a local program instead of OpenAI's alpha/search: it
++// reads the SearchRequest JSON on stdin and prints a SearchResponse.
++const WEB_RUN_COMMAND_ENV: &str = "CODEX_WEB_RUN_COMMAND";
++const WEB_RUN_COMMAND_TIMEOUT: Duration = Duration::from_secs(180);
+ 
+ pub(crate) struct WebSearchTool {
+     pub(crate) session_id: String,
+@@ -115,43 +123,50 @@ impl WebSearchTool {
+         let command_action = command_action(&commands);
+         let provider = self.provider.as_ref();
+         let first_party = provider_uses_first_party_auth_path(provider.info());
+-        let client = prepare_provider_request(provider, first_party, |_| async {
+-            let routing_auth = if first_party {
+-                provider.auth().await
+-            } else {
+-                None
+-            };
+-            let (endpoint, api_auth) = provider.api_provider_and_auth().await?;
+-            let resolved = provider
+-                .route_responses_api_provider(
+-                    endpoint,
+-                    routing_auth.as_ref(),
+-                    &self.workspace_routing,
+-                )
+-                .await?;
+-            let endpoint = resolved.provider;
+-            let transport = if resolved.redirect_policy == ClientRedirectPolicy::Reject
+-                || endpoint.headers.contains_key(ACCOUNT_ROUTING_HEADER)
+-            {
+-                create_client_for_route_async(
+-                    self.http_client_factory.clone(),
+-                    endpoint.url_for_path("alpha/search"),
+-                    ClientRouteClass::Api,
+-                    ClientRedirectPolicy::Reject,
+-                )
++        let local_command = std::env::var_os(WEB_RUN_COMMAND_ENV).filter(|value| !value.is_empty());
++        let client = if local_command.is_some() {
++            None
++        } else {
++            Some(
++                prepare_provider_request(provider, first_party, |_| async {
++                    let routing_auth = if first_party {
++                        provider.auth().await
++                    } else {
++                        None
++                    };
++                    let (endpoint, api_auth) = provider.api_provider_and_auth().await?;
++                    let resolved = provider
++                        .route_responses_api_provider(
++                            endpoint,
++                            routing_auth.as_ref(),
++                            &self.workspace_routing,
++                        )
++                        .await?;
++                    let endpoint = resolved.provider;
++                    let transport = if resolved.redirect_policy == ClientRedirectPolicy::Reject
++                        || endpoint.headers.contains_key(ACCOUNT_ROUTING_HEADER)
++                    {
++                        create_client_for_route_async(
++                            self.http_client_factory.clone(),
++                            endpoint.url_for_path("alpha/search"),
++                            ClientRouteClass::Api,
++                            ClientRedirectPolicy::Reject,
++                        )
++                        .await
++                        .map(ReqwestTransport::from_http_client)
++                    } else {
++                        create_transport_for_routes_async(
++                            self.http_client_factory.clone(),
++                            ClientRouteClass::Api,
++                        )
++                        .await
++                    }?;
++                    Ok(SearchClient::new(transport, endpoint, api_auth))
++                })
+                 .await
+-                .map(ReqwestTransport::from_http_client)
+-            } else {
+-                create_transport_for_routes_async(
+-                    self.http_client_factory.clone(),
+-                    ClientRouteClass::Api,
+-                )
+-                .await
+-            }?;
+-            Ok(SearchClient::new(transport, endpoint, api_auth))
+-        })
+-        .await
+-        .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?;
++                .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?,
++            )
++        };
+         let request = SearchRequest {
+             id: self.session_id.clone(),
+             model: call.model.clone(),
+@@ -180,7 +195,15 @@ impl WebSearchTool {
+                 }),
+             ))
+             .await;
+-        let (output, results) = match client.search(&request, extra_headers).await {
++        let searched = match (&local_command, &client) {
++            (Some(command), _) => run_local_search(command, &request).await,
++            (None, Some(client)) => client
++                .search(&request, extra_headers)
++                .await
++                .map_err(|err| err.to_string()),
++            (None, None) => Err("web.run has no search backend".to_string()),
++        };
++        let (output, results) = match searched {
+             Ok(response) => (Ok(response.output), response.results),
+             Err(err) => (Err(search_error_message(err)), None),
+         };
+@@ -225,6 +248,51 @@ impl WebSearchTool {
+     }
+ }
+ 
++async fn run_local_search(
++    command: &OsStr,
++    request: &SearchRequest,
++) -> Result<SearchResponse, String> {
++    use tokio::io::AsyncWriteExt;
++
++    let name = command.to_string_lossy();
++    let body = serde_json::to_vec(request).map_err(|err| format!("web.run request: {err}"))?;
++    let mut child = tokio::process::Command::new(command)
++        .stdin(Stdio::piped())
++        .stdout(Stdio::piped())
++        .stderr(Stdio::piped())
++        .kill_on_drop(true)
++        .spawn()
++        .map_err(|err| format!("{name}: {err}"))?;
++    let mut stdin = child
++        .stdin
++        .take()
++        .ok_or_else(|| format!("{name}: no stdin"))?;
++    stdin
++        .write_all(&body)
++        .await
++        .map_err(|err| format!("{name}: {err}"))?;
++    drop(stdin);
++    let output = tokio::time::timeout(WEB_RUN_COMMAND_TIMEOUT, child.wait_with_output())
++        .await
++        .map_err(|_| {
++            format!(
++                "{name}: no answer within {}s",
++                WEB_RUN_COMMAND_TIMEOUT.as_secs()
++            )
++        })?
++        .map_err(|err| format!("{name}: {err}"))?;
++    if !output.status.success() {
++        let stderr = String::from_utf8_lossy(&output.stderr);
++        let reason = stderr.trim();
++        return Err(if reason.is_empty() {
++            format!("{name}: {}", output.status)
++        } else {
++            reason.to_string()
++        });
++    }
++    serde_json::from_slice(&output.stdout).map_err(|err| format!("{name}: invalid response: {err}"))
++}
++
+ fn search_error_message(error: impl std::fmt::Display) -> String {
+     let mut message = error.to_string();
+     if message.len() > MAX_SEARCH_ERROR_BYTES {
