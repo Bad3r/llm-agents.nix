@@ -1,0 +1,80 @@
+--- a/tui/src/style.rs
++++ b/tui/src/style.rs
+@@ -79,6 +79,21 @@
+ // Decorative table rules should remain visible without competing with cell content.
+ const TABLE_SEPARATOR_FG_ALPHA: f32 = 0.20;
+ 
++pub(crate) fn composer_style() -> Style {
++    match default_bg() {
++        Some(bg) => Style::default().bg(best_color(composer_bg_rgb(bg))),
++        None => Style::default(),
++    }
++}
++
++pub(crate) fn composer_bg_rgb(terminal_bg: (u8, u8, u8)) -> (u8, u8, u8) {
++    if is_light(terminal_bg) {
++        user_message_bg_rgb(terminal_bg)
++    } else {
++        (0x20, 0x21, 0x22)
++    }
++}
++
+ pub fn user_message_style() -> Style {
+     user_message_style_for(default_bg())
+ }
+@@ -298,6 +313,13 @@
+ mod tests {
+     use super::*;
+     use pretty_assertions::assert_eq;
++
++    #[test]
++    fn composer_fill_preserves_other_surfaces() {
++        assert_eq!(composer_bg_rgb((0x12, 0x13, 0x14)), (0x20, 0x21, 0x22));
++        assert_eq!(user_message_bg_rgb((0x12, 0x13, 0x14)), (0x2e, 0x2f, 0x30));
++        assert_eq!(composer_bg_rgb((255, 255, 255)), (244, 244, 244));
++    }
+ 
+     #[test]
+     fn status_colors_preserve_light_terminal_themes() {
+--- a/tui/src/bottom_pane/chat_composer.rs
++++ b/tui/src/bottom_pane/chat_composer.rs
+@@ -388,7 +388,7 @@
+ use crate::render::RectExt;
+ use crate::render::renderable::Renderable;
+ use crate::slash_command::SlashCommand;
+-use crate::style::user_message_style;
++use crate::style::composer_style;
+ use crate::ui_consts::FOOTER_INDENT_COLS;
+ use codex_protocol::ThreadId;
+ use codex_protocol::user_input::ByteRange;
+@@ -4932,7 +4932,7 @@
+             selection.register(status.intersection(buf.area), changed);
+             selection.register(footer_rect.intersection(buf.area), changed);
+         }
+-        let style = user_message_style();
++        let style = composer_style();
+         Block::default().style(style).render(composer_rect, buf);
+         if let Some(previews) = options.image_previews {
+             previews.render(
+--- a/tui/src/bottom_pane/chat_composer/inline_input.rs
++++ b/tui/src/bottom_pane/chat_composer/inline_input.rs
+@@ -158,7 +158,7 @@
+         }
+         ratatui::widgets::Clear.render(area, buf);
+         Block::default()
+-            .style(Style::reset().patch(user_message_style()))
++            .style(Style::reset().patch(composer_style()))
+             .render(area, buf);
+         let mut area = area;
+         if self.footer.flash_visible()
+--- a/tui/src/transcript_image/composer.rs
++++ b/tui/src/transcript_image/composer.rs
+@@ -46,7 +46,7 @@
+         let cell_size = terminal_cell_size()
+             .or_else(|| (protocol != ImageProtocol::Sixel).then_some((8, 16)))?;
+         let background = crate::terminal_palette::default_bg()
+-            .map(crate::style::user_message_bg_rgb)
++            .map(crate::style::composer_bg_rgb)
+             .unwrap_or((48, 48, 48));
+         if previous.as_ref().is_some_and(|old| {
+             (old.protocol, old.cell_size, old.background) == (protocol, cell_size, background)
