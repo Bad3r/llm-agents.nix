@@ -1,0 +1,445 @@
+--- a/tui/src/style.rs
++++ b/tui/src/style.rs
+@@ -39,6 +39,22 @@
+         StdoutColorLevel::Ansi256 => best_color(rgb),
+         StdoutColorLevel::TrueColor | StdoutColorLevel::Unknown => rgb_color(rgb),
+     };
++    let scope = if unread {
++        "codex.accent"
++    } else {
++        "codex.ui.muted"
++    };
++    let color = ui_style(scope)
++        .and_then(|style| style.fg)
++        .map(|color| {
++            let background = if row.add_modifier.contains(Modifier::REVERSED) {
++                row.fg
++            } else {
++                row.bg
++            };
++            readable_color_on(color, background)
++        })
++        .unwrap_or(color);
+     // In reverse video the terminal paints glyphs with the background color.
+     let style = if row.add_modifier.contains(Modifier::REVERSED) {
+         row.bg(color)
+@@ -57,7 +73,15 @@
+ 
+ /// Semantic status colors that preserve the terminal's configured palette.
+ pub(crate) fn status_style(tone: StatusTone) -> Style {
+-    status_style_for(tone, default_bg(), effective_stdout_color_level())
++    let scope = match tone {
++        StatusTone::Success => "codex.ui.success",
++        StatusTone::Attention => "codex.ui.warning",
++        StatusTone::Failure => "codex.ui.error",
++    };
++    themed_style(
++        scope,
++        status_style_for(tone, default_bg(), effective_stdout_color_level()),
++    )
+ }
+ 
+ fn status_style_for(
+@@ -79,6 +103,42 @@
+ // Decorative table rules should remain visible without competing with cell content.
+ const TABLE_SEPARATOR_FG_ALPHA: f32 = 0.20;
+ 
++/// Optional semantic UI scopes share the active syntax theme and its live preview.
++pub(crate) fn ui_style(scope: &str) -> Option<Style> {
++    if !matches!(
++        effective_stdout_color_level(),
++        StdoutColorLevel::TrueColor | StdoutColorLevel::Ansi256
++    ) {
++        return None;
++    }
++    let quantize = |color| match color {
++        Color::Rgb(r, g, b) => best_color((r, g, b)),
++        color => color,
++    };
++    let mut style = crate::render::highlight::ui_style_for_scope(scope)?;
++    style.fg = style.fg.map(quantize);
++    style.bg = style.bg.map(quantize);
++    Some(style)
++}
++
++fn themed_style(scope: &str, fallback: Style) -> Style {
++    ui_style(scope).map_or(fallback, |style| fallback.patch(style))
++}
++
++pub(crate) fn composer_style() -> Style {
++    themed_style("codex.ui.prompt", user_message_style())
++}
++
++pub(crate) fn composer_bg_rgb(terminal_bg: Option<(u8, u8, u8)>) -> (u8, u8, u8) {
++    let surface = ui_style("codex.ui.prompt")
++        .and_then(|style| style.bg)
++        .or_else(|| ui_style("codex.ui.surface").and_then(|style| style.bg));
++    surface
++        .and_then(|color| background_rgb(Some(color)))
++        .or_else(|| terminal_bg.map(user_message_bg_rgb))
++        .unwrap_or((48, 48, 48))
++}
++
+ pub fn user_message_style() -> Style {
+     user_message_style_for(default_bg())
+ }
+@@ -88,15 +148,17 @@
+ /// Some terminals do not answer the optional default-color probe. Keep submitted prompts shaded
+ /// with an ANSI-safe fallback instead of dropping the surface.
+ pub(crate) fn history_prompt_style() -> Style {
+-    let Some(background) = default_bg() else {
+-        return Style::default().bg(Color::DarkGray);
+-    };
+-    let (foreground, alpha) = if is_light(background) {
+-        ((0, 0, 0), 0.02)
+-    } else {
+-        ((255, 255, 255), 0.16)
+-    };
+-    Style::default().bg(best_color(blend(foreground, background, alpha)))
++    let fallback = if let Some(background) = default_bg() {
++        let (foreground, alpha) = if is_light(background) {
++            ((0, 0, 0), 0.02)
++        } else {
++            ((255, 255, 255), 0.16)
++        };
++        Style::default().bg(best_color(blend(foreground, background, alpha)))
++    } else {
++        Style::default().bg(Color::DarkGray)
++    };
++    themed_style("codex.ui.history", fallback)
+ }
+ 
+ pub fn proposed_plan_style() -> Style {
+@@ -105,7 +167,10 @@
+ 
+ /// Returns a low-contrast rule style for separators within markdown tables.
+ pub(crate) fn table_separator_style() -> Style {
+-    table_separator_style_for(default_fg(), default_bg(), stdout_color_level())
++    themed_style(
++        "codex.ui.border",
++        table_separator_style_for(default_fg(), default_bg(), stdout_color_level()),
++    )
+ }
+ 
+ /// Returns the shared accent style for active or selected TUI controls.
+@@ -171,14 +236,19 @@
+         .map_or(Color::Reset, |(fg, bg)| {
+             rgb_color(blend(fg, bg, /*alpha*/ 0.6))
+         });
+-    Style::default()
+-        .fg(readable_color_on(preferred, /*background*/ None))
+-        .not_dim()
+-        .not_bold()
++    themed_style(
++        "codex.ui.muted",
++        Style::default().fg(readable_color_on(preferred, /*background*/ None)),
++    )
++    .not_dim()
++    .not_bold()
+ }
+ 
+ pub(crate) fn selection_style() -> Style {
+-    contrast::selection_style(default_bg(), effective_stdout_color_level())
++    let fallback = contrast::selection_style(default_bg(), effective_stdout_color_level());
++    ui_style("codex.ui.selection").map_or(fallback, |style| {
++        fallback.patch(style).bold().not_dim().not_reversed()
++    })
+ }
+ 
+ /// Resolve emphasis on the shaded prompt surface, including its quantized background.
+@@ -212,7 +282,10 @@
+ 
+ /// Muted amber keeps the passive warning count visible without looking like an error.
+ pub(crate) fn warning_notice_style() -> Style {
+-    warning_notice_style_for(default_bg(), effective_stdout_color_level())
++    themed_style(
++        "codex.ui.warning",
++        warning_notice_style_for(default_bg(), effective_stdout_color_level()),
++    )
+ }
+ 
+ fn warning_notice_style_for(background: Option<(u8, u8, u8)>, level: StdoutColorLevel) -> Style {
+@@ -232,17 +305,19 @@
+ 
+ /// Returns the style for a user-authored message using the provided terminal background.
+ pub fn user_message_style_for(terminal_bg: Option<(u8, u8, u8)>) -> Style {
+-    match terminal_bg {
++    let fallback = match terminal_bg {
+         Some(bg) => Style::default().bg(user_message_bg(bg)),
+         None => Style::default(),
+-    }
++    };
++    themed_style("codex.ui.surface", fallback)
+ }
+ 
+ pub fn proposed_plan_style_for(terminal_bg: Option<(u8, u8, u8)>) -> Style {
+-    match terminal_bg {
++    let fallback = match terminal_bg {
+         Some(bg) => Style::default().bg(proposed_plan_bg(bg)),
+         None => Style::default(),
+-    }
++    };
++    themed_style("codex.ui.plan", fallback)
+ }
+ 
+ /// Returns the shared accent style for the provided terminal background.
+@@ -251,11 +326,15 @@
+ }
+ 
+ fn accent_color_for(terminal_bg: Option<(u8, u8, u8)>) -> Color {
+-    let preferred = if terminal_bg.is_some_and(is_light) {
+-        LIGHT_BG_ACCENT_RGB
+-    } else {
+-        UI_ACCENT
+-    };
++    let preferred = ui_style("codex.accent")
++        .and_then(|style| background_rgb(style.fg))
++        .unwrap_or_else(|| {
++            if terminal_bg.is_some_and(is_light) {
++                LIGHT_BG_ACCENT_RGB
++            } else {
++                UI_ACCENT
++            }
++        });
+     contrast::foreground(preferred, terminal_bg, effective_stdout_color_level())
+ }
+ 
+--- a/tui/src/render/highlight.rs
++++ b/tui/src/render/highlight.rs
+@@ -355,8 +355,41 @@
+     })
+ }
+ 
+-/// Query the active syntax theme for the first foreground style provided by the
+-/// supplied TextMate scopes.
++thread_local! {
++    static UI_STYLES: std::cell::RefCell<(u64, std::collections::HashMap<String, Option<Style>>)> = std::cell::RefCell::default();
++}
++
++/// Semantic UI colors are optional and follow syntax-theme live previews.
++pub(crate) fn ui_style_for_scope(scope_name: &str) -> Option<Style> {
++    UI_STYLES.with_borrow_mut(|cached| {
++        let revision = syntax_theme_revision();
++        if cached.0 != revision {
++            cached.0 = revision;
++            cached.1.clear();
++        }
++        *cached
++            .1
++            .entry(scope_name.to_owned())
++            .or_insert_with(|| ui_style_for_scope_with_theme(&current_syntax_theme(), scope_name))
++    })
++}
++
++fn ui_style_for_scope_with_theme(theme: &Theme, scope_name: &str) -> Option<Style> {
++    let scope = Scope::new(scope_name).ok()?;
++    let highlighter = Highlighter::new(theme);
++    let settings = highlighter.style_mod_for_stack(&[scope]);
++    let foreground = settings.foreground.and_then(convert_syntect_color);
++    let background = settings.background.and_then(convert_syntect_color);
++    if foreground.is_none() && background.is_none() {
++        return None;
++    }
++    let mut style = Style::default();
++    style.fg = foreground;
++    style.bg = background;
++    Some(style)
++}
++
++/// Query the first explicitly scoped foreground from the active syntax theme.
+ pub(crate) fn foreground_style_for_scopes(scope_names: &[&str]) -> Option<Style> {
+     let theme = current_syntax_theme();
+     foreground_style_for_scopes_with_theme(&theme, scope_names)
+@@ -1379,6 +1412,46 @@
+             style.fg,
+             Some(crate::terminal_palette::rgb_color((10, 20, 30)))
+         );
++    }
++
++    #[test]
++    fn semantic_ui_background_does_not_replace_inherited_foreground() {
++        let mut item = theme_item_with_foreground("codex.ui.prompt", (10, 20, 30));
++        item.style.background = item.style.foreground.take();
++        let theme = Theme {
++            scopes: vec![item],
++            ..Theme::default()
++        };
++        let style = ui_style_for_scope_with_theme(&theme, "codex.ui.prompt").unwrap();
++        assert_eq!(style.fg, None);
++        assert_eq!(
++            style.bg,
++            Some(crate::terminal_palette::rgb_color((10, 20, 30)))
++        );
++    }
++
++    #[test]
++    fn semantic_ui_scopes_preserve_partial_styles_and_follow_theme_changes() {
++        let original = current_syntax_theme();
++        assert_eq!(
++            ui_style_for_scope_with_theme(&Theme::default(), "codex.ui.prompt"),
++            None
++        );
++        let theme = Theme {
++            scopes: vec![theme_item_with_foreground("codex.ui.prompt", (10, 20, 30))],
++            ..Theme::default()
++        };
++        let style = ui_style_for_scope_with_theme(&theme, "codex.ui.prompt").unwrap();
++        assert_eq!(
++            style.fg,
++            Some(crate::terminal_palette::rgb_color((10, 20, 30)))
++        );
++        assert_eq!(style.bg, None);
++        set_syntax_theme(theme);
++        assert_eq!(ui_style_for_scope("codex.ui.prompt"), Some(style));
++        set_syntax_theme(Theme::default());
++        assert_eq!(ui_style_for_scope("codex.ui.prompt"), None);
++        set_syntax_theme(original);
+     }
+ 
+     #[test]
+--- a/tui/src/bottom_pane/chat_composer.rs
++++ b/tui/src/bottom_pane/chat_composer.rs
+@@ -388,7 +388,7 @@
+ use crate::render::RectExt;
+ use crate::render::renderable::Renderable;
+ use crate::slash_command::SlashCommand;
+-use crate::style::user_message_style;
++use crate::style::composer_style;
+ use crate::ui_consts::FOOTER_INDENT_COLS;
+ use codex_protocol::ThreadId;
+ use codex_protocol::user_input::ByteRange;
+@@ -4932,7 +4932,7 @@
+             selection.register(status.intersection(buf.area), changed);
+             selection.register(footer_rect.intersection(buf.area), changed);
+         }
+-        let style = user_message_style();
++        let style = composer_style();
+         Block::default().style(style).render(composer_rect, buf);
+         if let Some(previews) = options.image_previews {
+             previews.render(
+--- a/tui/src/bottom_pane/chat_composer/inline_input.rs
++++ b/tui/src/bottom_pane/chat_composer/inline_input.rs
+@@ -158,7 +158,7 @@
+         }
+         ratatui::widgets::Clear.render(area, buf);
+         Block::default()
+-            .style(Style::reset().patch(user_message_style()))
++            .style(Style::reset().patch(composer_style()))
+             .render(area, buf);
+         let mut area = area;
+         if self.footer.flash_visible()
+--- a/tui/src/transcript_image/composer.rs
++++ b/tui/src/transcript_image/composer.rs
+@@ -45,9 +45,7 @@
+         // Kitty can scale a nominal raster into its cell placement. Sixel needs physical pixels.
+         let cell_size = terminal_cell_size()
+             .or_else(|| (protocol != ImageProtocol::Sixel).then_some((8, 16)))?;
+-        let background = crate::terminal_palette::default_bg()
+-            .map(crate::style::user_message_bg_rgb)
+-            .unwrap_or((48, 48, 48));
++        let background = crate::style::composer_bg_rgb(crate::terminal_palette::default_bg());
+         if previous.as_ref().is_some_and(|old| {
+             (old.protocol, old.cell_size, old.background) == (protocol, cell_size, background)
+         }) {
+@@ -198,3 +196,73 @@
+     }
+     (visible, count - visible)
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::render::highlight::{current_syntax_theme, set_syntax_theme};
++    use crate::terminal_palette::with_test_default_colors;
++    use syntect::highlighting::{Color, StyleModifier, Theme, ThemeItem};
++
++    #[test]
++    fn semantic_ui_image_background_resolves_without_terminal_probe() {
++        let original = current_syntax_theme();
++        let directory = tempfile::tempdir().unwrap();
++        let path = directory.path().join("transparent.png");
++        RgbaImage::from_pixel(1, 1, Rgba([0, 0, 0, 0]))
++            .save(&path)
++            .unwrap();
++        for scope in ["codex.ui.prompt", "codex.ui.surface"] {
++            set_syntax_theme(Theme {
++                scopes: vec![ThemeItem {
++                    scope: scope.parse().unwrap(),
++                    style: StyleModifier {
++                        background: Some(Color {
++                            r: 36,
++                            g: 47,
++                            b: 58,
++                            a: 255,
++                        }),
++                        ..StyleModifier::default()
++                    },
++                }],
++                ..Theme::default()
++            });
++            with_test_default_colors(None, || {
++                assert_eq!(crate::terminal_palette::default_bg(), None);
++                let images = ComposerImages::for_terminal(ImageProtocol::Kitty, None).unwrap();
++                assert_eq!(images.background, (36, 47, 58));
++                assert_eq!(
++                    crate::style::composer_style().bg,
++                    Some(crate::terminal_palette::rgb_color((36, 47, 58)))
++                );
++                let tile = images.load_tile(&path).unwrap();
++                assert_eq!(tile.pixels.get_pixel(1, 1).0, [36, 47, 58, 255]);
++            });
++        }
++        set_syntax_theme(Theme::default());
++        with_test_default_colors(None, || {
++            assert_eq!(
++                ComposerImages::for_terminal(ImageProtocol::Kitty, None)
++                    .unwrap()
++                    .background,
++                (48, 48, 48)
++            );
++        });
++        with_test_default_colors(
++            crate::terminal_probe::DefaultColors {
++                fg: (255, 255, 255),
++                bg: (18, 19, 20),
++            },
++            || {
++                assert_eq!(
++                    ComposerImages::for_terminal(ImageProtocol::Kitty, None)
++                        .unwrap()
++                        .background,
++                    (46, 47, 48)
++                );
++            },
++        );
++        set_syntax_theme(original);
++    }
++}
+--- a/tui/src/terminal_program_status.rs
++++ b/tui/src/terminal_program_status.rs
+@@ -114,12 +114,24 @@
+         }
+     }
+ 
+-    fn iterm_indicator(self) -> &'static str {
++    fn iterm_indicator(self) -> String {
++        let scope = match self {
++            Self::Idle | Self::Done => "codex.ui.success",
++            Self::Error => "codex.ui.error",
++            Self::Working => "codex.ui.warning",
++            Self::Blocked(_) => "codex.accent",
++        };
++        if let Some(ratatui::style::Color::Rgb(r, g, b)) =
++            crate::style::ui_style(scope).and_then(|style| style.fg)
++        {
++            return format!("#{r:02x}{g:02x}{b:02x}");
++        }
+         match self {
+             Self::Idle | Self::Done | Self::Error => "#00d75f",
+             Self::Working => "#ff9500",
+             Self::Blocked(_) => "#5f87ff",
+         }
++        .to_owned()
+     }
+ 
+     fn protocol_state(self) -> &'static str {
