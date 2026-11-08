@@ -5,6 +5,7 @@
   fetchurl,
   bubblewrap,
   coreutils,
+  desktop-file-utils,
   dpkg,
   formatelf,
   makeWrapper,
@@ -75,6 +76,7 @@ stdenv.mkDerivation {
     lib.optionals isLinux [
       python3
       formatelf
+      desktop-file-utils
       dpkg
       makeWrapper
       wrapGAppsHook3
@@ -162,6 +164,16 @@ stdenv.mkDerivation {
         cp -r usr/lib/chatgpt "$out/lib/"
         cp -r usr/share/applications usr/share/pixmaps "$out/share/"
         ln -s ../lib/chatgpt/codex-launcher "$out/bin/chatgpt"
+
+        # Lets launchers find the app by its Codex name.
+        if grep -q '^Keywords' "$out/share/applications/chatgpt.desktop"; then
+          echo "chatgpt.desktop now ships Keywords; merge them into the ones set here" >&2
+          exit 1
+        fi
+        desktop-file-edit \
+          --set-key=Keywords \
+          --set-value='Codex;OpenAI;GPT;Chatbot;' \
+          "$out/share/applications/chatgpt.desktop"
 
         # Plasma 5 is gone from nixpkgs.
         rm "$out/lib/chatgpt/libqt5_shim.so"
