@@ -3,6 +3,7 @@
   stdenv,
   flake,
   bash,
+  python3,
   buildGo127Module,
   fetchFromGitHub,
   versionCheckHook,
@@ -16,16 +17,16 @@
 
 buildGo127Module rec {
   pname = "agent-deck";
-  version = "1.16.36";
+  version = "1.16.38";
 
   src = fetchFromGitHub {
     owner = "asheshgoplani";
     repo = "agent-deck";
     tag = "v${version}";
-    hash = "sha256-D6PF5KWhiTwI+1M4XiT6KFv0+uO2PrdSWm9cjdSQofg=";
+    hash = "sha256-fvJaRcWtaFKdFbyPJOYKU95gerpeWL819Ol0e8Y7c8k=";
   };
 
-  vendorHash = "sha256-yNCm//ZOTAIxUUm4yEPobbNw0dD01huAth6B9xvBaiE=";
+  vendorHash = "sha256-8d56v5csbdGaQku2LR7Twy2fKoXBVPKN9KPHdsithjg=";
 
   subPackages = [ "cmd/agent-deck" ];
 
@@ -85,6 +86,13 @@ buildGo127Module rec {
   ];
 
   preCheck = ''
+    # In preCheck, not postPatch: the installed binary must keep the provider's #!/usr/bin/env.
+    patchShebangs cmd/agent-deck/testdata/fake-az-connect examples/providers/azure-vm/provider
+    # Not on PATH: with python3 available, tmux-driven tests stop skipping and fail.
+    substituteInPlace examples/providers/azure-vm/provider \
+      --replace-fail 'python3 -I -c' '${lib.getExe python3} -I -c' \
+      --replace-fail 'need python3' 'need ${lib.getExe python3}'
+
     # Tests refuse paths under the passwd home (/build); keep TMPDIR dot-free
     # (breaks TestSessionContextJSONGolden) and symlink-resolved for darwin.
     tmp=$(cd /tmp && pwd -P)
