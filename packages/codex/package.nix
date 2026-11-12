@@ -6,6 +6,9 @@
   rustPlatform,
   pkg-config,
   lld,
+  cmake,
+  alsa-lib,
+  gst_all_1,
   aws-lc,
   openssl,
   oniguruma,
@@ -45,7 +48,15 @@
   doInstallCheck ? true,
   librusty_v8 ? mkRustyV8Archive versionData.librusty_v8,
   installShellCompletions ? stdenv.buildPlatform.canExecute stdenv.hostPlatform,
+  # JavaScript code mode, run by codex-code-mode-host on a prebuilt V8.
+  withCodeMode ? true,
+  # Realtime voice through codex-voice-host and GStreamer.
+  withVoice ? false,
 }:
+
+assert lib.assertMsg (
+  withVoice -> stdenv.hostPlatform.isLinux
+) "codex: withVoice supports only Linux";
 
 let
   actualSrc =
@@ -69,6 +80,17 @@ let
     pathDir = "codex-path";
   };
 
+  # Plugins codex-voice-host loads by path (voice-host/src/runtime.rs).
+  voicePlugins = {
+    coreelements = gst_all_1.gstreamer.out;
+    app = gst_all_1.gst-plugins-base;
+    audioconvert = gst_all_1.gst-plugins-base;
+    audioresample = gst_all_1.gst-plugins-base;
+    opus = gst_all_1.gst-plugins-base;
+    rtp = gst_all_1.gst-plugins-good;
+    rtpmanager = gst_all_1.gst-plugins-good;
+  };
+
 in
 rustPlatform.buildRustPackage (
   {
@@ -79,8 +101,14 @@ rustPlatform.buildRustPackage (
     cargoBuildFlags = [
       "--package"
       "codex-cli"
+    ]
+    ++ lib.optionals withCodeMode [
       "--package"
       "codex-code-mode-host"
+    ]
+    ++ lib.optionals withVoice [
+      "--package"
+      "codex-voice-host"
     ];
 
     nativeBuildInputs = [
@@ -88,6 +116,8 @@ rustPlatform.buildRustPackage (
       pkg-config
       rust-bindgen
     ]
+    # opusic-sys builds its bundled libopus with cmake.
+    ++ lib.optionals withVoice [ cmake ]
     ++ lib.optionals stdenv.hostPlatform.isDarwin [
       # Unable to find libclang: "couldn't find any valid shared libraries matching: ['libclang.dylib']
       rustPlatform.bindgenHook
@@ -100,16 +130,25 @@ rustPlatform.buildRustPackage (
       sqlite
       zstd
     ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ libcap ];
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ libcap ]
+    ++ lib.optionals withVoice [
+      alsa-lib
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+    ];
+
+    dontUseCmakeConfigure = true;
 
     env = {
-      RUSTY_V8_ARCHIVE = librusty_v8;
       AWS_LC_SYS_USE_SYSTEM = "1";
       LIBSQLITE3_SYS_USE_PKG_CONFIG = "1";
       RUSTONIG_SYSTEM_LIBONIG = "1";
       ZSTD_SYS_USE_PKG_CONFIG = "1";
     }
-    // lib.optionalAttrs (librusty_v8 ? srcBinding) {
+    // lib.optionalAttrs withCodeMode {
+      RUSTY_V8_ARCHIVE = librusty_v8;
+    }
+    // lib.optionalAttrs (withCodeMode && librusty_v8 ? srcBinding) {
       # rusty_v8 >= 150 include!s this instead of running bindgen.
       RUSTY_V8_SRC_BINDING_PATH = librusty_v8.srcBinding;
     }
@@ -127,7 +166,9 @@ rustPlatform.buildRustPackage (
       ./rules-symlink.patch
       ./ui-theme.patch
       ./web-run-command.patch
-    ];
+    ]
+    # The voice runtime only accepts physical files; resolve store symlinks.
+    ++ lib.optional withVoice ./voice-runtime-symlinks.patch;
 
     # webpki-roots 1.0.10 drops the emSign roots and rustls-webpki 0.103.16
     # rejects the revoked eMudhra intermediates. Upstream main has both;
@@ -156,8 +197,30 @@ rustPlatform.buildRustPackage (
     # around its executable (#9887).
     postFixup = ''
       mkdir -p $out/libexec/codex/{bin,codex-path,codex-resources}
-      mv $out/bin/codex $out/bin/codex-code-mode-host $out/bin/logs_client \
-        $out/libexec/codex/bin/
+      mv $out/bin/codex $out/bin/logs_client $out/libexec/codex/bin/
+      ${
+        if withCodeMode then
+          ''
+            mv $out/bin/codex-code-mode-host $out/libexec/codex/bin/
+            ln -s ../libexec/codex/bin/codex-code-mode-host $out/bin/codex-code-mode-host
+          ''
+        else
+          ''
+            # The daemon refuses a package without this file.
+            printf '#!/bin/sh\necho "codex was built without code mode" >&2\nexit 1\n' \
+              > $out/libexec/codex/bin/codex-code-mode-host
+            chmod +x $out/libexec/codex/bin/codex-code-mode-host
+          ''
+      }
+      ${lib.optionalString withVoice ''
+        voice=$out/libexec/codex/codex-resources/voice
+        mkdir -p $voice/bin $voice/lib/gstreamer-1.0
+        mv $out/bin/codex-voice-host $voice/bin/
+        ln -s ${lib.getLib gst_all_1.gstreamer}/lib/libgstreamer-1.0.so.0 $voice/lib/
+        ${lib.concatMapAttrsStringSep "" (name: pkg: ''
+          ln -s ${lib.getLib pkg}/lib/gstreamer-1.0/libgst${name}.so $voice/lib/gstreamer-1.0/
+        '') voicePlugins}
+      ''}
       ln -s ${lib.getExe ripgrep} $out/libexec/codex/codex-path/rg
       printf '%s\n' ${lib.escapeShellArg packageManifest} \
         > $out/libexec/codex/codex-package.json
@@ -166,7 +229,6 @@ rustPlatform.buildRustPackage (
         ln -s ${lib.getExe bubblewrap} $out/libexec/codex/codex-resources/bwrap
       ''}
       ln -s ../libexec/codex/bin/codex $out/bin/codex
-      ln -s ../libexec/codex/bin/codex-code-mode-host $out/bin/codex-code-mode-host
       ln -s ../libexec/codex/bin/logs_client $out/bin/logs_client
     '';
 
@@ -192,10 +254,10 @@ rustPlatform.buildRustPackage (
       description = "OpenAI Codex CLI - a coding agent that runs locally on your computer";
       homepage = "https://github.com/openai/codex";
       changelog = "https://github.com/openai/codex/releases/tag/rust-v${version}";
-      sourceProvenance = with lib.sourceTypes; [
-        fromSource
-        binaryNativeCode # librusty_v8
-      ];
+      sourceProvenance = [
+        lib.sourceTypes.fromSource
+      ]
+      ++ lib.optional withCodeMode lib.sourceTypes.binaryNativeCode; # librusty_v8
       license = lib.licenses.asl20;
       mainProgram = "codex";
       platforms = lib.platforms.unix;

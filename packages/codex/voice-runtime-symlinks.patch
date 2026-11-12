@@ -1,0 +1,13 @@
+--- a/voice-host/src/runtime.rs
++++ b/voice-host/src/runtime.rs
+@@ -126,8 +126,8 @@
+ }
+ 
+ fn private_file(root: &Path, relative: &str) -> io::Result<PathBuf> {
+-    let path = root.join(relative);
+-    if path.canonicalize()? != path || !path.is_file() {
++    let path = root.join(relative).canonicalize()?;
++    if !path.is_file() {
+         return Err(runtime_error());
+     }
+     Ok(path)
