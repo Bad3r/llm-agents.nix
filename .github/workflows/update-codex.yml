@@ -53,21 +53,35 @@ jobs:
           sudo swapon /swap-codex
       - name: Build codex
         id: build
-        # The variant Bad3r/nixos installs, which evaluates this flake on its
-        # own nixpkgs pin and so reads the same store path from the cache.
-        # The derivation also changes when flake.lock moves, so this runs
+        # The variant Bad3r/nixos installs. That flake's llm-agents input
+        # follows its nixpkgs, the branch named here, so the build swaps this
+        # flake's pin for the head of that branch and yields the store path a
+        # freshly updated Bad3r/nixos lock reads from the cache. The path
+        # moves with that branch as well as with fork.json, so this runs
         # whether or not fork.json changed.
         env:
-          CODEX: >-
-            ((builtins.getFlake "path:${{ github.workspace }}").packages.x86_64-linux.codex.override { withVoice = true; })
+          NIXPKGS: Bad3r/nixpkgs
+          BRANCH: nixpkgs-unstable
+          VOICE: >-
+            p: let voice = p.override { withVoice = true; }; in
+            "${voice.drvPath} ${voice.outPath}"
         run: |
-          out=$(nix eval --raw --impure --expr "$CODEX.outPath")
+          rev=$(git ls-remote "https://github.com/$NIXPKGS" "refs/heads/$BRANCH")
+          rev=${rev%%[[:space:]]*}
+          if [[ -z $rev ]]; then
+            echo "::error::$NIXPKGS has no branch $BRANCH"
+            exit 1
+          fi
+          echo "nixpkgs: github:$NIXPKGS/$rev"
+          paths=$(nix eval --raw --override-input nixpkgs "github:$NIXPKGS/$rev" \
+            "path:$GITHUB_WORKSPACE#codex" --apply "$VOICE")
+          drv=${paths% *} out=${paths#* }
           echo "out=$out" >>"$GITHUB_OUTPUT"
           if nix path-info --store https://bad3r-nixos.cachix.org "$out" >/dev/null 2>&1; then
             echo "$out is in the cache"
             echo "built=false" >>"$GITHUB_OUTPUT"
           else
-            nix build --no-link --print-build-logs --impure --expr "$CODEX"
+            nix build --no-link --print-build-logs "$drv^out"
             echo "built=true" >>"$GITHUB_OUTPUT"
           fi
       - name: Push codex to Cachix
