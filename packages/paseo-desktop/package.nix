@@ -79,6 +79,9 @@ buildNpmPackage (finalAttrs: {
   buildPhase = ''
     runHook preBuild
 
+    # --ignore-scripts also skips the root postinstall that applies patches/
+    npm run postinstall
+
     # Native deps (terminal emulation; libuv-linked on Linux).
     # node-gyp-build skips compilation when a matching prebuilt binary exists,
     # so remove the bundled prebuilds first to force a real build.
