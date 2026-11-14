@@ -3,8 +3,10 @@
 
 """Update script for codex package.
 
-This script updates both the codex version and the librusty_v8 hashes.
-The v8 version is extracted from the Cargo.lock file of the codex repository.
+The package builds the releases of Bad3r/codex, which are upstream releases
+plus a patch stack, tagged patched-v<upstream version>-r<revision>. This
+script updates fork.json to the newest one, including the librusty_v8 hashes.
+The v8 version is extracted from the Cargo.lock file of the release.
 """
 
 import re
@@ -26,7 +28,9 @@ from updater import (
 )
 from updater.hash import DUMMY_SHA256_HASH
 
-HASHES_FILE = Path(__file__).parent / "hashes.json"
+HASHES_FILE = Path(__file__).parent / "fork.json"
+
+FORK_TAG = r"patched-v(\d+\.\d+\.\d+)-r(\d+)"
 
 RUSTY_V8_PLATFORMS = {
     "x86_64-linux": "x86_64-unknown-linux-gnu",
@@ -35,26 +39,31 @@ RUSTY_V8_PLATFORMS = {
 }
 
 
-def fetch_version() -> str:
-    """Fetch latest codex version from GitHub releases."""
-    tag = fetch_github_latest_release("openai", "codex")
-    match = re.match(r"^rust-v(.+)$", tag)
+def fetch_release() -> tuple[str, int]:
+    """Fetch the upstream version and revision of the newest fork release."""
+    tag = fetch_github_latest_release("Bad3r", "codex", tag_pattern=FORK_TAG)
+    match = re.fullmatch(FORK_TAG, tag)
     if not match:
-        msg = f"Unexpected tag format: {tag!r}, expected 'rust-v<version>'"
+        msg = f"Unexpected tag format: {tag!r}, expected 'patched-v<version>-r<N>'"
         raise ValueError(msg)
-    return match.group(1)
+    return match.group(1), int(match.group(2))
 
 
-def librusty_v8_pins(
-    codex_version: str, previous: dict[str, Any] | None
-) -> dict[str, Any]:
-    """Return the librusty_v8 pin for the given codex version.
+def is_newer(current: tuple[str, int], latest: tuple[str, int]) -> bool:
+    """Order releases by upstream version, then by revision."""
+    if current[0] == latest[0]:
+        return current[1] < latest[1]
+    return should_update(current[0], latest[0])
+
+
+def librusty_v8_pins(tag: str, previous: dict[str, Any] | None) -> dict[str, Any]:
+    """Return the librusty_v8 pin for the given fork release tag.
 
     Re-uses existing hashes when the v8 version has not changed to avoid
     re-downloading four ~100MB archives on every bump.
     """
     v8_version = fetch_version_from_text(
-        f"https://raw.githubusercontent.com/openai/codex/rust-v{codex_version}/codex-rs/Cargo.lock",
+        f"https://raw.githubusercontent.com/Bad3r/codex/{tag}/codex-rs/Cargo.lock",
         r'name = "v8"\nversion = "([^"]+)"',
     )
     print(f"V8 version: {v8_version}")
@@ -90,32 +99,34 @@ def librusty_v8_pins(
 def main() -> None:
     """Update the codex package."""
     data = load_hashes(HASHES_FILE)
-    current = data["version"]
-    latest = fetch_version()
+    current = (data["version"], data["revision"])
+    latest = fetch_release()
 
-    print(f"Current: {current}, Latest: {latest}")
+    print(f"Current: {current[0]}-r{current[1]}, Latest: {latest[0]}-r{latest[1]}")
 
-    if not should_update(current, latest):
+    if not is_newer(current, latest):
         print("Already up to date")
         return
 
-    tag = f"rust-v{latest}"
-    url = f"https://github.com/openai/codex/archive/refs/tags/{tag}.tar.gz"
+    version, revision = latest
+    tag = f"patched-v{version}-r{revision}"
+    url = f"https://github.com/Bad3r/codex/archive/refs/tags/{tag}.tar.gz"
 
     print("Calculating source hash...")
     source_hash = calculate_url_hash(url, unpack=True)
 
     data = {
-        "version": latest,
+        "version": version,
+        "revision": revision,
         "hash": source_hash,
         "cargoHash": DUMMY_SHA256_HASH,
-        "librusty_v8": librusty_v8_pins(latest, data.get("librusty_v8")),
+        "librusty_v8": librusty_v8_pins(tag, data.get("librusty_v8")),
     }
     save_hashes(HASHES_FILE, data)
 
     update_dependency_hash(".#codex", "cargoHash", HASHES_FILE, data)
 
-    print(f"Updated to {latest}")
+    print(f"Updated to {version}-r{revision}")
 
 
 if __name__ == "__main__":
