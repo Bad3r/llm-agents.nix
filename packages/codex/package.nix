@@ -21,7 +21,8 @@
   versionCheckHook,
   callPackage,
   mkRustyV8Archive ? callPackage ../../lib/rusty-v8.nix { },
-  versionData ? builtins.fromJSON (builtins.readFile ./hashes.json),
+  # The Bad3r/codex release pin. hashes.json is upstream's pin and is unused.
+  versionData ? builtins.fromJSON (builtins.readFile ./fork.json),
   version ? versionData.version,
   hash ? versionData.hash,
   # Named srcOverride because a `src` argument would be autofilled by
@@ -46,15 +47,17 @@ assert lib.assertMsg (
 ) "codex: withVoice supports only Linux";
 
 let
+  # A fork release is an upstream release plus the fork's patch stack.
+  tag = "patched-v${version}-r${toString versionData.revision}";
+
   actualSrc =
     if srcOverride != null then
       srcOverride
     else
       fetchFromGitHub {
-        owner = "openai";
+        owner = "Bad3r";
         repo = "codex";
-        tag = "rust-v${version}";
-        inherit hash;
+        inherit tag hash;
       };
 
   packageManifest = builtins.toJSON {
@@ -147,12 +150,8 @@ rustPlatform.buildRustPackage (
 
     # The daemon would copy the whole package (~550 MB) into ~/.codex and let
     # upstream's updater replace it. Run it from the store instead.
-    # Upstream skips symlinked rules files, which drops Home Manager links.
     patches = [
       ./daemon-nix-store.patch
-      ./rules-symlink.patch
-      ./ui-theme.patch
-      ./web-run-command.patch
     ]
     # The voice runtime only accepts physical files; resolve store symlinks.
     ++ lib.optional withVoice ./voice-runtime-symlinks.patch;
@@ -240,7 +239,7 @@ rustPlatform.buildRustPackage (
     meta = {
       description = "OpenAI Codex CLI - a coding agent that runs locally on your computer";
       homepage = "https://github.com/openai/codex";
-      changelog = "https://github.com/openai/codex/releases/tag/rust-v${version}";
+      changelog = "https://github.com/Bad3r/codex/releases/tag/${tag}";
       sourceProvenance = [
         lib.sourceTypes.fromSource
       ]

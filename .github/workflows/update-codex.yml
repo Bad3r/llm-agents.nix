@@ -1,0 +1,99 @@
+name: Update Codex From Fork Releases
+"on":
+  schedule:
+    # Three hours after each Bad3r/codex sync, which publishes the releases.
+    - cron: "17 3-23/8 * * *"
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: update-codex
+  cancel-in-progress: false
+jobs:
+  # Runs the updater and the build without write access. A pin reaches main
+  # only after the package it selects is built and in the binary cache.
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.update.outputs.changed }}
+      fork: ${{ steps.update.outputs.fork }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Setup Nix
+        uses: NixOS/nix-installer-action@main
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.numtide.com https://bad3r-nixos.cachix.org
+            extra-trusted-public-keys = niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g= bad3r-nixos.cachix.org-1:CWwJIEV6kogZP/xZPRXdT6hkKvs84haLxYgK9oF59JE=
+      - name: Update fork.json
+        id: update
+        env:
+          # Read-only token for API rate limits.
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          nix shell --inputs-from . nixpkgs#python3 --command python3 packages/codex/update.py
+          if git diff --quiet -- packages/codex/fork.json; then
+            echo "changed=false" >>"$GITHUB_OUTPUT"
+          else
+            {
+              echo "changed=true"
+              echo "fork=$(base64 --wrap=0 packages/codex/fork.json)"
+            } >>"$GITHUB_OUTPUT"
+          fi
+      - name: Add swap
+        # Compiling codex has run a 16 GiB runner out of memory.
+        run: |
+          sudo fallocate --length 24G /swap-codex
+          sudo chmod 600 /swap-codex
+          sudo mkswap /swap-codex
+          sudo swapon /swap-codex
+      - name: Build codex
+        id: build
+        # The variant Bad3r/nixos installs, which evaluates this flake on its
+        # own nixpkgs pin and so reads the same store path from the cache.
+        # The derivation also changes when flake.lock moves, so this runs
+        # whether or not fork.json changed.
+        env:
+          CODEX: >-
+            ((builtins.getFlake "path:${{ github.workspace }}").packages.x86_64-linux.codex.override { withVoice = true; })
+        run: |
+          out=$(nix eval --raw --impure --expr "$CODEX.outPath")
+          echo "out=$out" >>"$GITHUB_OUTPUT"
+          if nix path-info --store https://bad3r-nixos.cachix.org "$out" >/dev/null 2>&1; then
+            echo "$out is in the cache"
+            echo "built=false" >>"$GITHUB_OUTPUT"
+          else
+            nix build --no-link --print-build-logs --impure --expr "$CODEX"
+            echo "built=true" >>"$GITHUB_OUTPUT"
+          fi
+      - name: Push codex to Cachix
+        if: steps.build.outputs.built == 'true'
+        env:
+          CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          OUT: ${{ steps.build.outputs.out }}
+        run: nix run --inputs-from . nixpkgs#cachix -- push bad3r-nixos "$OUT"
+  push:
+    needs: update
+    if: needs.update.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Commit fork.json
+        env:
+          FORK: ${{ needs.update.outputs.fork }}
+        run: |
+          release='"\(.version)-r\(.revision)"'
+          old=$(jq -r "$release" packages/codex/fork.json)
+          base64 --decode <<<"$FORK" >packages/codex/fork.json
+          new=$(jq -r "$release" packages/codex/fork.json)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --message "codex: $old -> $new" packages/codex/fork.json
+          git push origin HEAD:main
