@@ -2296,12 +2296,8 @@ Packages with a declarative `passthru.updater` expose an `updateScript` that
 the dependency-update workflow also runs. Run it from the repository root:
 
 ```bash
-nix run .#orca.updateScript
+nix run .#<package>.updateScript
 ```
-
-Orca tracks the latest stable GitHub release, skips prereleases, and updates
-`packages/orca/hashes.json` for Linux x86_64, Linux ARM64, and macOS ARM64.
-Its build and updater share the same artifact URL template and platform map.
 
 ### Code Quality
 
