@@ -11,7 +11,7 @@ index d72c779..77697c4 100644
  
  [dev-dependencies]
 diff --git a/ext/web-search/src/tool.rs b/ext/web-search/src/tool.rs
-index 4b92af2..9078d93 100644
+index 34b00c3..1f7cc76 100644
 --- a/ext/web-search/src/tool.rs
 +++ b/ext/web-search/src/tool.rs
 @@ -1,10 +1,14 @@
@@ -29,7 +29,7 @@ index 4b92af2..9078d93 100644
  use codex_api::SearchSettings;
  use codex_core::X_CODEX_TURN_METADATA_HEADER;
  use codex_core::web_search_action_detail;
-@@ -52,6 +56,10 @@ pub(crate) const RUN_TOOL_NAME: &str = "run";
+@@ -50,6 +54,10 @@ pub(crate) const RUN_TOOL_NAME: &str = "run";
  const WEB_RUN_DESCRIPTION: &str = include_str!("../web_run_description.md");
  const RESULTS_PAYLOAD_BYTES_METRIC: &str = "codex.web_search.results.payload_bytes";
  const MAX_SEARCH_ERROR_BYTES: usize = 1024;
@@ -40,94 +40,84 @@ index 4b92af2..9078d93 100644
  
  pub(crate) struct WebSearchTool {
      pub(crate) session_id: String,
-@@ -115,43 +123,50 @@ impl WebSearchTool {
+@@ -111,38 +119,47 @@ impl WebSearchTool {
+     ) -> Result<Box<dyn ToolOutput>, FunctionCallError> {
+         let commands = parse_commands(call.function_arguments()?, self.supports_literature_search)?;
          let command_action = command_action(&commands);
-         let provider = self.provider.as_ref();
-         let first_party = provider_uses_first_party_auth_path(provider.info());
--        let client = prepare_provider_request(provider, first_party, |_| async {
--            let routing_auth = if first_party {
--                provider.auth().await
--            } else {
--                None
--            };
--            let (endpoint, api_auth) = provider.api_provider_and_auth().await?;
--            let resolved = provider
--                .route_responses_api_provider(
--                    endpoint,
--                    routing_auth.as_ref(),
--                    &self.workspace_routing,
--                )
--                .await?;
--            let endpoint = resolved.provider;
--            let transport = if resolved.redirect_policy == ClientRedirectPolicy::Reject
--                || endpoint.headers.contains_key(ACCOUNT_ROUTING_HEADER)
--            {
--                create_client_for_route_async(
--                    self.http_client_factory.clone(),
--                    endpoint.url_for_path("alpha/search"),
--                    ClientRouteClass::Api,
--                    ClientRedirectPolicy::Reject,
--                )
+-        let setup = codex_model_provider::resolve_request(
+-            self.provider.as_ref(),
+-            /*scope*/ None,
+-            Some(&self.workspace_routing),
+-            self.http_client_factory.clone(),
+-        )
+-        .await
+-        .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?;
+-        let transport = if setup.redirect_policy == ClientRedirectPolicy::Reject
+-            || setup
+-                .api_provider
+-                .headers
+-                .contains_key(ACCOUNT_ROUTING_HEADER)
+-        {
+-            create_client_for_route_async(
+-                setup.http_client_factory,
+-                setup.api_provider.url_for_path("alpha/search"),
+-                ClientRouteClass::Api,
+-                ClientRedirectPolicy::Reject,
+-            )
+-            .await
+-            .map(ReqwestTransport::from_http_client)
 +        let local_command = std::env::var_os(WEB_RUN_COMMAND_ENV).filter(|value| !value.is_empty());
 +        let client = if local_command.is_some() {
 +            None
-+        } else {
-+            Some(
-+                prepare_provider_request(provider, first_party, |_| async {
-+                    let routing_auth = if first_party {
-+                        provider.auth().await
-+                    } else {
-+                        None
-+                    };
-+                    let (endpoint, api_auth) = provider.api_provider_and_auth().await?;
-+                    let resolved = provider
-+                        .route_responses_api_provider(
-+                            endpoint,
-+                            routing_auth.as_ref(),
-+                            &self.workspace_routing,
-+                        )
-+                        .await?;
-+                    let endpoint = resolved.provider;
-+                    let transport = if resolved.redirect_policy == ClientRedirectPolicy::Reject
-+                        || endpoint.headers.contains_key(ACCOUNT_ROUTING_HEADER)
-+                    {
-+                        create_client_for_route_async(
-+                            self.http_client_factory.clone(),
-+                            endpoint.url_for_path("alpha/search"),
-+                            ClientRouteClass::Api,
-+                            ClientRedirectPolicy::Reject,
-+                        )
-+                        .await
-+                        .map(ReqwestTransport::from_http_client)
-+                    } else {
-+                        create_transport_for_routes_async(
-+                            self.http_client_factory.clone(),
-+                            ClientRouteClass::Api,
-+                        )
-+                        .await
-+                    }?;
-+                    Ok(SearchClient::new(transport, endpoint, api_auth))
-+                })
-                 .await
--                .map(ReqwestTransport::from_http_client)
--            } else {
--                create_transport_for_routes_async(
--                    self.http_client_factory.clone(),
--                    ClientRouteClass::Api,
--                )
--                .await
--            }?;
--            Ok(SearchClient::new(transport, endpoint, api_auth))
--        })
--        .await
+         } else {
+-            create_transport_for_routes_async(
+-                setup.http_client_factory,
+-                ClientRouteClass::Api,
+-                setup.redirect_policy,
++            let setup = codex_model_provider::resolve_request(
++                self.provider.as_ref(),
++                /*scope*/ None,
++                Some(&self.workspace_routing),
++                self.http_client_factory.clone(),
+             )
+             .await
+-        }
 -        .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?;
-+                .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?,
-+            )
+-        let client = SearchClient::new(transport, setup.api_provider, setup.api_auth);
++            .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?;
++            let transport = if setup.redirect_policy == ClientRedirectPolicy::Reject
++                || setup
++                    .api_provider
++                    .headers
++                    .contains_key(ACCOUNT_ROUTING_HEADER)
++            {
++                create_client_for_route_async(
++                    setup.http_client_factory,
++                    setup.api_provider.url_for_path("alpha/search"),
++                    ClientRouteClass::Api,
++                    ClientRedirectPolicy::Reject,
++                )
++                .await
++                .map(ReqwestTransport::from_http_client)
++            } else {
++                create_transport_for_routes_async(
++                    setup.http_client_factory,
++                    ClientRouteClass::Api,
++                    setup.redirect_policy,
++                )
++                .await
++            }
++            .map_err(|err| FunctionCallError::RespondToModel(search_error_message(err)))?;
++            Some(SearchClient::new(
++                transport,
++                setup.api_provider,
++                setup.api_auth,
++            ))
 +        };
          let request = SearchRequest {
              id: self.session_id.clone(),
              model: call.model.clone(),
-@@ -180,7 +195,15 @@ impl WebSearchTool {
+@@ -171,7 +188,15 @@ impl WebSearchTool {
                  }),
              ))
              .await;
@@ -144,7 +134,7 @@ index 4b92af2..9078d93 100644
              Ok(response) => (Ok(response.output), response.results),
              Err(err) => (Err(search_error_message(err)), None),
          };
-@@ -225,6 +248,51 @@ impl WebSearchTool {
+@@ -216,6 +241,51 @@ impl WebSearchTool {
      }
  }
  
