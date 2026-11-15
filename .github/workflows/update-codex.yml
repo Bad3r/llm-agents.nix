@@ -53,18 +53,17 @@ jobs:
           sudo swapon /swap-codex
       - name: Build codex
         id: build
-        # The variant Bad3r/nixos installs. That flake's llm-agents input
-        # follows its nixpkgs, the branch named here, so the build swaps this
-        # flake's pin for the head of that branch and yields the store path a
-        # freshly updated Bad3r/nixos lock reads from the cache. The path
-        # moves with that branch as well as with fork.json, so this runs
-        # whether or not fork.json changed.
+        # codex-voice, the variant Bad3r/nixos installs. That flake's
+        # llm-agents input follows its nixpkgs, the branch named here, so the
+        # build swaps this flake's pin for the head of that branch and yields
+        # the store path a freshly updated Bad3r/nixos lock reads from the
+        # cache. The path moves with that branch as well as with fork.json, so
+        # this runs whether or not fork.json changed.
         env:
           NIXPKGS: Bad3r/nixpkgs
           BRANCH: nixpkgs-unstable
-          VOICE: >-
-            p: let voice = p.override { withVoice = true; }; in
-            "${voice.drvPath} ${voice.outPath}"
+          PATHS: >-
+            p: "${p.drvPath} ${p.outPath}"
         run: |
           rev=$(git ls-remote "https://github.com/$NIXPKGS" "refs/heads/$BRANCH")
           rev=${rev%%[[:space:]]*}
@@ -74,7 +73,7 @@ jobs:
           fi
           echo "nixpkgs: github:$NIXPKGS/$rev"
           paths=$(nix eval --raw --override-input nixpkgs "github:$NIXPKGS/$rev" \
-            "path:$GITHUB_WORKSPACE#codex" --apply "$VOICE")
+            "path:$GITHUB_WORKSPACE#codex-voice" --apply "$PATHS")
           drv=${paths% *} out=${paths#* }
           echo "out=$out" >>"$GITHUB_OUTPUT"
           if nix path-info --store https://bad3r-nixos.cachix.org "$out" >/dev/null 2>&1; then
