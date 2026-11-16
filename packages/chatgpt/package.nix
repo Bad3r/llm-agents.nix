@@ -5,6 +5,7 @@
   stdenvNoCC,
   makeShellWrapper,
   replaceVars,
+  writeShellScript,
   formatelf,
   inotify-tools,
   curl,
@@ -39,6 +40,9 @@ let
     libc = "${stdenv.cc.libc}/lib";
     libs = lib.concatMapStringsSep " " (p: "${lib.getLib p}/lib") runtimeLibs;
   };
+  zygoteGbmPreload = writeShellScript "chatgpt-zygote-gbm-preload" (
+    builtins.readFile ./zygote-gbm-preload.sh
+  );
 in
 stdenvNoCC.mkDerivation {
   pname = "chatgpt";
@@ -53,7 +57,7 @@ stdenvNoCC.mkDerivation {
 
     mkdir -p "$out/bin"
     makeShellWrapper ${executable} "$out/bin/chatgpt" \
-      ${lib.optionalString stdenv.hostPlatform.isLinux "--run '. ${patchRuntime}' --set-default DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1"} \
+      ${lib.optionalString stdenv.hostPlatform.isLinux "--run '. ${patchRuntime}' --set-default DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1 --add-flags --zygote-cmd-prefix=${zygoteGbmPreload}"} \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}" \
       --add-flags ${lib.escapeShellArg commandLineArgs}
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
