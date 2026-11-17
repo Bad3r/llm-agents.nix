@@ -3,9 +3,10 @@
 
 """Update script for codex package.
 
-The package builds the releases of Bad3r/codex, which are upstream releases
-plus a patch stack, tagged patched-v<upstream version>-r<revision>. This
-script updates fork.json to the newest one, including the librusty_v8 hashes.
+The package builds the releases of Bad3r/codex, which are upstream releases,
+prereleases included, plus a patch stack, tagged
+patched-v<upstream version>-r<revision>. This script updates fork.json to the
+newest one, including the librusty_v8 hashes.
 The v8 version is extracted from the Cargo.lock file of the release.
 """
 
@@ -30,7 +31,7 @@ from updater.hash import DUMMY_SHA256_HASH
 
 HASHES_FILE = Path(__file__).parent / "fork.json"
 
-FORK_TAG = r"patched-v(\d+\.\d+\.\d+)-r(\d+)"
+FORK_TAG = r"patched-v(\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)-r(\d+)"
 
 RUSTY_V8_PLATFORMS = {
     "x86_64-linux": "x86_64-unknown-linux-gnu",
