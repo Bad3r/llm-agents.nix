@@ -135,6 +135,10 @@ rustPlatform.buildRustPackage (
       RUSTONIG_SYSTEM_LIBONIG = "1";
       ZSTD_SYS_USE_PKG_CONFIG = "1";
     }
+    // lib.optionalAttrs (srcOverride == null) {
+      # `codex --version` appends the fork release revision.
+      CODEX_FORK_REVISION = toString versionData.revision;
+    }
     // lib.optionalAttrs withCodeMode {
       RUSTY_V8_ARCHIVE = librusty_v8;
     }
@@ -229,6 +233,9 @@ rustPlatform.buildRustPackage (
 
     inherit doInstallCheck;
     nativeInstallCheckInputs = [ versionCheckHook ];
+    postInstallCheck = lib.optionalString (srcOverride == null) ''
+      $out/bin/codex --version | grep -F ' (r${toString versionData.revision})'
+    '';
 
     passthru = {
       category = "AI Coding Agents";
