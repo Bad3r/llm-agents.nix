@@ -51,6 +51,19 @@ jobs:
           sudo chmod 600 /swap-codex
           sudo mkswap /swap-codex
           sudo swapon /swap-codex
+      - name: Confine the build's memory
+        # The final links of codex page through swap for most of an hour. With
+        # the whole machine under that pressure the runner agent stops
+        # answering and GitHub drops the job ("The hosted runner lost
+        # communication with the server") with no log. Builds run in the
+        # daemon's cgroup; MemoryHigh reclaims and swaps that cgroup's pages
+        # first and leaves RAM to the runner. It sets no hard cap, so the build
+        # still has the whole swap file, and the store path is unchanged.
+        run: |
+          systemctl cat nix-daemon.service >/dev/null
+          sudo systemctl set-property --runtime nix-daemon.service MemoryHigh=12G
+          free -h
+          df -h /
       - name: Build codex
         id: build
         # codex-voice, the variant Bad3r/nixos installs. That flake's
@@ -83,6 +96,14 @@ jobs:
             nix build --no-link --print-build-logs "$drv^out"
             echo "built=true" >>"$GITHUB_OUTPUT"
           fi
+      - name: Report peak memory
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: |
+          cg=/sys/fs/cgroup$(systemctl show --property=ControlGroup --value nix-daemon.service)
+          echo "nix-daemon peak: memory $(numfmt --to=iec <"$cg/memory.peak"), swap $(numfmt --to=iec <"$cg/memory.swap.peak")"
+          free -h
+          df -h /
       - name: Push codex to Cachix
         if: steps.build.outputs.built == 'true'
         env:
