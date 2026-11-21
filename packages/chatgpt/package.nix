@@ -15,7 +15,8 @@
   withQt ? false,
   chatgpt-unwrapped ? callPackage ./unwrapped.nix { inherit withQt; },
   commandLineArgs ? "",
-  zygoteGbmPreload ? callPackage ../../lib/zygote-gbm-preload.nix { },
+  # Supplied by nixpkgs forks that package it; see its meta.longDescription.
+  gbm-zygote-preload ? null,
 }:
 
 let
@@ -54,7 +55,11 @@ stdenvNoCC.mkDerivation {
 
     mkdir -p "$out/bin"
     makeShellWrapper ${executable} "$out/bin/chatgpt" \
-      ${lib.optionalString stdenv.hostPlatform.isLinux "--run '. ${patchRuntime}' --set-default DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1 --add-flags --zygote-cmd-prefix=${zygoteGbmPreload}"} \
+      ${lib.optionalString stdenv.hostPlatform.isLinux "--run '. ${patchRuntime}' --set-default DOTNET_SYSTEM_GLOBALIZATION_INVARIANT 1"} \
+      ${
+        lib.optionalString (stdenv.hostPlatform.isLinux && gbm-zygote-preload != null)
+          "--prefix LD_PRELOAD : ${gbm-zygote-preload}/lib/gbm-zygote-preload.so --set GBM_ZYGOTE_PRELOAD_EXE ${chatgpt-unwrapped}/lib/chatgpt/.ChatGPT-wrapped"
+      } \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--ozone-platform=wayland}}" \
       --add-flags ${lib.escapeShellArg commandLineArgs}
     ${lib.optionalString stdenv.hostPlatform.isLinux ''

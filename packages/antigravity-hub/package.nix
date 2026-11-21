@@ -40,6 +40,8 @@
   unzip,
   wrapGAppsHook3,
   mkUpdater,
+  # Supplied by nixpkgs forks that package it; see its meta.longDescription.
+  gbm-zygote-preload ? null,
   # Appended to the arguments the app passes its language server, e.g.
   # [ "--https_server_port=7777" "--remote_accessible" ].
   languageServerFlags ? [ ],
@@ -164,17 +166,19 @@ stdenv.mkDerivation {
   dontFixup = stdenv.hostPlatform.isDarwin;
 
   # makeShellWrapper, because --add-flags expands shell variables.
-  # Every child inherits the GBM preload: this Electron aborts on
-  # --zygote-cmd-prefix, which would scope it to the GPU process's zygote. The
-  # language server drops it, so agent commands run without it.
-  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
-    makeShellWrapper $out/share/antigravity/antigravity $out/bin/antigravity \
-      "''${gappsWrapperArgs[@]}" \
-      --run '. ${../../lib/gbm-preload.sh}'
-    wrapProgramShell $out/share/antigravity/resources/bin/language_server \
-      --unset LD_PRELOAD \
-      --append-flags ${lib.escapeShellArg (lib.escapeShellArgs languageServerFlags)}
-  '';
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux (
+    ''
+      makeShellWrapper $out/share/antigravity/antigravity $out/bin/antigravity \
+        "''${gappsWrapperArgs[@]}" ${
+          lib.optionalString (gbm-zygote-preload != null)
+            "--prefix LD_PRELOAD : ${gbm-zygote-preload}/lib/gbm-zygote-preload.so --set GBM_ZYGOTE_PRELOAD_EXE $out/share/antigravity/antigravity"
+        }
+    ''
+    + lib.optionalString (languageServerFlags != [ ]) ''
+      wrapProgramShell $out/share/antigravity/resources/bin/language_server \
+        --append-flags ${lib.escapeShellArg (lib.escapeShellArgs languageServerFlags)}
+    ''
+  );
 
   passthru = {
     category = "AI Assistants";
