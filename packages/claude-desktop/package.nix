@@ -74,6 +74,9 @@
 
   # Command line arguments which are always passed to the application.
   commandLineArgs ? "",
+
+  # Supplied by nixpkgs forks that package it; see its meta.longDescription.
+  gbm-zygote-preload ? null,
 }:
 
 let
@@ -264,6 +267,10 @@ let
         --prefix LD_LIBRARY_PATH : "$out/lib/claude-desktop" \
         --suffix PATH : "${lib.makeBinPath [ xdg-utils ]}" \
         --prefix XDG_DATA_DIRS : "$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH" \
+        ${
+          lib.optionalString (gbm-zygote-preload != null)
+            "--prefix LD_PRELOAD : ${gbm-zygote-preload}/lib/gbm-zygote-preload.so --set GBM_ZYGOTE_PRELOAD_EXE $out/lib/claude-desktop/claude-desktop"
+        } \
         --add-flags ${lib.escapeShellArg commandLineArgs}
 
       runHook postInstall
