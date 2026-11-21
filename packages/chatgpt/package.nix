@@ -5,7 +5,6 @@
   stdenvNoCC,
   makeShellWrapper,
   replaceVars,
-  writeShellScript,
   formatelf,
   inotify-tools,
   curl,
@@ -16,6 +15,7 @@
   withQt ? false,
   chatgpt-unwrapped ? callPackage ./unwrapped.nix { inherit withQt; },
   commandLineArgs ? "",
+  zygoteGbmPreload ? callPackage ../../lib/zygote-gbm-preload.nix { },
 }:
 
 let
@@ -40,9 +40,6 @@ let
     libc = "${stdenv.cc.libc}/lib";
     libs = lib.concatMapStringsSep " " (p: "${lib.getLib p}/lib") runtimeLibs;
   };
-  zygoteGbmPreload = writeShellScript "chatgpt-zygote-gbm-preload" (
-    builtins.readFile ./zygote-gbm-preload.sh
-  );
 in
 stdenvNoCC.mkDerivation {
   pname = "chatgpt";

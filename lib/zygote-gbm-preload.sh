@@ -1,7 +1,8 @@
 # shellcheck shell=bash
-# Chromium --zygote-cmd-prefix for the chatgpt wrapper on Linux. The GPU
-# process forks from the unsandboxed zygote, and its seccomp broker denies
-# /run/opengl-driver, so libgbm's lazy dlopen of its backend fails with EACCES.
+# Chromium --zygote-cmd-prefix for Linux wrappers of bundled Chromium and
+# Electron builds. The GPU process forks from the unsandboxed zygote, and its
+# seccomp broker denies /run/opengl-driver, so libgbm's lazy dlopen of its
+# backend fails with EACCES.
 # glibc reuses a preloaded object only when the dlopen path matches it byte for
 # byte, so the paths below are built exactly as Mesa's loader builds them.
 
