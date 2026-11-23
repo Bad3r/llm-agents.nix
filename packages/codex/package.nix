@@ -6,6 +6,8 @@
   rustPlatform,
   pkg-config,
   lld,
+  flock,
+  writeShellScript,
   cmake,
   alsa-lib,
   gst_all_1,
@@ -21,6 +23,7 @@
   versionCheckHook,
   callPackage,
   mkRustyV8Archive ? callPackage ../../lib/rusty-v8.nix { },
+  buildRustPackageCached,
   # The Bad3r/codex release pin. hashes.json is upstream's pin and is unused.
   versionData ? builtins.fromJSON (builtins.readFile ./fork.json),
   version ? versionData.version,
@@ -60,6 +63,18 @@ let
         inherit tag hash;
       };
 
+  # Compiled side by side, the largest crates get rustc OOM-killed on the
+  # aarch64 builders, so let only one of them through at a time.
+  serialRustc = writeShellScript "serial-rustc" ''
+    case " $* " in
+      *" --crate-name codex_core "* | *" --crate-name codex_app_server "* | \
+      *" --crate-name codex_tui "* | *" --crate-name codex_exec "*)
+        exec ${lib.getExe flock} "$NIX_BUILD_TOP/serial-rustc.lock" "$@"
+        ;;
+    esac
+    exec "$@"
+  '';
+
   packageManifest = builtins.toJSON {
     layoutVersion = 1;
     inherit version;
@@ -82,7 +97,7 @@ let
   };
 
 in
-rustPlatform.buildRustPackage (
+buildRustPackageCached (
   {
     pname = "codex";
     inherit version sourceRoot;
@@ -130,6 +145,7 @@ rustPlatform.buildRustPackage (
     dontUseCmakeConfigure = true;
 
     env = {
+      RUSTC_WRAPPER = serialRustc;
       AWS_LC_SYS_USE_SYSTEM = "1";
       LIBSQLITE3_SYS_USE_PKG_CONFIG = "1";
       RUSTONIG_SYSTEM_LIBONIG = "1";

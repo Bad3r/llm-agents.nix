@@ -12,18 +12,18 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "claw-code";
-  version = "0.1.13-unstable-2026-11-10";
+  version = "0.1.14-unstable-2026-11-23";
 
   src = fetchFromGitHub {
     owner = "ultraworkers";
     repo = "claw-code";
-    rev = "508b4d862d42a5fa5bde8df5b2d3670f4d4ca324";
-    hash = "sha256-Zmq+R1ITZ7k013lhOYEOt75vuG9C+k3CcIUMjJll4aY=";
+    rev = "eb6f730839e61842512e09a60b9ae0e1770ec56d";
+    hash = "sha256-atoUZbkb9BcpQ1e8LDpBOzNhJ5abTz3P82EJXWOIDu8=";
   };
 
   sourceRoot = "source/rust";
 
-  cargoHash = "sha256-hQQIlsyvbz5slKnADYBbFUtk58KPEhLklTfYoCJSEUY=";
+  cargoHash = "sha256-+YyqCFf/utCdbVeHRctE01c1CUl7gcMskyT+WTHm9Pc=";
 
   nativeBuildInputs = [ pkg-config ];
 
