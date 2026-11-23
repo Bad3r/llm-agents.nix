@@ -151,10 +151,6 @@ buildRustPackageCached (
       RUSTONIG_SYSTEM_LIBONIG = "1";
       ZSTD_SYS_USE_PKG_CONFIG = "1";
     }
-    // lib.optionalAttrs (srcOverride == null) {
-      # `codex --version` appends the fork release revision.
-      CODEX_FORK_REVISION = toString versionData.revision;
-    }
     // lib.optionalAttrs withCodeMode {
       RUSTY_V8_ARCHIVE = librusty_v8;
     }
@@ -195,6 +191,12 @@ buildRustPackageCached (
           --replace-fail 'pub mod apply_command;' \
           $'#![recursion_limit = "256"]\n\npub mod apply_command;'
       fi
+    ''
+    # `codex --version` appends the fork release revision. Exported here, not
+    # in env: buildRustPackageCached hands env to the dependency build, which
+    # would then be rebuilt for every fork revision.
+    + lib.optionalString (srcOverride == null) ''
+      export CODEX_FORK_REVISION=${toString versionData.revision}
     '';
 
     inherit preBuild;
@@ -250,7 +252,7 @@ buildRustPackageCached (
     inherit doInstallCheck;
     nativeInstallCheckInputs = [ versionCheckHook ];
     postInstallCheck = lib.optionalString (srcOverride == null) ''
-      $out/bin/codex --version | grep -F ' (r${toString versionData.revision})'
+      $out/bin/codex --version | grep -F " (r$CODEX_FORK_REVISION)"
     '';
 
     passthru = {
