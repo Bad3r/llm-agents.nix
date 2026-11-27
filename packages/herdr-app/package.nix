@@ -85,8 +85,15 @@ rustPlatform.buildRustPackage (finalAttrs: {
   dontUseZigCheck = true;
   dontUseZigInstall = true;
 
+  # Release-note clips download from media.herdr.dev on every launch; gate
+  # them on release builds like telemetry, feedback and update checks.
+  postPatch = ''
+    substituteInPlace src/update_notes.rs \
+      --replace-fail 'fn fetch_media(notes: &[Note]) {' 'fn fetch_media(notes: &[Note]) {
+        if option_env!("HERDR_APP_RELEASE").is_none() { return; }'
+  ''
   # Tools with absolute paths are absent in the sandbox.
-  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+  + lib.optionalString stdenv.hostPlatform.isDarwin ''
     substituteInPlace vendor/ghostty/pkg/apple-sdk/native_link.zig \
       --replace-fail '"/usr/bin/xcrun"' '"xcrun"'
     substituteInPlace vendor/ghostty/src/build/GhosttyLibVt.zig \
